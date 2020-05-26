@@ -126,6 +126,7 @@ ConVar tf_max_voice_speak_delay			( "tf_max_voice_speak_delay", "1.5", FCVAR_REP
 ConVar of_forcespawnprotect	( "of_forcespawnprotect", "0", FCVAR_REPLICATED | FCVAR_NOTIFY , "Manually define how long the spawn protection lasts." );
 ConVar of_instantrespawn	( "of_instantrespawn", "0", FCVAR_REPLICATED | FCVAR_NOTIFY , "Instant respawning." );
 ConVar of_dropweapons		( "of_dropweapons", "0", FCVAR_REPLICATED | FCVAR_NOTIFY , "Allow manual weapon dropping." );
+ConVar of_dropweapons_ondeath("of_dropweapons_ondeath", "1", FCVAR_REPLICATED | FCVAR_NOTIFY, "Allow the player's current weapon to drop when they die.");
 ConVar of_healonkill		( "of_healonkill", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "Amount of health gained after a kill." );
 
 ConVar of_resistance		( "of_resistance", "0.33", FCVAR_REPLICATED | FCVAR_NOTIFY , "Defines the resistance of the Shield powerup." );
@@ -5730,8 +5731,10 @@ void CTFPlayer::Event_Killed( const CTakeDamageInfo &info )
 	else if ( m_Shared.GetActiveTFWeapon() && !m_Shared.GetActiveTFWeapon()->GetTFWpnData().m_bAlwaysDrop )
 		DropWeapon( m_Shared.GetActiveTFWeapon(), false, false ,Clip, Reserve );	
 #endif
-	if ( m_Shared.GetActiveTFWeapon() && !m_Shared.GetActiveTFWeapon()->GetTFWpnData().m_bAlwaysDrop )
-		DropWeapon( m_Shared.GetActiveTFWeapon(), false, false ,Clip, Reserve );
+	if (!of_dropweapons_ondeath.GetBool()){
+		if (m_Shared.GetActiveTFWeapon() && !m_Shared.GetActiveTFWeapon()->GetTFWpnData().m_bAlwaysDrop)
+			DropWeapon(m_Shared.GetActiveTFWeapon(), false, false, Clip, Reserve);
+	}
 	
 	Clip = -1;
 	Reserve = -1;
