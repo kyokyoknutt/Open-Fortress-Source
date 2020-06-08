@@ -215,7 +215,7 @@ void CTFViewModel::CalcViewModelView( CBasePlayer *owner, const Vector& eyePosit
 			roll  += pWeapon->GetTFWpnData().m_flCenteredViewmodelAngleZ;
 		}
 
-		if( bMinimized )
+		if( bMinimized && !bCentered )
 		{
 			x += pWeapon->GetTFWpnData().m_flMinViewmodelOffsetX;
 			y += pWeapon->GetTFWpnData().m_flMinViewmodelOffsetY;
