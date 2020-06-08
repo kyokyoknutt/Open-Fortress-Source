@@ -71,7 +71,7 @@ ConVar	of_movementmode("of_movementmode", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, 
 ConVar	of_q3airaccelerate("of_q3airaccelerate", "1.5", FCVAR_NOTIFY | FCVAR_REPLICATED);
 ConVar	of_cslide("of_cslide", "0", FCVAR_NOTIFY | FCVAR_REPLICATED);
 ConVar	of_cslideaccelerate("of_cslideaccelerate", "4", FCVAR_NOTIFY | FCVAR_REPLICATED);
-ConVar	of_cslidefriction("of_cslidefriction", "1", FCVAR_NOTIFY | FCVAR_REPLICATED);
+ConVar	of_cslidefriction("of_cslidefriction", "0.8", FCVAR_NOTIFY | FCVAR_REPLICATED);
 #endif
 
 #if defined( CSTRIKE_DLL ) || defined( HL1MP_DLL )

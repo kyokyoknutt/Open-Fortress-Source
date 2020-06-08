@@ -120,8 +120,6 @@ protected:
 	virtual void AirAccelerate(Vector& wishdir, float wishspeed, float accel, bool q1accel = true);
 	void		 Friction(bool CSliding);
 
-	void		FinishGravity(void);
-
 private:
 
 	bool		CheckWaterJumpButton(void);
@@ -157,27 +155,6 @@ CTFGameMovement::CTFGameMovement()
 	m_bBlockJump = false;
 	m_fRampJumpVel = 0.f;
 	m_fCSlideDuration = 0.f;
-}
-
-void CTFGameMovement::FinishGravity(void)
-{
-	float ent_gravity;
-
-	if (player->m_flWaterJumpTime)
-		return;
-
-	if (player->GetGravity())
-		ent_gravity = player->GetGravity();
-	else
-		ent_gravity = 1.0;
-
-	// Get the correct velocity for the end of the dt 
-	mv->m_vecVelocity[2] -= (ent_gravity * GetCurrentGravity() * gpGlobals->frametime * 0.5);
-
-	if (player->GetGroundEntity() == NULL)
-		m_fRampJumpVel = mv->m_vecVelocity[2];
-
-	CheckVelocity();
 }
 
 //---------------------------------------------------------------------------------------- 
@@ -1668,6 +1645,7 @@ void CTFGameMovement::FullWalkMove()
 	bool CSliding = false;
 	if (player->GetGroundEntity() != NULL)
 	{
+		//check if player can CSlide
 		CSliding = of_cslide.GetBool() &&												//crouch sliding is enabled
 				   mv->m_flMaxSpeed > 5 &&												//player is allowed to move
 				   !m_pTFPlayer->GetWaterLevel() &&		 								//player is not in water
@@ -1681,6 +1659,10 @@ void CTFGameMovement::FullWalkMove()
 		//If not using CSlide right away clear it
 		if (!CSliding)
 			m_fCSlideDuration = 0;
+
+		//if you are on the ground after the jump check you did not
+		//use the ramp jump velocity charge so clear it right away
+		m_fRampJumpVel = 0;
 	}
 	else
 	{
@@ -1704,7 +1686,9 @@ void CTFGameMovement::FullWalkMove()
 	}
 	else
 	{
-		m_fCSlideDuration = gpGlobals->curtime - mv->m_vecVelocity[2] / 200.f; //gravity has been fully applied, use VelZ to determine cslide duration
+		//Determine ramp jump vel and crouch slide duration
+		m_fRampJumpVel = mv->m_vecVelocity[2];
+		m_fCSlideDuration = gpGlobals->curtime - mv->m_vecVelocity[2] / 200.f;
 	}
 
 	// Handling falling.
