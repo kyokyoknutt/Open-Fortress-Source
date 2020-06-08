@@ -47,11 +47,11 @@ ConVar 	of_crouchjump("of_crouchjump", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Al
 ConVar 	of_bunnyhop_max_speed_factor("of_bunnyhop_max_speed_factor", "1.2", FCVAR_NOTIFY | FCVAR_REPLICATED, "Max Speed achievable with bunnyhoping.");
 ConVar 	of_jump_velocity("of_jump_velocity", "268.3281572999747", FCVAR_NOTIFY | FCVAR_REPLICATED, "The velocity applied when a player jumps.");
 ConVar  of_zombie_lunge_speed("of_zombie_lunge_speed", "800", FCVAR_ARCHIVE | FCVAR_NOTIFY, "How much velocity, in units, to apply to a zombie lunge.");
-ConVar  of_ramp_jump("of_ramp_jump", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "Enables ramp jump");
+ConVar  of_ramp_jump("of_ramp_jump", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "0: off\n1: Quake Style ramp jumps\n2: Source ramp jumps");
 ConVar  of_ramp_up_multiplier("of_ramp_up_multiplier", "0.7", FCVAR_REPLICATED | FCVAR_NOTIFY);
 ConVar  of_ramp_down_multiplier("of_ramp_down_multiplier", "0.7", FCVAR_REPLICATED | FCVAR_NOTIFY);
 ConVar  of_ramp_min_speed("of_ramp_min_speed", "50", FCVAR_REPLICATED | FCVAR_NOTIFY, "Minimal speed you need to be for ramp jumps to take effect.");
-//ConVar  of_ramp_up_forward_multiplier("of_ramp_up_forward_multiplier", "1.1", FCVAR_REPLICATED | FCVAR_NOTIFY);
+
 #if defined (CLIENT_DLL)
 ConVar 	of_jumpsound("of_jumpsound", "1", FCVAR_CLIENTDLL | FCVAR_ARCHIVE | FCVAR_USERINFO, "Hough", true, 0, true, 2);
 #endif
@@ -93,7 +93,7 @@ public:
 	virtual unsigned int PlayerSolidMask(bool brushOnly = false);
 	virtual void ProcessMovement(CBasePlayer *pBasePlayer, CMoveData *pMove);
 	virtual bool CanAccelerate();
-	virtual bool CheckJumpButton(bool CSliding = false);
+	virtual bool CheckJumpButton();
 	bool CheckLunge();
 	virtual bool CheckWater(void);
 	virtual void WaterMove(void);
@@ -120,13 +120,19 @@ protected:
 	virtual void AirAccelerate(Vector& wishdir, float wishspeed, float accel, bool q1accel = true);
 	void		 Friction(bool CSliding);
 
+	void		FinishGravity(void);
+
 private:
 
 	bool		CheckWaterJumpButton(void);
 	void		AirDash(void);
 	void		PreventBunnyJumping();
-	float		CheckTrimp(float flMul, int rampMode);
+	float		CheckRamp(float flMul, int rampMode);
 	void		CheckCSlideSound(bool CSliding);
+
+	bool		m_bBlockJump;
+	float		m_fRampJumpVel;
+	float		m_fCSlideDuration;
 
 private:
 
@@ -141,7 +147,6 @@ IGameMovement *g_pGameMovement = (IGameMovement *)&g_GameMovement;
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGameMovement, IGameMovement, INTERFACENAME_GAMEMOVEMENT, g_GameMovement);
 
-
 // ---------------------------------------------------------------------------------------- //
 // CTFGameMovement.
 // ---------------------------------------------------------------------------------------- //
@@ -149,6 +154,30 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGameMovement, IGameMovement, INTERFACENAME_GA
 CTFGameMovement::CTFGameMovement()
 {
 	m_pTFPlayer = NULL;
+	m_bBlockJump = false;
+	m_fRampJumpVel = 0.f;
+	m_fCSlideDuration = 0.f;
+}
+
+void CTFGameMovement::FinishGravity(void)
+{
+	float ent_gravity;
+
+	if (player->m_flWaterJumpTime)
+		return;
+
+	if (player->GetGravity())
+		ent_gravity = player->GetGravity();
+	else
+		ent_gravity = 1.0;
+
+	// Get the correct velocity for the end of the dt 
+	mv->m_vecVelocity[2] -= (ent_gravity * GetCurrentGravity() * gpGlobals->frametime * 0.5);
+
+	if (player->GetGroundEntity() == NULL)
+		m_fRampJumpVel = mv->m_vecVelocity[2];
+
+	CheckVelocity();
 }
 
 //---------------------------------------------------------------------------------------- 
@@ -434,7 +463,7 @@ void CTFGameMovement::PreventBunnyJumping()
 	}
 }
 
-bool CTFGameMovement::CheckJumpButton(bool CSliding)
+bool CTFGameMovement::CheckJumpButton()
 {
 	// Are we dead?  Then we cannot jump.
 	if (player->pl.deadflag)
@@ -454,7 +483,7 @@ bool CTFGameMovement::CheckJumpButton(bool CSliding)
 	bool bOnGround = player->GetGroundEntity() != NULL;
 
 	//jumping cvars
-	bool CrouchJump = of_crouchjump.GetBool() && !CSliding;
+	bool CrouchJump = of_crouchjump.GetBool() && !of_cslide.GetBool();
 
 	// Cannot jump while ducked.
 	if (player->GetFlags() & FL_DUCKING)
@@ -552,7 +581,7 @@ bool CTFGameMovement::CheckJumpButton(bool CSliding)
 		//Trimping
 		int rampMode = of_ramp_jump.GetInt();
 		if (rampMode)
-			flMul = CheckTrimp(flMul, rampMode);
+			flMul = CheckRamp(flMul, rampMode);
 
 		mv->m_vecVelocity[2] += flMul;
 	}
@@ -582,50 +611,58 @@ bool CTFGameMovement::CheckJumpButton(bool CSliding)
 
 	// Flag that we jumped and don't jump again until it is released.
 	mv->m_nOldButtons |= IN_JUMP;
-	m_pTFPlayer->m_Shared.SetJumpBuffer(JumpBuffer == 1 ? true : false); //jump successful, set the buffer
+	m_bBlockJump = JumpBuffer == 1 ? true : false; //jump successful, set the buffer
 	return true;
 }
 
-float CTFGameMovement::CheckTrimp(float flMul, int rampMode)
+float CTFGameMovement::CheckRamp(float flMul, int rampMode)
 {
-	// Take the lateral velocity
-	Vector vecVelocity = mv->m_vecVelocity * Vector(1.0f, 1.0f, 0.0f);
-	float flHorizontalSpeed = vecVelocity.Length();
-
-	if (flHorizontalSpeed < of_ramp_min_speed.GetFloat()) //not enough speed, abort
-		return flMul;
-
-	//Try find the floor
-	trace_t pm;
-	Vector vecStart = mv->GetAbsOrigin();
-	Vector vecStop = vecStart - Vector(0, 0, 60.0f);
-	TracePlayerBBox(vecStart, vecStop, MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, pm);
-
-	// no floor, abort
-	if (pm.fraction == 1.0f)
-		return flMul;
-
-	//Calculate dot product of horizontal velocity and surface
-	VectorNormalize(vecVelocity);
-	float flDotProduct = DotProduct(vecVelocity, pm.plane.normal);
-	float absDot = abs(flDotProduct);
-
-	//not enough trimping power
-	if (absDot < 0.05f)
-		return flMul;
-
-	if (flDotProduct < 0) //going up a slope
+	if (rampMode == 1) //Quake style
 	{
-		//increase jump power according to the dot product and horizontal velocity
-		flMul += absDot * flHorizontalSpeed * of_ramp_up_multiplier.GetFloat();
+		mv->m_vecVelocity[2] = max(0, m_fRampJumpVel); //set velocity to what it was before touching the ground
+		flMul *= mv->m_vecVelocity[2] ? of_ramp_up_multiplier.GetFloat() : 1;
 	}
-	else if (rampMode == 2)
+	else //source trimping
 	{
-		float ramp_multi = of_ramp_down_multiplier.GetFloat();
-		//jump velocity must be demultiplied and horizontal speed must be increased
-		flMul *= absDot / ramp_multi;
-		for (int i = 0; i < 2; i++)
-			mv->m_vecVelocity[i] += absDot * mv->m_vecVelocity[i] * ramp_multi;
+		// Take the lateral velocity
+		Vector vecVelocity = mv->m_vecVelocity * Vector(1.0f, 1.0f, 0.0f);
+		float flHorizontalSpeed = vecVelocity.Length();
+
+		if (flHorizontalSpeed < of_ramp_min_speed.GetFloat()) //not enough speed, abort
+			return flMul;
+
+		//Try find the floor
+		trace_t pm;
+		Vector vecStart = mv->GetAbsOrigin();
+		Vector vecStop = vecStart - Vector(0, 0, 60.0f);
+		TracePlayerBBox(vecStart, vecStop, MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, pm);
+
+		// no floor, abort
+		if (pm.fraction == 1.0f)
+			return flMul;
+
+		//Calculate dot product of horizontal velocity and surface
+		VectorNormalize(vecVelocity);
+		float flDotProduct = DotProduct(vecVelocity, pm.plane.normal);
+		float absDot = abs(flDotProduct);
+
+		//not enough trimping power
+		if (absDot < 0.15f)
+			return flMul;
+
+		if (flDotProduct < 0) //going up a slope
+		{
+			//increase jump power according to the dot product and horizontal velocity
+			flMul += absDot * flHorizontalSpeed * of_ramp_up_multiplier.GetFloat();
+		}
+		else
+		{
+			float ramp_multi = of_ramp_down_multiplier.GetFloat();
+			//jump velocity must be demultiplied and horizontal speed must be increased
+			flMul *= absDot / ramp_multi;
+			for (int i = 0; i < 2; i++)
+				mv->m_vecVelocity[i] += absDot * mv->m_vecVelocity[i] * ramp_multi;
+		}
 	}
 
 	return flMul;
@@ -698,7 +735,7 @@ bool CTFGameMovement::CheckLunge()
 	// Flag that we jumped and don't jump again until it is released.
 	mv->m_nOldButtons |= IN_JUMP;
 	mv->m_nOldButtons |= IN_ATTACK2;
-	m_pTFPlayer->m_Shared.SetJumpBuffer(true);
+	m_bBlockJump = true;
 	return true;
 }
 
@@ -1608,27 +1645,16 @@ void CTFGameMovement::FullWalkMove()
 		return;
 	}
 
-	//Ivory: Check if player is CSliding, ideally I would place it right before Friction but
-	//there are some complications when crouch jump is on that are evaluated in CheckJumpButton()
-	//so this has to happen every frame
-	bool CSliding = (player->GetGroundEntity() != NULL &&								//player is on the ground
-					 of_cslide.GetBool() &&												//crouch sliding is enabled
-					 mv->m_flMaxSpeed > 5 &&											//player is allowed to move
-					 !m_pTFPlayer->GetWaterLevel() &&		 							//player is not in water
-					 (player->m_Local.m_bDucking || player->m_Local.m_bDucked) &&		//player is ducked/ducking
-					 (mv->m_flForwardMove || mv->m_flSideMove) &&						//player is moving
-					 gpGlobals->curtime <= m_pTFPlayer->m_Shared.GetCSlideDuration());	//there is crouch slide charge to spend
-
 	//Jumping stuff
 	if (mv->m_nButtons & IN_JUMP)
 	{
-		if (!m_pTFPlayer->m_Shared.GetJumpBuffer())
-			CheckJumpButton(CSliding);
+		if (!m_bBlockJump)
+			CheckJumpButton();
 	}
 	else
 	{
 		mv->m_nOldButtons &= ~IN_JUMP;
-		m_pTFPlayer->m_Shared.SetJumpBuffer(false);
+		m_bBlockJump = false;
 	}
 
 	//Zombie lunge
@@ -1639,19 +1665,26 @@ void CTFGameMovement::FullWalkMove()
 	CheckVelocity();
 
 	//Ground and air movement
+	bool CSliding = false;
 	if (player->GetGroundEntity() != NULL)
 	{
+		CSliding = of_cslide.GetBool() &&												//crouch sliding is enabled
+				   mv->m_flMaxSpeed > 5 &&												//player is allowed to move
+				   !m_pTFPlayer->GetWaterLevel() &&		 								//player is not in water
+				   (player->m_Local.m_bDucking || player->m_Local.m_bDucked) &&			//player is ducked/ducking
+				   (mv->m_flForwardMove || mv->m_flSideMove) &&							//player is moving
+				   gpGlobals->curtime <= m_fCSlideDuration;								//there is crouch slide charge to spend
+
 		Friction(CSliding);
 		WalkMove(CSliding);
 
 		//If not using CSlide right away clear it
 		if (!CSliding)
-			m_pTFPlayer->m_Shared.SetCSlideDuration(0);
+			m_fCSlideDuration = 0;
 	}
 	else
 	{
 		AirMove();
-		CSliding = false;
 	}
 
 	// Set final flags.
@@ -1671,7 +1704,7 @@ void CTFGameMovement::FullWalkMove()
 	}
 	else
 	{
-		m_pTFPlayer->m_Shared.SetCSlideDuration(gpGlobals->curtime - mv->m_vecVelocity[2] / 200.f); //gravity has been fully applied, use VelZ to determine cslide duration
+		m_fCSlideDuration = gpGlobals->curtime - mv->m_vecVelocity[2] / 200.f; //gravity has been fully applied, use VelZ to determine cslide duration
 	}
 
 	// Handling falling.

@@ -124,7 +124,9 @@ void CTFModelPanel::Paint()
 // Update our Studio Hdr to our current model
 void CTFModelPanel::RefreshModel()
 {
-	studiohdr_t *pStudioHdr = m_RootMDL.m_MDL.GetStudioHdr();
+	//Fenteale: using m_RootMDL.m_MDL.GetStudioHdr() doesnt work in linux.  use this instead
+	studiohdr_t *pStudioHdr = GetStudioHdr();
+	
 	if ( !pStudioHdr )
 		return;
 
@@ -217,10 +219,7 @@ void CTFModelPanel::SetParticleName(const char* name)
 	int iGreen = of_tennisball.GetBool() ? 255 : of_color_g.GetInt();
 	int iBlue = of_tennisball.GetBool() ? 0 : of_color_b.GetInt();
 	
-	// TODO: remove this when alignment on linux is fixed!!!
-	#ifndef LINUX
 	m_pData->SetParticleColor( GetModelPtr(), &m_RootMDL.m_MDLToWorld, iRed, iGreen, iBlue );
-	#endif
 
 	m_pData->m_bIsUpdateToDate = true;
 }
