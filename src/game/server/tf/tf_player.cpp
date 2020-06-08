@@ -5033,7 +5033,8 @@ int CTFPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 				m_bitsDamageType |= bitsDamage; // Save this so we can report it to the client
 				m_bitsHUDDamage = -1;  // make sure the damage bits get resent
 
-				m_Local.m_vecPunchAngle.SetX( -2 );
+				if ( !( bitsDamage & DMG_DISSOLVE ) )
+					m_Local.m_vecPunchAngle.SetX( -2 );
 
 				PainSound( info );
 
@@ -5055,7 +5056,8 @@ int CTFPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		m_bitsDamageType |= bitsDamage; // Save this so we can report it to the client
 		m_bitsHUDDamage = -1;  // make sure the damage bits get resent
 
-		m_Local.m_vecPunchAngle.SetX( -2 );
+		if ( !( bitsDamage & DMG_DISSOLVE ) )
+			m_Local.m_vecPunchAngle.SetX( -2 );
 
 		PainSound( info );
 
@@ -5408,6 +5410,10 @@ int CTFPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			bBleed = false;
 		}
 	}
+	
+	// DMG_GENERIC and DMG_DISSOLVE must not bleed
+	if ( ( info.GetDamageType() & DMG_GENERIC || info.GetDamageType() & DMG_DISSOLVE ) )
+		bBleed = false;
 
 	if ( bBleed )
 	{

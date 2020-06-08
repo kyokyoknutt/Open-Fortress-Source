@@ -179,7 +179,7 @@ public:
 	virtual void OnCursorMoved( int x, int y );
 	virtual void OnMouseWheeled( int delta );
 
-	studiohdr_t* GetStudioHdr( void ) { return m_RootMDL.m_MDL.GetStudioHdr(); }
+	studiohdr_t* GetStudioHdr( void );
 	void SetBody( unsigned int nBody ) { m_RootMDL.m_MDL.m_nBody = nBody; }
 	MDLData_t GetRootMDL() { return m_RootMDL; }
 

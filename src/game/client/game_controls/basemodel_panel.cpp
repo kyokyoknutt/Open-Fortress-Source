@@ -239,10 +239,11 @@ void CBaseModelPanel::SetModelAnim( int iAnim )
 	if ( nAnimCount == 0 || !m_BMPResData.m_aAnimations.IsValidIndex( iAnim ) )
 		return;
 
-	MDLCACHE_CRITICAL_SECTION();
 
 	// Get the studio header of the root model.
-	studiohdr_t *pStudioHdr = m_RootMDL.m_MDL.GetStudioHdr();
+	//Fenteale: using m_RootMDL.m_MDL.GetStudioHdr() doesnt work in linux.  use this instead
+	studiohdr_t *pStudioHdr = GetStudioHdr();
+	
 	if ( !pStudioHdr )
 		return;
 
@@ -263,6 +264,17 @@ void CBaseModelPanel::SetModelAnim( int iAnim )
 	{
 		SetSequence( iSequence );
 	}
+}
+
+
+studiohdr_t* CBaseModelPanel::GetStudioHdr( void )
+{
+	MDLCACHE_CRITICAL_SECTION();
+	//Fenteale: using m_RootMDL.m_MDL.GetStudioHdr() doesnt work in linux.  use this instead
+	MDLHandle_t hSelectedMDL = g_pMDLCache->FindMDL(m_BMPResData.m_pszModelName);
+	g_pMDLCache->PreloadModel(hSelectedMDL);
+	return g_pMDLCache->GetStudioHdr( hSelectedMDL );
+	
 }
 
 //-----------------------------------------------------------------------------

@@ -3716,31 +3716,3 @@ bool CTFPlayerShared::InPowerupCond()
 	}
 	return false;
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: jump buffer related
-//-----------------------------------------------------------------------------
-
-void CTFPlayerShared::SetJumpBuffer(bool buffer)
-{
-	m_bBlockJump = buffer;
-}
-
-bool CTFPlayerShared::GetJumpBuffer()
-{
-	return m_bBlockJump;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: crouch slide related
-//-----------------------------------------------------------------------------
-
-void CTFPlayerShared::SetCSlideDuration(float duration)
-{
-	m_iCSlideDuration = duration;
-}
-
-float CTFPlayerShared::GetCSlideDuration()
-{
-	return m_iCSlideDuration;
-}

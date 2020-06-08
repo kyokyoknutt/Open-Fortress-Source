@@ -249,14 +249,6 @@ public:
 	bool	IsPlayerDominatingMe( int iPlayerIndex );
 	void	SetPlayerDominatingMe( CTFPlayer *pPlayer, bool bDominated );
 
-	//jump buffering
-	void	SetJumpBuffer(bool buffer);
-	bool	GetJumpBuffer();
-
-	//crouchs slide
-	void	SetCSlideDuration(float duration);
-	float	GetCSlideDuration();
-
 	float	m_flStepSoundDelay;
 	float	m_flJumpSoundDelay;
 	
@@ -416,11 +408,6 @@ private:
 #endif
 
 	int m_iJauggernaughtOldClass;
-
-	//Movement expansions
-	bool  m_bBlockJump;
-	float m_fRampJumpVel;
-	int	  m_iCSlideDuration;
 };			   
 
 #define TF_DEATH_DOMINATION				0x0001	// killer is dominating victim
