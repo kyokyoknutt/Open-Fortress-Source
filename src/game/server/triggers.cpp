@@ -2377,6 +2377,8 @@ public:
 
 	DECLARE_DATADESC();
 };
+#else
+IMPLEMENT_AUTO_LIST( ITriggerTeleportAutoList );
 #endif
 
 LINK_ENTITY_TO_CLASS(trigger_teleport, CTriggerTeleport);

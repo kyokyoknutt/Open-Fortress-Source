@@ -110,7 +110,7 @@ public:
 	bool			HasActivePanels( void ) { return ( m_SavePanels.Count() != 0 ); }
 	CGameSavePanel	*GetActivePanel( void );
 	int				GetActivePanelIndex( void ) { return m_iSelectedSave; }
-	CFooterPanel	*GetFooterPanel( void ) { return m_pFooter; }
+	// CFooterPanel	*GetFooterPanel( void ) { return m_pFooter; }
 	const SaveGameDescription_t *GetPanelSaveDecription( int idx ) { return ( IsValidPanel(idx) ? m_SavePanels[idx]->GetSaveInfo() : NULL ); }
 	const SaveGameDescription_t *GetActivePanelSaveDescription( void ) { return GetPanelSaveDecription( m_iSelectedSave ); }
 
@@ -154,7 +154,7 @@ private:
 	uint							m_nUsedStorageSpace;	// Amount of disk space used by save games 
 	
 	vgui::Panel			*m_pCenterBg;
-	CFooterPanel		*m_pFooter;
+	// CFooterPanel		*m_pFooter;
 
 	// Xbox
 	void	ScrollSelectionPanels( EScrollDirection dir );

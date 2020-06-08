@@ -207,7 +207,7 @@ CSaveGameBrowserDialog::CSaveGameBrowserDialog( vgui::Panel *parent )
 	m_pCenterBg->SetVisible( true );
 
 	// Create our button footer
-	m_pFooter = new CFooterPanel( parent, "SaveGameFooter" );
+	// m_pFooter = new CFooterPanel( parent, "SaveGameFooter" );
 
 	// Load our res files from the keyvalue we're holding
 	KeyValues *pKeys = NULL;
@@ -223,11 +223,11 @@ CSaveGameBrowserDialog::~CSaveGameBrowserDialog( void )
 	m_SavePanels.PurgeAndDeleteElements();
 	
 	// Kill the footer
-	if ( m_pFooter )
-	{
-		delete m_pFooter;
-		m_pFooter = NULL;
-	}
+	// if ( m_pFooter )
+	// {
+	// 	delete m_pFooter;
+	// 	m_pFooter = NULL;
+	// }
 
 	if ( m_pCenterBg )
 	{
@@ -1026,7 +1026,7 @@ void CSaveGameBrowserDialog::OnClose( void )
 	SetControlDisabled( true );
 
 	m_KeyRepeat.Reset();
-	BasePanel()->RunCloseAnimation( "CloseNewGameDialog_OpenMainMenu" );			
+	// BasePanel()->RunCloseAnimation( "CloseNewGameDialog_OpenMainMenu" );			
 
 	BaseClass::OnClose();
 }
@@ -1037,7 +1037,7 @@ void CSaveGameBrowserDialog::OnClose( void )
 void CSaveGameBrowserDialog::RefreshSaveGames( void )
 {
 	// Close any pending messages
-	//BasePanel()->CloseMessageDialog( DIALOG_STACK_IDX_WARNING );
+	// BasePanel()->CloseMessageDialog( DIALOG_STACK_IDX_WARNING );
 
 	// Don't leave us in a locked state
 	SetControlDisabled( false );

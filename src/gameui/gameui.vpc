@@ -95,75 +95,10 @@ $Project "GameUI"
 		$File	"$SRCDIR\game\client\vgui_video_player.h"
 		$File	"$SRCDIR\game\client\vgui_video_player.cpp"
 
-		$File	"nb_button.h"
-		$File	"nb_button.cpp"
-		$File	"nb_header_footer.h"
-		$File	"nb_header_footer.cpp"
-
 		$File	"cbase.h"
 
-		$File	"basemodframe.h"
-		$File	"gamemodes.h"
 		$File	"optionsmousedialog.h"
-		$File	"UI_Shared.h"
-		$File	"UIGameData.h"
-
-		$File	"vachievements.h"		
-		$File	"vaddonassociation.h"
-		$File	"VAddons.h" [$ENABLE_ADDONS]
-		$File	"VAttractScreen.h"
-		$File	"VAudio.h"
-		$File	"VAudioVideo.h"
-		$File	"vcustomcampaigns.h"
-		$File	"VDropDownMenu.h"
-		$File	"VFlyoutMenu.h"
-		$File	"VFooterPanel.h"
-		$File	"VGenericConfirmation.h"
-		$File	"VGenericPanelList.h"
-		$File	"vgetlegacydata.h"
-		$File	"vhybridbutton.h"
-		$File	"VInGameMainMenu.h"
-		$File	"vkeyboard.h"
-		$File	"VKeyboardMouse.h"
-		$File	"VLoadingProgress.h"
-		$File	"VMainMenu.h"
-		$File	"VMultiplayer.h"
-		$File	"vmouse.h"
-		$File	"VSliderControl.h"
-		$File	"VTransitionScreen.h"
-		$File	"VVideo.h"
-		
-		$File	"basemodframe.cpp"
-		$File	"BaseModPanel.cpp"
-		$File	"gamemodes.cpp"
-		$File	"optionsmousedialog.cpp"
-		$File	"vachievements.cpp"
-		$File	"vaddonassociation.cpp"
-		$File	"VAddons.cpp" [$ENABLE_ADDONS]
-		$File	"VAttractScreen.cpp"
-		$File	"VAudio.cpp"
-		$File	"VAudioVideo.cpp"
-		$File	"vcustomcampaigns.cpp"
-		$File	"VDropDownMenu.cpp"
-		$File	"VFlyoutMenu.cpp"
-		$File	"VFooterPanel.cpp"
-		$File	"VGenericConfirmation.cpp"
-		$File	"VGenericPanelList.cpp"
-		$File	"vgetlegacydata.cpp"
-		$File	"vhybridbutton.cpp"
-		$File	"VInGameMainMenu.cpp"
-		$File	"vkeyboard.cpp"
-		$File	"vkeyboardmouse.cpp"
-		$File	"VLoadingProgress.cpp"
-		$File	"VMainMenu.cpp"
-		$File	"VMultiplayer.cpp"
-		$File	"vmenubackground.cpp"
-		$File	"vmouse.cpp"
-		$File	"VSliderControl.cpp"
-		$File	"VTransitionScreen.cpp"
-		$File	"VVideo.cpp"
-		$File	"UI_Shared.cpp"
-		$File	"UIGameData.cpp"
+	
 
 		$File	"BackgroundMenuButton.cpp" \
 				"BaseSaveGameDialog.cpp" \
@@ -186,12 +121,12 @@ $Project "GameUI"
 				"KeyToggleCheckButton.cpp" \
 				"LabeledCommandComboBox.cpp" \
 				"LoadingDialog.cpp" \
-				"loadingtippanel.cpp" \
 				"logofile.cpp" \
 				"ModInfo.cpp" \
 				"MouseMessageForwardingPanel.cpp" \
 				"MultiplayerAdvancedDialog.cpp" \
 				"OptionsDialog.cpp" \
+				"optionsmousedialog.cpp" \
 				"OptionsSubAudio.cpp" \
 				"OptionsSubDifficulty.cpp" \
 				"OptionsSubGame.cpp" \
@@ -200,9 +135,7 @@ $Project "GameUI"
 				"OptionsSubMultiplayer.cpp" \
 				"OptionsSubPortal.cpp" \
 				"OptionsSubVideo.cpp" \
-				"OptionsSubVoice.cpp" \
-				"customizationdialog.cpp" \			
-				"customizationdialogsub.cpp" \						
+				"OptionsSubVoice.cpp" \					
 				"PanelListPanel.cpp" \
 				"PlayerListDialog.cpp" \
 				"rungameengine.cpp" \

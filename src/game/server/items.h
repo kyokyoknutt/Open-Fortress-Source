@@ -43,7 +43,7 @@ class CItem : public CBaseAnimating, public CDefaultPlayerPickupVPhysics
 public:
 	DECLARE_CLASS( CItem, CBaseAnimating );
 
-	CItem();
+	//CItem();
 
 	virtual void Spawn( void );
 	virtual void Precache();
@@ -56,10 +56,10 @@ public:
 	virtual bool MyTouch( CBasePlayer *pPlayer ) { return false; };
 
 	// Become touchable when we are at rest
-	virtual void OnEntityEvent( EntityEvent_t event, void *pEventData );
+	//virtual void OnEntityEvent( EntityEvent_t event, void *pEventData );
 
 	// Activate when at rest, but don't allow pickup until then
-	void ActivateWhenAtRest( float flTime = 0.5f );
+	//void ActivateWhenAtRest( float flTime = 0.5f );
 
 	// IPlayerPickupVPhysics
 	virtual void OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason = PICKED_UP_BY_CANNON );
@@ -80,9 +80,11 @@ public:
 #endif
 
 	DECLARE_DATADESC();
+/*
 protected:
 	virtual void ComeToRest( void );
 	bool		m_bActivateWhenAtRest;
+*/
 
 private:
 	

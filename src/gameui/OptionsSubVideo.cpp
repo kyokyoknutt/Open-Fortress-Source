@@ -1175,7 +1175,7 @@ void COptionsSubVideo::OpenAdvanced()
 {
 	if ( !m_hOptionsSubVideoAdvancedDlg.Get() )
 	{
-		m_hOptionsSubVideoAdvancedDlg = new COptionsSubVideoAdvancedDlg( BasePanel()->FindChildByName( "OptionsDialog" ) ); // we'll parent this to the OptionsDialog directly
+		m_hOptionsSubVideoAdvancedDlg = new COptionsSubVideoAdvancedDlg( this );
 	}
 
 	m_hOptionsSubVideoAdvancedDlg->Activate();
@@ -1200,7 +1200,7 @@ void COptionsSubVideo::OpenAdvanced()
 void COptionsSubVideo::LaunchBenchmark()
 {
 	//This was a feature?
-	//BasePanel()->OnOpenBenchmarkDialog();
+	// BasePanel()->OnOpenBenchmarkDialog();
 }
 
 //-----------------------------------------------------------------------------

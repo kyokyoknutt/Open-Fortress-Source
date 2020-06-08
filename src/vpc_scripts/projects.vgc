@@ -18,7 +18,7 @@ $Project "client"
 {
 	"game\client\client_hl2mp.vpc"		[($WIN32||$POSIX) && $HL2MP]
 	"game\client\client_tf_mod.vpc"		[($WIN32||$POSIX) && $TF_MOD]
-	"game\client\client_of.vpc"		[($WIN32||$POSIX) && $OFD]
+	"game\client\client_of.vpc"			[($WIN32||$POSIX) && $OFD]
 }
 
 $Project "fgdlib"

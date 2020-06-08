@@ -4,6 +4,8 @@
 #include "tf_obj.h"
 #include "nav_mesh/tf_nav_area.h"
 #include "tf_bot_get_health.h"
+#include "entity_healthkit.h"
+#include "func_regenerate.h"
 
 ConVar tf_bot_health_search_near_range( "tf_bot_health_search_near_range", "1000", FCVAR_CHEAT );
 ConVar tf_bot_health_search_far_range( "tf_bot_health_search_far_range", "2000", FCVAR_CHEAT );
@@ -132,8 +134,14 @@ bool CTFBotGetHealth::IsPossible( CTFBot *actor )
 	}
 
 	CUtlVector<EHANDLE> healths;
+	for ( int i = 0; i < IHealthKitAutoList::AutoList().Count(); ++i )
+	{
+		EHANDLE hndl = static_cast< CHealthKit* >( IHealthKitAutoList::AutoList()[ i ] );
+		healths.AddToTail( hndl );
+	}
+
 	CHealthFilter filter( actor );
-	actor->SelectReachableObjects( TFGameRules()->GetHealthEnts(), &healths, filter, actor->GetLastKnownArea(), flMinDist + flMaxDist );
+	actor->SelectReachableObjects( healths, &healths, filter, actor->GetLastKnownArea(), flMinDist + flMaxDist );
 	
 	if ( healths.IsEmpty() )
 	{
@@ -198,26 +206,28 @@ bool CHealthFilter::IsSelected( const CBaseEntity *ent ) const
 		return false;
 
 	// Can't use enemy teams resupply cabinet
-	if ( FClassnameIs( const_cast<CBaseEntity *>( ent ), "func_regenerate" ) )
+	CRegenerateZone *pZone = dynamic_cast<CRegenerateZone *>( const_cast<CBaseEntity *>( ent ) );
+
+	if ( pZone )
 	{
 		if ( ( pArea->HasTFAttributes( BLUE_SPAWN_ROOM ) && m_pActor->GetTeamNumber() == TF_TEAM_RED  )
 		  || ( pArea->HasTFAttributes( RED_SPAWN_ROOM  ) && m_pActor->GetTeamNumber() == TF_TEAM_BLUE )
-		){
+		)
+		{
 			return false;
 		}
 	}
 
-	if ( FClassnameIs( const_cast<CBaseEntity *>( ent ), "obj_dispenser*" ) )
-	{
-		CBaseObject *pObject = static_cast<CBaseObject *>( const_cast<CBaseEntity *>( ent ) );
+	CBaseObject *pObject = dynamic_cast<CBaseObject *>( const_cast<CBaseEntity *>( ent ) );
 
-		// Ignore non-functioning buildings
-		if ( pObject->IsDisabled() || pObject->IsBuilding() || pObject->IsPlacing() || pObject->HasSapper() )
-			return false;
-	}
+	// Ignore non-functioning buildings
+	if ( pObject && ( pObject->IsDisabled() || pObject->IsBuilding() || pObject->IsPlacing() || pObject->HasSapper() ) )
+		return false;
+
+	CHealthKit *pHealthKit = dynamic_cast<CHealthKit *>( const_cast<CBaseEntity *>( ent ) );
 
 	// Any other entity or packs that have been picked up are a no go
-	if ( FClassnameIs( const_cast<CBaseEntity *>( ent ), "item_healthkit*" ) && ent->GetFlags() & EF_NODRAW )
+	if ( pHealthKit && ( pHealthKit->IsTiny() || pHealthKit->GetFlags() & EF_NODRAW ) )
 		return false;
 
 	// Find minimum cost area we are currently searching

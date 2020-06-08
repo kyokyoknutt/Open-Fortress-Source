@@ -361,7 +361,6 @@ private:
 public:
 
 	CTFPlayerShared m_Shared;
-	float 			m_flJumpSoundDelay;
 
 // Called by shared code.
 public:

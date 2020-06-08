@@ -15,6 +15,11 @@
 #include "vgui_controls/PHandle.h"
 #include "convar.h"
 
+#include "OptionsDialog.h"
+#include "optionsmousedialog.h"
+#include "PlayerListDialog.h"
+#include "CreateMultiplayerGameDialog.h"
+
 class IGameClientExports;
 class CCommand;
 
@@ -76,6 +81,7 @@ public:
 	virtual bool ValidateStorageDevice(int *pStorageDeviceValidated);
 	virtual void OnConfirmQuit(void);
 	virtual bool IsMainMenuVisible(void);
+
 	virtual void SetMainMenuOverride(vgui::VPANEL panel);
 	virtual void SendMainMenuCommand(const char *pszCommand);
 
@@ -83,9 +89,6 @@ public:
 	virtual bool UpdateProgressBar(float progress, const char *statusText);
 	// Shows progress desc, returns previous setting... (used with custom progress bars )
 	virtual bool SetShowProgressText( bool show );
-
-	// Allows the level loading progress to show map-specific info
-	virtual void SetProgressLevelName( const char *levelName );
 
  	virtual void NeedConnectionProblemWaitScreen();
 
@@ -104,27 +107,18 @@ public:
  	bool IsConsoleUI();
  	bool HasSavedThisMenuSession();
  	void SetSavedThisMenuSession( bool bState );
- 
- 	void ShowLoadingBackgroundDialog();
-	void HideLoadingBackgroundDialog();
-	bool HasLoadingBackgroundDialog();
+
+	void OpenOptionsDialog(vgui::Panel *parent);
+	void OpenOptionsMouseDialog(vgui::Panel *parent);
+	void OpenKeyBindingsDialog(vgui::Panel *parent);
+	void OpenCreateMultiplayerGameDialog(vgui::Panel *parent);
+	void OpenPlayerListDialog(vgui::Panel *parent);
+	void OnOpenServerBrowser(vgui::Panel *parent);
 
 private:
 	void SendConnectedToGameMessage();
 
-	virtual void StartProgressBar();
-	virtual bool ContinueProgressBar(float progressFraction);
-	virtual void StopProgressBar(bool bError, const char *failureReason, const char *extendedReason = NULL);
-	virtual bool SetProgressBarStatusText(const char *statusText);
-
-	//!! these functions currently not implemented
-	virtual void SetSecondaryProgressBar(float progress /* range [0..1] */);
-	virtual void SetSecondaryProgressBarText(const char *statusText);
-
 	bool FindPlatformDirectory(char *platformDir, int bufferSize);
-	void GetUpdateVersion( char *pszProd, char *pszVer);
-	void ValidateCDKey();
-
 	CreateInterfaceFn m_GameFactory;
 
 	bool m_bTryingToLoadFriends : 1;
@@ -138,10 +132,14 @@ private:
 	int m_iGameQueryPort;
 	
 	int m_iFriendsLoadPauseFrames;
-	int m_iPlayGameStartupSound;
 
 	char m_szPreviousStatusText[128];
 	char m_szPlatformDir[MAX_PATH];
+
+	vgui::DHANDLE<COptionsDialog> m_hOptionsDialog;	// standalone options dialog - PC only
+	vgui::DHANDLE<CCreateMultiplayerGameDialog> m_hCreateMultiplayerGameDialog;	// standalone options dialog - PC only	
+	vgui::DHANDLE<CPlayerListDialog> m_hPlayerListDialog;	// standalone options dialog - PC only	
+	vgui::DHANDLE<COptionsMouseDialog> m_hOptionsMouseDialog;	// standalone options dialog - PC only	
 
 	vgui::DHANDLE<class CCDKeyEntryDialog> m_hCDKeyEntryDialog;
 };

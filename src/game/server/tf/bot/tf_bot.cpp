@@ -1259,7 +1259,7 @@ float CTFBot::GetMaxAttackRange() const
 	// OFBot: hack so bots stop trying to act like a sniper with their pistol
 	if ( weapon->IsWeapon( TF_WEAPON_PISTOL_MERCENARY ) || weapon->IsWeapon( TF_WEAPON_PISTOL_AKIMBO ) )
 	{
-		return 700.0f;
+		return 1024.0f;
 	}
 
 	if ( weapon->IsWeapon( TF_WEAPON_FLAMETHROWER ) || weapon->IsWeapon( TF_WEAPON_LIGHTNING_GUN ) )

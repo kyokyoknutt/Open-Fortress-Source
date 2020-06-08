@@ -126,7 +126,11 @@ bool CTFBotGetWeapon::IsPossible( CTFBot *actor )
 	VPROF_BUDGET( __FUNCTION__, "NextBot" );
 
 	CUtlVector<EHANDLE> weapons;
-	weapons.AddVectorToTail( TFGameRules()->GetWeaponEnts() );
+	for ( int i = 0; i < IWeaponSpawnerAutoList::AutoList().Count(); ++i )
+	{
+		EHANDLE hndl = static_cast< CWeaponSpawner* >( IWeaponSpawnerAutoList::AutoList()[ i ] );
+		weapons.AddToTail( hndl );
+	}
 
 	CWeaponFilter filter( actor );
 	actor->SelectReachableObjects( weapons, &weapons, filter, actor->GetLastKnownArea(), tf_bot_weapon_search_range.GetFloat() );
@@ -198,29 +202,21 @@ bool CWeaponFilter::IsSelected( const CBaseEntity *ent ) const
 	if ( !pArea->IsMarked() || m_flMinCost < pArea->GetCostSoFar() )
 		return false;
 
-	CBaseEntity *pEntity = const_cast< CBaseEntity *>( ent );
-	if ( pEntity )
+	CWeaponSpawner *pSpawner = dynamic_cast< CWeaponSpawner *>( const_cast<CBaseEntity *>( ent ) );
+
+	if ( pSpawner )
 	{
-		CWeaponSpawner *pSpawner = dynamic_cast< CWeaponSpawner *>( pEntity );
+		if ( pSpawner->m_bRespawning ) // don't go for spawners that are respawning
+			return false;
 
-		if ( pSpawner )
-		{
-			if ( pSpawner->m_bRespawning ) // don't go for spawners that are respawning
-				return false;
+		if ( pSpawner->m_bDisabled ) // don't go for spawners that are disabled
+			return false;
 
-			if ( pSpawner->m_bDisabled ) // don't go for spawners that are disabled
-				return false;
+		int iWeaponID = AliasToWeaponID( pSpawner->m_iszWeaponName.Get() );
 
-			int iWeaponID = AliasToWeaponID( pSpawner->m_iszWeaponName.Get() );
-
-			if ( m_pActor->Weapon_OwnsThisID( iWeaponID ) ) // don't go for spawners that we already have a weapon from
-				return false;
-		}
+		if ( m_pActor->Weapon_OwnsThisID( iWeaponID ) ) // don't go for spawners that we already have a weapon from
+			return false;
 	}
-
-	// Can't pick up spawners that are respawning
-	//if ( ( FClassnameIs( const_cast<CBaseEntity *>( ent ), "dm_weapon_spawner" ) && ent->m_nRenderFX == kRenderFxDistort ) ) // I don't think checking the RenderFX actually works
-	//	return false;
 
 	const_cast<CWeaponFilter *>( this )->m_flMinCost = pArea->GetCostSoFar();
 

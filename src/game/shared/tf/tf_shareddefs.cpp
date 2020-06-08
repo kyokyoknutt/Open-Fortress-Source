@@ -441,7 +441,6 @@ bool WeaponID_IsMeleeWeapon(int iWeaponID)
 		iWeaponID == TF_WEAPON_BONESAW ||
 		iWeaponID == TF_WEAPON_KNIFE ||
 		iWeaponID == TF_WEAPON_UMBRELLA ||
-		iWeaponID == TF_WEAPON_BERSERK ||
 		iWeaponID == TFC_WEAPON_CROWBAR ||
 		iWeaponID == TFC_WEAPON_UMBRELLA ||
 		iWeaponID == TFC_WEAPON_KNIFE ||

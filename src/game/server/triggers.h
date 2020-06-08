@@ -125,10 +125,11 @@ public:
 extern CUtlVector< CHandle<CTriggerMultiple> >	g_hWeaponFireTriggers;
 
 #ifdef OF_DLL
+DECLARE_AUTO_LIST(ITriggerTeleportAutoList)
 //-----------------------------------------------------------------------------
 // Purpose: Teleport
 //-----------------------------------------------------------------------------
-class CTriggerTeleport : public CBaseTrigger
+class CTriggerTeleport : public CBaseTrigger, public ITriggerTeleportAutoList
 {
 public:
 	DECLARE_CLASS( CTriggerTeleport, CBaseTrigger );

@@ -88,7 +88,7 @@ void CWorldItem::Spawn( void )
 
 BEGIN_DATADESC( CItem )
 
-	DEFINE_FIELD( m_bActivateWhenAtRest,	 FIELD_BOOLEAN ),
+	//DEFINE_FIELD( m_bActivateWhenAtRest,	 FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_vOriginalSpawnOrigin, FIELD_POSITION_VECTOR ),
 	DEFINE_FIELD( m_vOriginalSpawnAngles, FIELD_VECTOR ),
 	DEFINE_PHYSPTR( m_pConstraint ),
@@ -96,7 +96,7 @@ BEGIN_DATADESC( CItem )
 	// Function Pointers
 	DEFINE_ENTITYFUNC( ItemTouch ),
 	DEFINE_THINKFUNC( Materialize ),
-	DEFINE_THINKFUNC( ComeToRest ),
+	//DEFINE_THINKFUNC( ComeToRest ),
 
 #if defined( HL2MP ) || defined( TF_DLL ) || defined( OF_DLL )
 	DEFINE_FIELD( m_flNextResetCheckTime, FIELD_TIME ),
@@ -109,7 +109,7 @@ BEGIN_DATADESC( CItem )
 
 END_DATADESC()
 
-
+/*
 //-----------------------------------------------------------------------------
 // Constructor 
 //-----------------------------------------------------------------------------
@@ -117,15 +117,19 @@ CItem::CItem()
 {
 	m_bActivateWhenAtRest = false;
 }
+*/
 
 bool CItem::CreateItemVPhysicsObject( void )
 {
 	// Create the object in the physics system
-	int nSolidFlags = GetSolidFlags() | FSOLID_NOT_STANDABLE;
+	int nSolidFlags = GetSolidFlags() | FSOLID_NOT_STANDABLE | FSOLID_TRIGGER;
+
+	/*
 	if ( !m_bActivateWhenAtRest )
 	{
 		nSolidFlags |= FSOLID_TRIGGER;
 	}
+	*/
 
 	if ( VPhysicsInitNormal( SOLID_VPHYSICS, nSolidFlags, false ) == NULL )
 	{
@@ -229,18 +233,21 @@ extern int gEvilImpulse101;
 //-----------------------------------------------------------------------------
 // Activate when at rest, but don't allow pickup until then
 //-----------------------------------------------------------------------------
-void CItem::ActivateWhenAtRest( float flTime /* = 0.5f */ )
+/*
+void CItem::ActivateWhenAtRest( float flTime )
 {
 	RemoveSolidFlags( FSOLID_TRIGGER );
 	m_bActivateWhenAtRest = true;
 	SetThink( &CItem::ComeToRest );
 	SetNextThink( gpGlobals->curtime + flTime );
 }
+*/
 
 
 //-----------------------------------------------------------------------------
 // Become touchable when we are at rest
 //-----------------------------------------------------------------------------
+/*
 void CItem::OnEntityEvent( EntityEvent_t event, void *pEventData )
 {
 	BaseClass::OnEntityEvent( event, pEventData );
@@ -257,11 +264,13 @@ void CItem::OnEntityEvent( EntityEvent_t event, void *pEventData )
 		break;
 	}
 }
+*/
 
 
 //-----------------------------------------------------------------------------
 // Become touchable when we are at rest
 //-----------------------------------------------------------------------------
+/*
 void CItem::ComeToRest( void )
 {
 	if ( m_bActivateWhenAtRest )
@@ -271,6 +280,7 @@ void CItem::ComeToRest( void )
 		SetThink( NULL );
 	}
 }
+*/
 
 #if defined( HL2MP ) || defined( TF_DLL ) || defined( OF_DLL )
 
@@ -307,6 +317,7 @@ void CItem::FallThink ( void )
 	}
 #endif // HL2MP
 
+/*
 #if defined( TF_DLL ) || defined( OF_DLL )
 	// We only come here if ActivateWhenAtRest() is never called,
 	// which is the case when creating currencypacks in MvM
@@ -327,10 +338,11 @@ void CItem::FallThink ( void )
 	{
 		SetThink( &CItem::ComeToRest );
 	}
+*/
 #endif // TF
 }
 
-#endif // HL2MP, TF
+//#endif // HL2MP, TF
 
 //-----------------------------------------------------------------------------
 // Purpose: Used to tell whether an item may be picked up by the player.  This

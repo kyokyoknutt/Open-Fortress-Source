@@ -66,20 +66,28 @@ ConVar	sv_maxspeed		( "sv_maxspeed", "320", FCVAR_NOTIFY | FCVAR_REPLICATED );
 	
 #endif//_XBOX
 
+#if defined( OF_CLIENT_DLL ) || defined( OF_DLL )
+ConVar	of_movementmode("of_movementmode", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Change movement mode\n0: Default OF\n1: Quake 3\n2: CPMA");
+ConVar	of_q3airaccelerate("of_q3airaccelerate", "1.5", FCVAR_NOTIFY | FCVAR_REPLICATED);
+ConVar	of_cslide("of_cslide", "0", FCVAR_NOTIFY | FCVAR_REPLICATED);
+ConVar	of_cslideaccelerate("of_cslideaccelerate", "4", FCVAR_NOTIFY | FCVAR_REPLICATED);
+ConVar	of_cslidefriction("of_cslidefriction", "1", FCVAR_NOTIFY | FCVAR_REPLICATED);
+#endif
+
 #if defined( CSTRIKE_DLL ) || defined( HL1MP_DLL )
-ConVar	sv_airaccelerate(  "sv_airaccelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED);    
-ConVar	sv_wateraccelerate(  "sv_wateraccelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED);     
-ConVar	sv_waterfriction(  "sv_waterfriction", "1", FCVAR_NOTIFY | FCVAR_REPLICATED);      
-ConVar	sv_footsteps	( "sv_footsteps", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "Play footstep sound for players" );
-ConVar	sv_rollspeed	( "sv_rollspeed", "200", FCVAR_NOTIFY | FCVAR_REPLICATED);
-ConVar	sv_rollangle	( "sv_rollangle", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Max view roll angle");
+ConVar	sv_airaccelerate("sv_airaccelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED);
+ConVar	sv_wateraccelerate("sv_wateraccelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED);     
+ConVar	sv_waterfriction("sv_waterfriction", "1", FCVAR_NOTIFY | FCVAR_REPLICATED);      
+ConVar	sv_footsteps	("sv_footsteps", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "Play footstep sound for players" );
+ConVar	sv_rollspeed	("sv_rollspeed", "200", FCVAR_NOTIFY | FCVAR_REPLICATED);
+ConVar	sv_rollangle	("sv_rollangle", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Max view roll angle");
 #else
-ConVar	sv_airaccelerate(  "sv_airaccelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED );    
-ConVar	sv_wateraccelerate(  "sv_wateraccelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED );     
-ConVar	sv_waterfriction(  "sv_waterfriction", "1", FCVAR_NOTIFY | FCVAR_REPLICATED );      
-ConVar	sv_footsteps	( "sv_footsteps", "1", FCVAR_NOTIFY | FCVAR_REPLICATED , "Play footstep sound for players" );
-ConVar	sv_rollspeed	( "sv_rollspeed", "200", FCVAR_NOTIFY | FCVAR_REPLICATED );
-ConVar	sv_rollangle	( "sv_rollangle", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Max view roll angle");
+ConVar	sv_airaccelerate("sv_airaccelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED);
+ConVar	sv_wateraccelerate("sv_wateraccelerate", "10", FCVAR_NOTIFY | FCVAR_REPLICATED);     
+ConVar	sv_waterfriction("sv_waterfriction", "1", FCVAR_NOTIFY | FCVAR_REPLICATED);      
+ConVar	sv_footsteps	("sv_footsteps", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "Play footstep sound for players" );
+ConVar	sv_rollspeed	("sv_rollspeed", "200", FCVAR_NOTIFY | FCVAR_REPLICATED);
+ConVar	sv_rollangle	("sv_rollangle", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Max view roll angle");
 #endif // CSTRIKE_DLL
 
 #if defined( DOD_DLL ) || defined( CSTRIKE_DLL ) || defined( HL1MP_DLL )

@@ -23,7 +23,6 @@
 
 #ifdef CLIENT_DLL
 	#define SHARED_ARGS VarArgs
-	#include "of_loadout.h"
 #else
 	#define SHARED_ARGS UTIL_VarArgs
 #endif
@@ -307,7 +306,6 @@ void ReloadItemsSchema()
 	InitItemsGame();
 	ParseItemsGame();
 #ifdef CLIENT_DLL
-	GLoadoutPanel()->InvalidateLayout( false, true );
 	engine->ExecuteClientCmd( "schema_reload_items_game_server" );
 #endif
 }

@@ -181,10 +181,6 @@ void CTFWeaponBaseMelee::PrimaryAttack()
 
 	// Swing the weapon.
 	Swing( pPlayer );
-	
-#ifdef GAME_DLL
-	pPlayer->trickshot = 0;
-#endif
 
 #if !defined( CLIENT_DLL ) 
 	pPlayer->SpeakWeaponFire();

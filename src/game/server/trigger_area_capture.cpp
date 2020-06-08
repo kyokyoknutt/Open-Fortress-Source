@@ -23,7 +23,7 @@ IMPLEMENT_AUTO_LIST( ITriggerAreaCaptureAutoList );
 BEGIN_DATADESC(CTriggerAreaCapture)
 
 	// Touch functions
-	DEFINE_FUNCTION( CTriggerAreaCaptureShim::Touch ),
+	DEFINE_ENTITYFUNC( AreaTouch ),
 
 	// Think functions
 	DEFINE_THINKFUNC( CaptureThink ),
@@ -95,7 +95,7 @@ void CTriggerAreaCapture::Spawn( void )
 	
 	Precache();
 
-	SetTouch ( &CTriggerAreaCaptureShim::Touch );		
+	SetTouch ( &CTriggerAreaCapture::AreaTouch );		
 	SetThink( &CTriggerAreaCapture::CaptureThink );
 	SetNextThink( gpGlobals->curtime + AREA_THINK_TIME );
 

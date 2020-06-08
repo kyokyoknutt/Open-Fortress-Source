@@ -246,6 +246,11 @@ protected:
 	// HACK FOR BOTS
 	friend class CBotManager;
 	static edict_t *s_PlayerEdict; // must be set before calling constructor
+
+#if defined( OF_DLL )
+	bool m_bIsCSliding;
+#endif
+
 public:
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();

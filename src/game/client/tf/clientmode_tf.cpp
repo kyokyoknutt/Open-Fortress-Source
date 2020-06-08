@@ -175,21 +175,6 @@ void ClientModeTFNormal::Init()
 	m_pFreezePanel = ( CTFFreezePanel * )GET_HUDELEMENT( CTFFreezePanel );
 	Assert( m_pFreezePanel );
 
-	CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
-	if ( gameUIFactory )
-	{
-		m_pGameUI = (IGameUI *) gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL );
-		if ( NULL != m_pGameUI )
-		{
-			// insert stats summary panel as the loading background dialog
-			CTFStatsSummaryPanel *pPanel = GStatsSummaryPanel();
-			pPanel->InvalidateLayout( false, true );
-			pPanel->SetVisible( false );
-			pPanel->MakePopup( false );
-			m_pGameUI->SetLoadingBackgroundDialog( pPanel->GetVPanel() );
-		}		
-	}
-
 	BaseClass::Init();
 	
 	ListenForGameEvent( "pumpkin_lord_summoned" );

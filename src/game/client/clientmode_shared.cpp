@@ -1236,13 +1236,15 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 #ifdef OF_CLIENT_DLL
 	else if (Q_strcmp( "ffa_broadcast_audio", eventname ) == 0 )
 	{
-		if ( !of_announcer_events.GetBool() 
-		&& (!strcmp( event->GetString("sound"), "Dominating" )
-		|| !strcmp( event->GetString("sound"), "Revenge" ) 
-		|| !strcmp( event->GetString("sound"), "Impressive" )
-		|| !strcmp( event->GetString("sound"), "Excellent" )
-		|| !strcmp( event->GetString("sound"), "Humiliation" ) ) )
+		if ( !of_announcer_events.GetBool() &&
+			(!strcmp(event->GetString("sound"), "Dominating") ||
+			!strcmp(event->GetString("sound"), "Revenge")))
 			return;
+		//|| !strcmp( event->GetString("sound"), "Revenge" ) 
+		//|| !strcmp( event->GetString("sound"), "Impressive" )
+		//|| !strcmp( event->GetString("sound"), "Excellent" )
+		//|| !strcmp( event->GetString("sound"), "Humiliation" ) )
+
 		int playerid = event->GetInt( "player" );
 		
 		bool announcer = event->GetBool( "announcer" );

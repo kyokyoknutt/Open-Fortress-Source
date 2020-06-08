@@ -506,6 +506,10 @@ protected:
 	float			m_flStepSoundTime;
 	bool			m_IsFootprintOnLeft;
 
+#if defined( OF_CLIENT_DLL )
+	bool			m_bIsCSliding;
+#endif
+
 private:
 	// Make sure no one calls this...
 	C_BasePlayer& operator=( const C_BasePlayer& src );

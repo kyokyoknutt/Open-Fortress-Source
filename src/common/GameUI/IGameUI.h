@@ -18,6 +18,8 @@
 #include "xbox/xboxstubs.h"
 #endif
 
+#include "IBasePanel.h"
+
 // reasons why the user can't connect to a game server
 enum ESteamLoginFailure
 {

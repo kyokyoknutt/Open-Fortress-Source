@@ -45,10 +45,23 @@ extern ConVar fov_softzoom;
 extern ConVar fov_desired;
 #endif
 
+/*const float SOFTZOOMINTIME_DEFAULT = 0.25f;
+const float SOFTZOOMOUTTIME_DEFAULT = 0.1f;*/
+void QuickzoomConVarChanged(IConVar *var, const char *pOldValue, float flOldValue); // Callback - should be overriden down below
+
 #if defined (CLIENT_DLL)
 ConVar of_autoreload( "of_autoreload", "1", FCVAR_CLIENTDLL | FCVAR_ARCHIVE | FCVAR_USERINFO, "Automatically reload when not firing." );
 ConVar of_autoswitchweapons("of_autoswitchweapons", "1", FCVAR_CLIENTDLL | FCVAR_ARCHIVE | FCVAR_USERINFO , "Toggles autoswitching when picking up new weapons.");
 #endif
+
+// This was in the CLIENT_DLL section, but then I was unable to set it on a listen server so moved it out here to Shared space.
+// To allow players to change their zoom speeds on most weapons (With callbacks & caching for performance)
+// Currently DOES AFFECT the re-zooming time, but is does still use m_flNextZoomTime as a minimum (m_flNextZoomTime + zoom in/out time).
+ConVar cl_quickzoom_in_time("cl_quickzoom_in_time", "0.25", FCVAR_ARCHIVE | FCVAR_USERINFO, "The time it takes to zoom in with 'soft zoom' (secondary attack on most weapons)", true, 0.0f, true, 3.0f, QuickzoomConVarChanged);
+ConVar cl_quickzoom_out_time("cl_quickzoom_out_time", "0.1", FCVAR_ARCHIVE | FCVAR_USERINFO, "The time it takes to zoom out with 'soft zoom' (secondary attack on most weapons)", true, 0.0f, true, 3.0f, QuickzoomConVarChanged);
+float fConVarQuickZoomInTime = cl_quickzoom_in_time.GetFloat();
+float fConVarQuickZoomOutTime = cl_quickzoom_out_time.GetFloat();
+
 
 ConVar tf_weapon_criticals( "tf_weapon_criticals", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Toggles random crits." );
 ConVar of_crit_multiplier( "of_crit_multiplier", "3", FCVAR_NOTIFY | FCVAR_REPLICATED, "How much the crit powerup increases your damage." );
@@ -63,6 +76,18 @@ extern ConVar of_multiweapons;
 //
 // Global functions.
 //
+
+//-----------------------------------------------------------------------------
+// Purpose: Callback for the soft-zoom speed convars. Caches them in variables for efficiency!
+//-----------------------------------------------------------------------------
+
+void QuickzoomConVarChanged(IConVar *var, const char *pOldValue, float flOldValue)
+{
+	fConVarQuickZoomInTime = cl_quickzoom_in_time.GetFloat();
+	fConVarQuickZoomOutTime = cl_quickzoom_out_time.GetFloat();
+	Log("Updated zoom values successfully!");
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -1590,17 +1615,17 @@ void CTFWeaponBase::SoftZoomCheck( void )
 	&& pOwner->m_Shared.m_flNextZoomTime <= gpGlobals->curtime )
 	{
 		if( pOwner->GetFOV() == flFovDesired )
-			pOwner->m_Shared.m_flNextZoomTime = gpGlobals->curtime + 0.25f;
+			pOwner->m_Shared.m_flNextZoomTime = gpGlobals->curtime + fConVarQuickZoomInTime;
 
-		pOwner->SetFOV( pOwner, flZoomLevel, 0.25f );
+		pOwner->SetFOV(pOwner, flZoomLevel, fConVarQuickZoomInTime);
 	}
 	else
 	{
 		if( ( pOwner->m_Shared.m_flNextZoomTime <= gpGlobals->curtime ) )
 		{
 			if( pOwner->GetFOV() == flZoomLevel )
-				pOwner->m_Shared.m_flNextZoomTime = gpGlobals->curtime + 0.1;
-			pOwner->SetFOV( pOwner, 0, 0.1f );
+				pOwner->m_Shared.m_flNextZoomTime = gpGlobals->curtime + fConVarQuickZoomOutTime;
+			pOwner->SetFOV(pOwner, 0, fConVarQuickZoomOutTime);
 		}
 	}
 }

@@ -126,7 +126,11 @@ bool CTFBotGetPowerup::IsPossible( CTFBot *actor )
 	VPROF_BUDGET( __FUNCTION__, "NextBot" );
 
 	CUtlVector<EHANDLE> powerups;
-	powerups.AddVectorToTail( TFGameRules()->GetPowerupEnts() );
+	for ( int i = 0; i < ICondPowerupAutoList::AutoList().Count(); ++i )
+	{
+		EHANDLE hndl = static_cast< CCondPowerup* >( ICondPowerupAutoList::AutoList()[ i ] );
+		powerups.AddToTail( hndl );
+	}
 
 	CPowerupFilter filter( actor );
 	actor->SelectReachableObjects( powerups, &powerups, filter, actor->GetLastKnownArea(), tf_bot_powerup_search_range.GetFloat() );
@@ -198,8 +202,16 @@ bool CPowerupFilter::IsSelected( const CBaseEntity *ent ) const
 		return false;
 
 	// Can't pick up spawners that are respawning
-	if ( ( FClassnameIs( const_cast<CBaseEntity *>( ent ), "dm_powerup_spawner" ) && ent->m_nRenderFX == kRenderFxDistort ) ) // I don't think checking the RenderFX actually works
-		return false;
+	CCondPowerup *pPowerup = dynamic_cast< CCondPowerup *>( const_cast<CBaseEntity *>( ent )  );
+
+	if ( pPowerup )
+	{
+		if ( pPowerup->m_bRespawning ) // don't go for spawners that are respawning
+			return false;
+
+		if ( pPowerup->m_bDisabled ) // don't go for spawners that are disabled
+			return false;
+	}
 
 	// Find minimum cost area we are currently searching
 	if ( !pArea->IsMarked() || m_flMinCost < pArea->GetCostSoFar() )

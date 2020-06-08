@@ -1074,7 +1074,12 @@ void CVisibleShadowList::EnumShadow( unsigned short clientShadowHandle )
 		return;
 
 	IClientRenderable *pRenderable = ClientEntityList().GetClientRenderableFromHandle( shadow.m_Entity );
+#ifdef OF_CLIENT_DLL
+	if ( !pRenderable )
+		return;
+#else
 	Assert( pRenderable );
+#endif
 
 	// Don't bother with children of hierarchy; they will be drawn with their parents
 	if ( s_ClientShadowMgr.ShouldUseParentShadow( pRenderable ) || s_ClientShadowMgr.WillParentRenderBlobbyShadow( pRenderable ) )
@@ -3232,7 +3237,13 @@ void CClientShadowMgr::UpdateProjectedTexture( ClientShadowHandle_t handle, bool
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::ComputeBoundingSphere( IClientRenderable* pRenderable, Vector& origin, float& radius )
 {
+#ifdef OF_CLIENT_DLL
+	if ( !pRenderable )
+		return;
+#else
 	Assert( pRenderable );
+#endif
+
 	Vector mins, maxs;
 	pRenderable->GetShadowRenderBounds( mins, maxs, GetActualShadowCastType( pRenderable ) );
 	Vector size;

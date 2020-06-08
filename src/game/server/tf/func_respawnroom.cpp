@@ -11,41 +11,14 @@
 #include "ndebugoverlay.h"
 #include "tf_gamerules.h"
 #include "entity_tfstart.h"
-#include "modelentities.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-//-----------------------------------------------------------------------------
-// Purpose: Visualizes a respawn room to the enemy team
-//-----------------------------------------------------------------------------
-class CFuncRespawnRoomVisualizer : public CFuncBrush
-{
-	DECLARE_CLASS( CFuncRespawnRoomVisualizer, CFuncBrush );
-public:
-	DECLARE_DATADESC();
-	DECLARE_SERVERCLASS();
-
-	virtual void Spawn( void );
-	void	InputRoundActivate( inputdata_t &inputdata );
-	int		DrawDebugTextOverlays( void );
-	CFuncRespawnRoom *GetRespawnRoom( void ) { return m_hRespawnRoom; }
-
-	virtual int		UpdateTransmitState( void );
-	virtual int		ShouldTransmit( const CCheckTransmitInfo *pInfo );
-	virtual bool	ShouldCollide( int collisionGroup, int contentsMask ) const;
-
-	void SetActive( bool bActive );
-
-protected:
-	string_t					m_iszRespawnRoomName;
-	CHandle<CFuncRespawnRoom>	m_hRespawnRoom;
-};
-
 LINK_ENTITY_TO_CLASS( func_respawnroom, CFuncRespawnRoom);
 
 BEGIN_DATADESC( CFuncRespawnRoom )
-	DEFINE_FUNCTION( CFuncRespawnRoomShim::Touch ),
+	DEFINE_ENTITYFUNC( RespawnRoomTouch ),
 	// inputs
 	DEFINE_INPUTFUNC( FIELD_VOID, "SetActive", InputSetActive ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "SetInactive", InputSetInactive ),
@@ -78,7 +51,7 @@ void CFuncRespawnRoom::Spawn( void )
 	SetCollisionGroup( TFCOLLISION_GROUP_RESPAWNROOMS );
 
 	m_bActive = true;
-	SetTouch( &CFuncRespawnRoomShim::Touch );
+	SetTouch( &CFuncRespawnRoom::RespawnRoomTouch );
 }
 
 //-----------------------------------------------------------------------------

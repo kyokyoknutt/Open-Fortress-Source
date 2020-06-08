@@ -28,7 +28,7 @@ COptionsSubGame::~COptionsSubGame()
 
 void COptionsSubGame::OnClose( void )
 {
-	BasePanel()->RunCloseAnimation( "CloseOptionsSubGame" );
+	// BasePanel()->RunCloseAnimation( "CloseOptionsSubGame" );
 	BaseClass::OnClose();
 }
 

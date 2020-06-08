@@ -122,7 +122,8 @@
 #include "fmod_manager.h"
 #include "c_of_music_player.h"
 #include "of_shared_schemas.h"
-#include "of_loadout.h"
+#include "gameui/BaseModPanel.h"
+#include <GameUI/IGameUI.h>
 #endif
 #include "clientsteamcontext.h"
 #include "renamed_recvtable_compat.h"
@@ -1057,9 +1058,11 @@ int CHLClient::Init(CreateInterfaceFn appSystemFactory, CreateInterfaceFn physic
 	
 #ifdef OF_CLIENT_DLL	
 	AddRequiredSearchPaths();
-#endif
 
-#ifdef OF_CLIENT_DLL
+	// Why on earth would you only automatically enable this in Valve games????!?!?
+	engine->SetRestrictServerCommands( true );
+	engine->SetRestrictClientCommands( true );
+
 	// crude way to detect if TF2 is mounted properly
 	IMaterial *testmat = materials->FindMaterial("console/title_war", TEXTURE_GROUP_OTHER );
 	if ( testmat->IsErrorMaterial() )
@@ -1151,10 +1154,24 @@ int CHLClient::Init(CreateInterfaceFn appSystemFactory, CreateInterfaceFn physic
 	ParseSoundManifest();
 	FMODManager()->InitFMOD();
 
+	BaseModUI::CBaseModPanel* pBaseModPanel = new BaseModUI::CBaseModPanel();
+
+	pBaseModPanel->SetBounds(0, 0, 640, 480);
+	pBaseModPanel->SetPaintBorderEnabled(false);
+	pBaseModPanel->SetPaintBackgroundEnabled(true);
+	pBaseModPanel->SetPaintEnabled(true);
+	pBaseModPanel->SetVisible(true);
+	
+	pBaseModPanel->SetMouseInputEnabled(IsPC());
+	// pBaseModPanel->SetKeyBoardInputEnabled( IsPC() );
+	pBaseModPanel->SetKeyBoardInputEnabled(true);
+
+	/*
 	CTFLoadoutPanel *pLoadoutPanel = GLoadoutPanel();
 	pLoadoutPanel->InvalidateLayout( false, true );
 	pLoadoutPanel->SetVisible( false );
 	pLoadoutPanel->MakePopup( false );
+	*/
 #endif
 
 	if (!view)
@@ -1175,6 +1192,18 @@ int CHLClient::Init(CreateInterfaceFn appSystemFactory, CreateInterfaceFn physic
 
 	// Register user messages..
 	CUserMessageRegister::RegisterAll();
+
+#ifdef OF_CLIENT_DLL
+	// ------------------------------
+	// Force CELT audio codec, instead of the one from Steam
+	// ------------------------------
+	ConVar *sv_voicecodec = NULL;
+	sv_voicecodec = g_pCVar->FindVar( "sv_voicecodec" );
+	if ( sv_voicecodec )
+	{
+		sv_voicecodec->SetValue( "vaudio_celt" );
+	}
+#endif
 
 	ClientVoiceMgr_Init();
 
@@ -1314,6 +1343,7 @@ int CHLClient::Init(CreateInterfaceFn appSystemFactory, CreateInterfaceFn physic
 	{
 		mod_load_vcollide_async->SetValue( 1 );
 	}
+
 	// ------------------------------
 
 	// mat_picmip is handled in PostInit() instead
@@ -1388,6 +1418,8 @@ void CHLClient::PostInit()
 #endif
 
 #ifdef OF_CLIENT_DLL
+	// TODO: revisit this now that we can patch engine memory
+
 	// What is the reasoning for this mess?
 	// The engine clamps mat_picmip to -1 - 2 every rendering frame and we don't have access to change this
 	// Therefore we set the desired picmip from another convar and then immediately nuke it on the same frame
@@ -1417,9 +1449,7 @@ void CHLClient::PostInit()
 			mat_picmip->Nuke();
 		}
 	}
-#endif
 
-#ifdef OF_CLIENT_DLL
 	ConVar *cl_updaterate = NULL;
 	cl_updaterate = g_pCVar->FindVar( "cl_updaterate" );
 	if( cl_updaterate )
@@ -1555,6 +1585,11 @@ void CHLClient::HudProcessInput( bool bActive )
 	g_pClientMode->ProcessInput( bActive );
 }
 
+#ifdef OF_CLIENT_DLL
+static bool bSbFilterSet = false;
+static int  iSbFilterAttempts = 0;
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: Called when shared data gets changed, allows dll to modify data
 // Input  : bActive - 
@@ -1579,15 +1614,42 @@ void CHLClient::HudUpdate( bool bActive )
 	// run vgui animations
 	vgui::GetAnimationController()->UpdateAnimations( engine->Time() );
 
+#ifndef OF_CLIENT_DLL
 	hudlcd->SetGlobalStat( "(time_int)", VarArgs( "%d", (int)gpGlobals->curtime ) );
 	hudlcd->SetGlobalStat( "(time_float)", VarArgs( "%.2f", gpGlobals->curtime ) );
 
 	// I don't think this is necessary any longer, but I will leave it until
 	// I can check into this further.
 	C_BaseTempEntity::CheckDynamicTempEnts();
+#endif
 
 #ifdef OF_CLIENT_DLL
 	g_discordrpc.RunFrame();
+
+	// ------------------------------
+	// Force show servers with incompatible versions. 
+	// So that clients won't be confused when there is no servers appearing in the browser due to outdated versions
+	// Must be done here... because the serverbrowser only gets inited when the gameui is running its frames
+	// ------------------------------
+	if ( !bSbFilterSet )
+	{
+		// Skip 1st frame
+		if ( iSbFilterAttempts > 1 )
+		{
+			ConVarRef sb_filter_incompatible_versions( "sb_filter_incompatible_versions" );
+			if ( sb_filter_incompatible_versions.IsValid() )
+			{
+				sb_filter_incompatible_versions.SetValue(0);
+				bSbFilterSet = true;
+			}
+		}
+
+		// Failsafe incase serverbrowser module never loads to stop the expensive convar searches
+		iSbFilterAttempts++;
+
+		if ( iSbFilterAttempts > 10 )
+			bSbFilterSet = true;
+	}
 #endif
 
 #ifdef SIXENSE

@@ -20,6 +20,10 @@
 	#include "team.h"
 #endif
 
+#if defined( OF_CLIENT_DLL ) || defined( OF_DLL )
+#include "tf_gamerules.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -355,11 +359,16 @@ bool CTeamplayRules::IsTeamplay( void )
 
 bool CTeamplayRules::FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker, const CTakeDamageInfo &info )
 {
+#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+	if ( TFGameRules()->IsCoopEnabled() && pAttacker && pAttacker->IsPlayer() && friendlyfire.GetInt() == 0 )
+		return false;
+#endif
+
 	if ( pAttacker && PlayerRelationship( pPlayer, pAttacker ) == GR_TEAMMATE && !info.IsForceFriendlyFire() )
 	{
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
 		// my teammate hit me.
-		if ( ( of_teamplay_knockback.GetInt() == 1 ) && (friendlyfire.GetInt() == 0 ) && pAttacker != pPlayer)
+		if ( ( of_teamplay_knockback.GetInt() == 1 ) && (friendlyfire.GetInt() == 0 ) && pAttacker != pPlayer )
 		{
 			// hack: we tell ourselves to pass the damage but then zero out this damage later
 			return true;

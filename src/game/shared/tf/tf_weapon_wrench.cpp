@@ -121,7 +121,7 @@ void CTFWrench::Smack( void )
 		trace.m_pEnt &&
 		trace.m_pEnt->IsBaseObject() &&
 		( 
-			( ( iPlayerTeam != TF_TEAM_MERCENARY ) &&
+			( ( TFGameRules()->IsCoopEnabled() || iPlayerTeam != TF_TEAM_MERCENARY ) &&
 					trace.m_pEnt->GetTeamNumber() == iPlayerTeam ) ||
 				pPlayer == ((CBaseObject *) trace.m_pEnt)->GetOwner()
 			)

@@ -29,8 +29,8 @@ public:
 	void PlayMusicEnd( ChannelGroup *pNewChannelGroup, const char* pLoopingMusic, bool bDelay = false, Channel *pLoopingChannel = NULL );
 	void StopAllSound( void );
 	void TransitionAmbientSounds( const char* pathToFileFromSoundsFolder );
-	float GetSoundLenght(void);
-	unsigned int GetSoundLenghtPCM( Sound *sound );
+	float GetSoundLength(void);
+	unsigned int GetSoundLengthPCM( Sound *sound );
 
 	float m_fDefaultVolume;
 private:

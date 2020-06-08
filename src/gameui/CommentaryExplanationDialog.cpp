@@ -70,7 +70,7 @@ void CCommentaryExplanationDialog::OnCommand( const char *command )
 	if ( !stricmp( command, "ok" ) )
 	{
 		Close();
-		BasePanel()->FadeToBlackAndRunEngineCommand( m_pszFinishCommand );
+		// BasePanel()->FadeToBlackAndRunEngineCommand( m_pszFinishCommand );
 	}
 	else if ( !stricmp( command, "cancel" ) || !stricmp( command, "close" ) )
 	{

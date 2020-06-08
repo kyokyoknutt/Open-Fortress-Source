@@ -127,7 +127,11 @@ bool CTFBotUseJumpPad::IsPossible( CTFBot *actor )
 
 	CUtlVector<EHANDLE> jumppads;
 
-	jumppads.AddVectorToTail( TFGameRules()->GetJumpPadEnts() );
+	for ( int i = 0; i < IOFDTriggerJumpAutoList::AutoList().Count(); ++i )
+	{
+		EHANDLE hndl = static_cast< COFDTriggerJump* >(IOFDTriggerJumpAutoList::AutoList()[ i ] );
+		jumppads.AddToTail( hndl );
+	}
 
 	CJumpPadFilter filter( actor );
 	actor->SelectReachableObjects( jumppads, &jumppads, filter, actor->GetLastKnownArea(), tf_bot_jumppad_search_range.GetFloat() );

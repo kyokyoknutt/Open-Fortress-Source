@@ -631,6 +631,7 @@ CBasePlayer::CBasePlayer( )
 
 #ifdef OF_DLL
 	m_nUpdateRate = 66;  // cl_updaterate defualt
+	m_bIsCSliding = false;
 #else
 	m_nUpdateRate = 20;
 #endif

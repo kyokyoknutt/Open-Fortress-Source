@@ -30,7 +30,7 @@
 #include "CommentaryExplanationDialog.h"
 #include "vgui_controls/BitmapImagePanel.h"
 #include "BonusMapsDatabase.h"
-#include "BaseModPanel.h"
+#include "BasePanel.h"
 
 #include <stdio.h>
 
@@ -349,13 +349,13 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 		m_pBonusSelection = SETUP_PANEL( new Label( this, "BonusSelectionLabel", "#GameUI_BonusMapsStandard" ) );
 		m_pBonusSelectionBorder = SETUP_PANEL( new ImagePanel( this, "BonusSelectionBorder" ) );
 
-		m_pFooter = new CFooterPanel( parent, "NewGameFooter" );
-		m_pFooter->AddNewButtonLabel( "#GameUI_Play", "#GameUI_Icons_A_BUTTON" );
-		m_pFooter->AddNewButtonLabel( "#GameUI_Close", "#GameUI_Icons_B_BUTTON" );
+		// m_pFooter = new CFooterPanel( parent, "NewGameFooter" );
+		// m_pFooter->AddNewButtonLabel( "#GameUI_Play", "#GameUI_Icons_A_BUTTON" );
+		// m_pFooter->AddNewButtonLabel( "#GameUI_Close", "#GameUI_Icons_B_BUTTON" );
 	}
 	else
 	{
-		m_pFooter = NULL;
+		// m_pFooter = NULL;
 	}
 
 	// parse out the chapters off disk
@@ -538,8 +538,8 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 
 CNewGameDialog::~CNewGameDialog()
 {
-	delete m_pFooter;
-	m_pFooter = NULL;
+	// delete m_pFooter;
+	// m_pFooter = NULL;
 }
 
 void CNewGameDialog::Activate( void )
@@ -549,9 +549,9 @@ void CNewGameDialog::Activate( void )
 	if ( GameUI().IsConsoleUI() )
 	{
 		// Stop blinking the menu item now that we've seen the unlocked stuff
-		BaseModUI::CBaseModPanel *pBasePanel = BaseModUI::BasePanel();
-		if ( pBasePanel )
-			pBasePanel->SetMenuItemBlinkingState( "OpenNewGameDialog", false );
+		// IBasePanel *pBasePanel = BasePanel();
+		// if ( pBasePanel )
+		// 	pBasePanel->SetMenuItemBlinkingState( "OpenNewGameDialog", false );
 
 		BonusMapsDatabase()->SetBlink( false );
 	}
@@ -1357,7 +1357,7 @@ void CNewGameDialog::OnClose( void )
 
 	if ( GameUI().IsConsoleUI() && !m_bMapStarting )
 	{
-		BasePanel()->RunCloseAnimation( "CloseNewGameDialog_OpenMainMenu" );			
+		// BasePanel()->RunCloseAnimation( "CloseNewGameDialog_OpenMainMenu" );			
 		BonusMapsDatabase()->WriteSaveData();	// Closing this dialog is a good time to save
 	}
 	BaseClass::OnClose();

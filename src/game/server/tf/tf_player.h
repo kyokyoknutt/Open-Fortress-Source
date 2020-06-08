@@ -416,9 +416,6 @@ public:
 								// affecting the player at any time.
 								// GoalItems use it to keep track of their own 
 								// mask to apply to a player's item_list
-								
-	int	  trickshot;
-	float last_kill;
 
 	float invincible_finished;
 	float invisible_finished;
@@ -544,6 +541,16 @@ public:
 	CUtlVector< WeaponHandle >	m_hSuperWeapons;
 
 	WeaponHandle m_hWeaponInSlot[10][20]; // 20 pos cuz melee my ass
+
+	//medals
+	bool				m_bHadPowerup;
+	int					m_iPowerupKills;
+	int					m_iEXKills;
+	float				m_fEXTime;
+	int					m_iSpreeKills;
+	int					m_iImpressiveCount;
+	CBaseEntity			*m_SuicideEntity;
+
 private:
 
 	int					GetAutoTeam( void );

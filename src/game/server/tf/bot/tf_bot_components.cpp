@@ -139,17 +139,18 @@ bool CTFBotLocomotion::IsEntityTraversable( CBaseEntity *ent, TraverseWhenType w
 		// always assume we can walk through players, we'll try to avoid them if needed later
 		if ( ent->IsPlayer() )
 			return true;
-		
-		// walk through powerups + dropped weapons
-		if ( FClassnameIs( ent, "tf_dropped*" ) || FClassnameIs( ent, "tf_ammo_pack" ) )
-			return true;
-		
+
 		if ( ent->IsBaseObject() )
 		{
 			CBaseObject *obj = static_cast<CBaseObject *>( ent );
 			if ( obj->GetBuilder() == this->GetEntity() ) // we can't walk through our own buildings...
 				return false;
 		}
+		
+		// walk through powerups + dropped weapons
+		CTFPowerup *pItem = dynamic_cast<CTFPowerup *>( const_cast<CBaseEntity *>( ent ) );
+		if ( pItem )
+			return true;
 	}
 
 	return BaseClass::IsEntityTraversable( ent, when );

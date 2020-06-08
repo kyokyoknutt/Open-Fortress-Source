@@ -379,6 +379,10 @@ void ClientPrecache( void )
 #endif // HL2MP
 	CBaseEntity::PrecacheScriptSound( "Player.FallDamage" );
 	CBaseEntity::PrecacheScriptSound( "Player.Swim" );
+	
+#if defined OF_DLL
+	CBaseEntity::PrecacheScriptSound( "Player.Slide" );
+#endif
 
 	// General HUD sounds
 	CBaseEntity::PrecacheScriptSound( "Player.PickupWeapon" );

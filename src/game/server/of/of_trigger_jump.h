@@ -5,8 +5,8 @@
 #include "cbase.h"
 #include "triggers.h"
 
-
-class COFDTriggerJump : public CBaseTrigger
+DECLARE_AUTO_LIST(IOFDTriggerJumpAutoList)
+class COFDTriggerJump : public CBaseTrigger, public IOFDTriggerJumpAutoList
 {
 public:
 	DECLARE_CLASS( COFDTriggerJump, CBaseTrigger );
@@ -32,6 +32,7 @@ public:
 
 protected:
 	string_t m_szTarget;
+	string_t m_szLaunchTarget; // TEMP: for trigger_catapult
 	EHANDLE m_pTarget;
 	bool m_iSoftLanding;
 

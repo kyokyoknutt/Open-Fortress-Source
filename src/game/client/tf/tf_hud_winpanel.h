@@ -68,7 +68,7 @@ public:
 	CTFWinPanelDM(const char *pElementName);
 
 	virtual void Reset();
-	virtual void FireGameEvent(IGameEvent * event);
+	virtual void FireGameEvent(IGameEvent *event);
 	virtual bool ShouldDraw(void);
 	virtual void SetVisible(bool state);
 	virtual void OnCommand(const char *command);

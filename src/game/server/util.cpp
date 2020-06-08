@@ -1382,25 +1382,31 @@ void UTIL_ClearTrace( trace_t &trace )
 //-----------------------------------------------------------------------------
 static void SetMinMaxSize (CBaseEntity *pEnt, const Vector& mins, const Vector& maxs )
 {
+#ifdef OF_DLL
+	bool bBackwards = false;
+#endif
+
 	for ( int i=0 ; i<3 ; i++ )
 	{
 		if ( mins[i] > maxs[i] )
 		{
 #ifdef OF_DLL
-			Error("%i/%s - %s:  backwards mins/maxs: %s\n\nIf you are getting this error, your game is not mounting Team Fortress 2 correctly.\nInstall TF2 if you haven't already, or try specifying full drive paths to TF2 in the gameinfo.txt.", pEnt->entindex(),
-				STRING( pEnt->GetEntityName() ),
-				pEnt->GetClassname(), STRING ( pEnt->GetModelName() ) );
+			// No clue why this happens... but it does
+			bBackwards = true;
 #else
 			Error( "%s: backwards mins/maxs", ( pEnt ) ? pEnt->GetDebugName() : "<NULL>" );
 #endif
 		}
 	}
 	
-#ifndef OF_DLL
 	Assert( pEnt );
-#endif
 
-	pEnt->SetCollisionBounds( mins, maxs );
+#ifdef OF_DLL
+	if ( bBackwards )
+		pEnt->SetCollisionBounds( maxs, mins );
+	else
+#endif
+		pEnt->SetCollisionBounds( mins, maxs );
 }
 
 

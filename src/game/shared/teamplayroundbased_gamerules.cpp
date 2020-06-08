@@ -271,7 +271,7 @@ static ConCommand mp_switchteams( "mp_switchteams", cc_SwitchTeams, "Switch team
 void cc_ScrambleTeams( const CCommand& args )
 {
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
-	if ( TFGameRules() && ( ( TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ) || TFGameRules()->IsInfGamemode() ) )
+	if ( TFGameRules() && ( ( TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ) || ( TFGameRules()->IsInfGamemode() || TFGameRules()->IsCoopEnabled() ) ) )
 		return;
 #endif
 	
@@ -1853,7 +1853,7 @@ void CTeamplayRoundBasedRules::State_Think_RND_RUNNING( void )
 
 	// See if we're coming up to the server timelimit, in which case force a stalemate immediately.
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
-	if ( mp_timelimit.GetInt() > 0 && IsInPreMatch() == false && GetTimeLeft() <= 0 && !TFGameRules()->IsInfGamemode() )
+	if ( mp_timelimit.GetInt() > 0 && IsInPreMatch() == false && GetTimeLeft() <= 0 && !TFGameRules()->IsInfGamemode() && !TFGameRules()->IsCoopEnabled() )
 #else
 	if ( mp_timelimit.GetInt() > 0 && IsInPreMatch() == false && GetTimeLeft() <= 0 )
 #endif
@@ -3331,7 +3331,7 @@ void CTeamplayRoundBasedRules::CheckRespawnWaves( void )
 void CTeamplayRoundBasedRules::BalanceTeams( bool bRequireSwitcheesToBeDead )
 {
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
-	if ( TFGameRules() && ( ( TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ) || TFGameRules()->IsInfGamemode() ) )
+	if ( TFGameRules() && ( ( TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ) || ( TFGameRules()->IsInfGamemode() || TFGameRules()->IsCoopEnabled() ) ) )
 		return;
 #endif
 

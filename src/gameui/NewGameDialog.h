@@ -81,7 +81,7 @@ private:
 	vgui::Label			*m_pChapterTitleLabels[2];
 	vgui::Label			*m_pBonusSelection;
 	vgui::ImagePanel	*m_pBonusSelectionBorder;
-	CFooterPanel		*m_pFooter;
+	// CFooterPanel		*m_pFooter;
 	bool				m_bCommentaryMode;
 	vgui::Label			*m_pCommentaryLabel;
 

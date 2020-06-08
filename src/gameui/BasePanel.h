@@ -11,7 +11,13 @@
 #pragma once
 #endif
 
-#include "BaseModPanel.h"
-inline BaseModUI::CBaseModPanel * BasePanel() { return &BaseModUI::CBaseModPanel::GetSingleton(); }
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/MenuItem.h"
+#include "vgui_controls/MessageDialog.h"
+#include "KeyValues.h"
+#include "utlvector.h"
+#include "tier1/CommandBuffer.h"
+
 
 #endif // BASEPANEL_H

@@ -221,17 +221,31 @@ void CTFWeaponBaseGun::PrimaryAttack( void )
 	}
 
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
+
+	//fire line tracer to determine if projectile will hit a player, needed for Impressive medal
 #ifdef GAME_DLL
-	int kqly = pPlayer->trickshot;
+	if (WeaponID_IsSniperRifle(GetWeaponID()))
+	{
+		Vector vecSrc = pPlayer->Weapon_ShootPosition();
+
+		trace_t tr;
+		UTIL_TraceLine(vecSrc, vecSrc + pPlayer->GetAutoaimVector(0) * GetTFWpnData().m_WeaponData[TF_WEAPON_PRIMARY_MODE].m_flRange, MASK_ALL, pPlayer, COLLISION_GROUP_NONE, &tr);
+
+		if (tr.m_pEnt)
+		{
+			if (tr.m_pEnt->IsPlayer())
+				pPlayer->m_iImpressiveCount++;
+			else
+				pPlayer->m_iImpressiveCount = 0;
+		}
+	}
 #endif
+
 	FireProjectile( pPlayer );
 	
 	m_iDamageIncrease += m_pWeaponInfo->m_iContinuousFireDamageIncrease;
 	m_flBlastRadiusIncrease += m_pWeaponInfo->m_flContinuousFireBlastRadiusIncrease;
-#ifdef GAME_DLL
-	if ( kqly == pPlayer->trickshot )
-		pPlayer->trickshot = 0;
-#endif
+
 	// Set next attack times.
 	if ( GetTFWpnData().m_WeaponData[TF_WEAPON_PRIMARY_MODE].m_flBurstFireDelay == 0 )
 	{

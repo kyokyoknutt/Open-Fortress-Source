@@ -451,6 +451,10 @@ C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOf
 	m_nLocalPlayerVisionFlags = 0;
 
 	ListenForGameEvent( "base_player_teleported" );
+
+#if defined( OF_CLIENT_DLL )
+	m_bIsCSliding = false;
+#endif
 }
 
 //-----------------------------------------------------------------------------

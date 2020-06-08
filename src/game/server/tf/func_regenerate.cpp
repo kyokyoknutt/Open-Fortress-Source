@@ -27,8 +27,11 @@ BEGIN_DATADESC( CRegenerateZone )
 	DEFINE_KEYFIELD( m_iszAssociatedModel, FIELD_STRING, "associatedmodel" ),
 
 	// Functions.
-	DEFINE_FUNCTION( Touch ),
+	DEFINE_ENTITYFUNC( RegenerateTouch ),
 END_DATADESC();
+
+IMPLEMENT_AUTO_LIST( IRegenerateZoneAutoList );
+
 
 //=============================================================================
 //
@@ -50,7 +53,7 @@ void CRegenerateZone::Spawn( void )
 {
 	Precache();
 	InitTrigger();
-	SetTouch( &CRegenerateZone::Touch );
+	SetTouch( &CRegenerateZone::RegenerateTouch );
 }
 
 //-----------------------------------------------------------------------------
@@ -93,7 +96,7 @@ void CRegenerateZone::Activate( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CRegenerateZone::Touch( CBaseEntity *pOther )
+void CRegenerateZone::RegenerateTouch( CBaseEntity *pOther )
 {
 	if ( !IsDisabled() )
 	{

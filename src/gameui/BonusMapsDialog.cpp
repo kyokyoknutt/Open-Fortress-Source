@@ -26,7 +26,7 @@
 #include "TGAImagePanel.h"
 #include "MouseMessageForwardingPanel.h"
 
-#include "BaseModPanel.h"
+#include "BasePanel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -256,9 +256,9 @@ CBonusMapsDialog::CBonusMapsDialog(vgui::Panel *parent) : BaseClass(parent, "Bon
 	LoadControlSettings("resource/BonusMapsDialog.res");
 
 	// Stop blinking the bonus maps menu item
-	BaseModUI::CBaseModPanel *pBasePanel = BaseModUI::BasePanel();
-	if ( pBasePanel )
-		pBasePanel->SetMenuItemBlinkingState( "OpenBonusMapsDialog", false );
+	// IBasePanel *pBasePanel = BasePanel();
+	// if ( pBasePanel )
+	// 	pBasePanel->SetMenuItemBlinkingState( "OpenBonusMapsDialog", false );
 
 	BonusMapsDatabase()->SetBlink( false );
 }

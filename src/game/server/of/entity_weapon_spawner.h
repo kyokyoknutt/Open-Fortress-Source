@@ -17,7 +17,8 @@
 // CTF WeaponSpawner class.
 //
 
-class CWeaponSpawner : public CTFPowerup
+DECLARE_AUTO_LIST(IWeaponSpawnerAutoList)
+class CWeaponSpawner : public CTFPowerup, public IWeaponSpawnerAutoList
 {
 public:
 	DECLARE_CLASS( CWeaponSpawner, CTFPowerup );

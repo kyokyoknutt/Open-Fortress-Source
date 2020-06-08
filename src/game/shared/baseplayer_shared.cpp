@@ -680,6 +680,11 @@ void CBasePlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, flo
 	if ( gpGlobals->maxClients > 1 && !sv_footsteps.GetFloat() )
 		return;
 
+#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+	if (m_bIsCSliding)
+		return;
+#endif
+
 #if defined( CLIENT_DLL )
 	// during prediction play footstep sounds only once
 	if ( prediction->InPrediction() && !prediction->IsFirstTimePredicted() )
@@ -729,7 +734,7 @@ void CBasePlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, flo
 #ifndef CLIENT_DLL
 	// in MP, server removes all players in the vecOrigin's PVS, these players generate the footsteps client side
 	
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )	
+#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
 	filter.UsePredictionRules();   
 	if ( !force && gpGlobals->maxClients > 1 )
 #else

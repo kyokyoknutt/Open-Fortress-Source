@@ -50,6 +50,8 @@ DEFINE_KEYFIELD( m_iszPickupSound, FIELD_STRING, "pickup_sound" ),
 
 END_DATADESC()
 
+IMPLEMENT_AUTO_LIST( IAmmoPackAutoList );
+
 //=============================================================================
 //
 // CTF AmmoPack functions.

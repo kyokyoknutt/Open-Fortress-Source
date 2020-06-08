@@ -1635,6 +1635,10 @@ int CBaseObject::OnTakeDamage( const CTakeDamageInfo &info )
 			return 0;
 	}
 
+	// No damaging our buildings in coop
+    if ( info.GetAttacker()->IsPlayer() && TFGameRules()->IsCoopEnabled() )
+		return 0;
+
 	IHasBuildPoints *pBPInterface = dynamic_cast<IHasBuildPoints*>(this);
 
 	float flDamage = info.GetDamage();
@@ -1877,7 +1881,7 @@ void CBaseObject::CreateObjectGibs( void )
 		Assert( pAmmoPack );
 		if ( pAmmoPack )
 		{
-			pAmmoPack->ActivateWhenAtRest();
+			//pAmmoPack->ActivateWhenAtRest();
 
 			// Fill up the ammo pack.
 			pAmmoPack->GiveAmmo( nMetalPerGib, TF_AMMO_METAL );

@@ -14,6 +14,14 @@
 
 float GetCurrentGravity( void );
 
+#if defined( OF_CLIENT_DLL ) || defined( OF_DLL )
+extern ConVar of_movementmode;
+extern ConVar of_q3airaccelerate;
+extern ConVar of_cslide;
+extern ConVar of_cslideaccelerate;
+extern ConVar of_cslidefriction;
+#endif
+
 extern ConVar sv_gravity;
 extern ConVar sv_stopspeed;
 extern ConVar sv_noclipaccelerate;

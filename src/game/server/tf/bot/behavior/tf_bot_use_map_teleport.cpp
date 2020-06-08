@@ -127,7 +127,11 @@ bool CTFBotUseMapTeleport::IsPossible( CTFBot *actor )
 
 	CUtlVector<EHANDLE> mapteleports;
 
-	mapteleports.AddVectorToTail( TFGameRules()->GetMapTeleportEnts() );
+	for ( int i = 0; i < ITriggerTeleportAutoList::AutoList().Count(); ++i )
+	{
+		EHANDLE hndl = static_cast< CTriggerTeleport* >( ITriggerTeleportAutoList::AutoList()[ i ] );
+		mapteleports.AddToTail( hndl );
+	}
 
 	CMapTeleportFilter filter( actor );
 	actor->SelectReachableObjects( mapteleports, &mapteleports, filter, actor->GetLastKnownArea(), tf_bot_mapteleport_search_range.GetFloat() );

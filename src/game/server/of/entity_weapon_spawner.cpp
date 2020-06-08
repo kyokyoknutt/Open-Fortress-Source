@@ -64,6 +64,8 @@ END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( dm_weapon_spawner, CWeaponSpawner );
 
+IMPLEMENT_AUTO_LIST( IWeaponSpawnerAutoList );
+
 CWeaponSpawner::CWeaponSpawner()
 {
 	m_flRespawnTick = 0.0f;
@@ -81,66 +83,57 @@ CWeaponSpawner::CWeaponSpawner()
 
 void CWeaponSpawner::Spawn( void )
 {
-	if ( !of_weaponspawners.GetBool() || !TFGameRules()->IsMutator( NO_MUTATOR ) || TFGameRules()->IsGGGamemode() )
-	{
-		m_bDisabled = true;
-		return;
-	}
-
 	m_nRenderFX = kRenderFxNone;
-	if ( TFGameRules()->IsMutator( NO_MUTATOR ) && 
-		 !TFGameRules()->IsGGGamemode() )
+
+	Q_strncpy( m_iszWeaponName.GetForModify(), STRING(szWeaponName), 128 );
+
+	// fixup tf_weapon_shotgun_<class> strings to tf_weapon_shotgun
+	if ( !Q_strncmp( "tf_weapon_shot", m_iszWeaponName.Get(), 14 ) )
+		Q_strncpy( m_iszWeaponName.GetForModify(), "tf_weapon_shotgun", 128 );
+
+	if ( szWeaponModel != MAKE_STRING("") )
+		Q_strncpy( m_iszWeaponModel, STRING( szWeaponModel ) , sizeof( m_iszWeaponModel ) );
+
+	if ( szWeaponModelOLD != MAKE_STRING("") )
+		Q_strncpy( m_iszWeaponModelOLD, STRING( szWeaponModelOLD ) , sizeof( m_iszWeaponModelOLD ) );
+		Q_strncpy( m_iszPickupSound, STRING( szPickupSound ), sizeof( m_iszPickupSound ) );
+
+	if ( filesystem )
 	{
-		Q_strncpy( m_iszWeaponName.GetForModify(), STRING(szWeaponName), 128 );
-
-		// fixup tf_weapon_shotgun_<class> strings to tf_weapon_shotgun
-		if ( !Q_strncmp( "tf_weapon_shot", m_iszWeaponName.Get(), 14 ) )
-			Q_strncpy( m_iszWeaponName.GetForModify(), "tf_weapon_shotgun", 128 );
-
-		if ( szWeaponModel != MAKE_STRING("") )
-			Q_strncpy( m_iszWeaponModel, STRING( szWeaponModel ) , sizeof( m_iszWeaponModel ) );
-
-		if ( szWeaponModelOLD != MAKE_STRING("") )
-			Q_strncpy( m_iszWeaponModelOLD, STRING( szWeaponModelOLD ) , sizeof( m_iszWeaponModelOLD ) );
-			Q_strncpy( m_iszPickupSound, STRING( szPickupSound ), sizeof( m_iszPickupSound ) );
-
-		if ( filesystem )
+		char szMapName[128];
+		Q_snprintf( szMapName, sizeof(szMapName), "maps/%s_mapdata.txt" , STRING(gpGlobals->mapname) );
+		if ( filesystem->FileExists( szMapName, "GAME" ) )
 		{
-			char szMapName[128];
-			Q_snprintf( szMapName, sizeof(szMapName), "maps/%s_mapdata.txt" , STRING(gpGlobals->mapname) );
-			if ( filesystem->FileExists( szMapName, "GAME" ) )
+			KeyValues* pMapData = new KeyValues( "MapData" );
+			pMapData->LoadFromFile( filesystem, szMapName );
+			if ( pMapData )
 			{
-				KeyValues* pMapData = new KeyValues( "MapData" );
-				pMapData->LoadFromFile( filesystem, szMapName );
-				if ( pMapData )
+				KeyValues* pWeaponSpawners = pMapData->FindKey( "WeaponSpawners" );
+				if ( pWeaponSpawners )
 				{
-					KeyValues* pWeaponSpawners = pMapData->FindKey( "WeaponSpawners" );
-					if ( pWeaponSpawners )
+					char pTemp[256];
+					Q_snprintf( pTemp, sizeof(pTemp), "%d", m_iIndex.Get() );
+					KeyValues* pWeaponSpawner = pWeaponSpawners->FindKey( pTemp );
+					if ( pWeaponSpawner )
 					{
-						char pTemp[256];
-						Q_snprintf( pTemp, sizeof(pTemp), "%d", m_iIndex.Get() );
-						KeyValues* pWeaponSpawner = pWeaponSpawners->FindKey( pTemp );
-						if ( pWeaponSpawner )
-						{
-							Q_strncpy( m_iszWeaponName.GetForModify(), pWeaponSpawner->GetString("Weapon", m_iszWeaponName.GetForModify()), 128 );
-							Q_strncpy( m_iszWeaponModel, pWeaponSpawner->GetString("Model", m_iszWeaponModel) , sizeof( m_iszWeaponModel ) );
-							Q_strncpy( m_iszPickupSound,  pWeaponSpawner->GetString("PickupSound", m_iszPickupSound), sizeof( m_iszPickupSound ) );						
-						}
+						Q_strncpy( m_iszWeaponName.GetForModify(), pWeaponSpawner->GetString("Weapon", m_iszWeaponName.GetForModify()), 128 );
+						Q_strncpy( m_iszWeaponModel, pWeaponSpawner->GetString("Model", m_iszWeaponModel) , sizeof( m_iszWeaponModel ) );
+						Q_strncpy( m_iszPickupSound,  pWeaponSpawner->GetString("PickupSound", m_iszPickupSound), sizeof( m_iszPickupSound ) );						
 					}
 				}
 			}
 		}
-
-		Precache();
-		// Update(); called in Precache instead
-		SetWeaponModel();
-		BaseClass::Spawn();
-		ResetSequence( LookupSequence("spin") );
-		UTIL_SetSize( this, -Vector(25,25,12), Vector(25,25,12) );
-
-		RegisterThinkContext( "AnnounceThink" );
-		SetContextThink( &CWeaponSpawner::AnnouncerThink, gpGlobals->curtime, "AnnounceThink" );
 	}
+
+	Precache();
+	// Update(); called in Precache instead
+	SetWeaponModel();
+	BaseClass::Spawn();
+	ResetSequence( LookupSequence("spin") );
+	UTIL_SetSize( this, -Vector(25,25,12), Vector(25,25,12) );
+
+	RegisterThinkContext( "AnnounceThink" );
+	SetContextThink( &CWeaponSpawner::AnnouncerThink, gpGlobals->curtime, "AnnounceThink" );
 }
 
 void CWeaponSpawner::SetWeaponModel( void )
@@ -459,6 +452,8 @@ void CWeaponSpawner::InputSetWeaponModel( inputdata_t &inputdata )
 	{
 		CBaseEntity::PrecacheModel( name );
 		SetModel( name );
+
+		ResetSequence( LookupSequence("spin") );
 	}
 }
 

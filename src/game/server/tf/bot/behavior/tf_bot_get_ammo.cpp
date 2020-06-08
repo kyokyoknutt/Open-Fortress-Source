@@ -4,7 +4,8 @@
 #include "tf_obj.h"
 #include "nav_mesh/tf_nav_mesh.h"
 #include "tf_bot_get_ammo.h"
-
+#include "entity_ammopack.h"
+#include "func_regenerate.h"
 
 ConVar tf_bot_ammo_search_range( "tf_bot_ammo_search_range", "5000", FCVAR_CHEAT, "How far bots will search to find ammo around them" );
 ConVar tf_bot_debug_ammo_scavanging( "tf_bot_debug_ammo_scavanging", "0", FCVAR_CHEAT );
@@ -121,16 +122,12 @@ bool CTFBotGetAmmo::IsPossible( CTFBot *actor )
 	VPROF_BUDGET( __FUNCTION__, "NextBot" );
 
 	CUtlVector<EHANDLE> ammos;
-	for ( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity; pEntity = gEntList.NextEnt( pEntity ) )
-	{
-		if ( pEntity->ClassMatches( "tf_ammo_pack" ) )
-		{
-			EHANDLE hndl( pEntity );
-			ammos.AddToTail( hndl );
-		}
-	}
 
-	ammos.AddVectorToTail( TFGameRules()->GetAmmoEnts() );
+	for ( int i = 0; i < IAmmoPackAutoList::AutoList().Count(); ++i )
+	{
+		EHANDLE hndl = static_cast< CAmmoPack* >( IAmmoPackAutoList::AutoList()[ i ] );
+		ammos.AddToTail( hndl );
+	}
 
 	CAmmoFilter filter( actor );
 	actor->SelectReachableObjects( ammos, &ammos, filter, actor->GetLastKnownArea(), tf_bot_ammo_search_range.GetFloat() );
@@ -202,7 +199,8 @@ bool CAmmoFilter::IsSelected( const CBaseEntity *ent ) const
 		return false;
 
 	// Can't use enemy teams resupply cabinet
-	if ( FClassnameIs( const_cast<CBaseEntity *>( ent ), "func_regenerate" ) )
+	CRegenerateZone *pZone = dynamic_cast<CRegenerateZone *>( const_cast<CBaseEntity *>( ent ) );
+	if ( pZone )
 	{
 		if ( m_pActor->GetTeamNumber() == TF_TEAM_RED && pArea->HasTFAttributes( BLUE_SPAWN_ROOM ) )
 			return false;
@@ -211,10 +209,9 @@ bool CAmmoFilter::IsSelected( const CBaseEntity *ent ) const
 			return false;
 	}
 
-	if ( FClassnameIs( const_cast<CBaseEntity *>( ent ), "obj_dispenser*" ) )
+	CBaseObject *pObject = dynamic_cast<CBaseObject *>( const_cast<CBaseEntity *>( ent ) );
+	if ( pObject )
 	{
-		CBaseObject *pObject = static_cast<CBaseObject *>( const_cast<CBaseEntity *>( ent ) );
-
 		// Don't try to syphon metal from an unupgraded dispenser if we're trying to setup
 		if ( m_pActor->IsPlayerClass( TF_CLASS_ENGINEER ) &&
 			 pObject->GetUpgradeLevel() <= 2 &&
@@ -229,7 +226,8 @@ bool CAmmoFilter::IsSelected( const CBaseEntity *ent ) const
 	}
 
 	// Any other entity or packs that have been picked up are a no go
-	if ( ( FClassnameIs( const_cast<CBaseEntity *>( ent ), "tf_ammo_pack" ) || FClassnameIs( const_cast<CBaseEntity *>( ent ), "item_ammopack*" ) ) && ent->GetFlags() & EF_NODRAW )
+	CAmmoPack *pAmmopack = dynamic_cast<CAmmoPack *>( const_cast<CBaseEntity *>( ent ) );
+	if ( pAmmopack && pAmmopack->GetFlags() & EF_NODRAW )
 		return false;
 
 	// Find minimum cost area we are currently searching

@@ -19,7 +19,6 @@ ConVar  of_item_debug("of_item_debug", "0", FCVAR_CHEAT, "Visualize Item boundin
 // CTF HealthKit defines.
 //
 
-#define TF_HEALTHKIT_MODEL			"models/items/healthkit.mdl"
 #define TF_HEALTHKIT_PICKUP_SOUND	"HealthKit.Touch"
 
 LINK_ENTITY_TO_CLASS( item_healthkit_full, CHealthKit );
@@ -53,6 +52,8 @@ DEFINE_KEYFIELD( m_iszPickupSound, FIELD_STRING, "pickup_sound" ),
 
 END_DATADESC()
 
+IMPLEMENT_AUTO_LIST( IHealthKitAutoList );
+
 //=============================================================================
 //
 // CTF HealthKit functions.
@@ -64,14 +65,19 @@ END_DATADESC()
 void CHealthKit::Spawn( void )
 {
 	Precache();
-	if ( m_iszModel==MAKE_STRING( "" ) )
+
+	if ( m_iszModel == MAKE_STRING( "" ) )
 	{
-		if ( m_iszModelOLD!=MAKE_STRING( "" ) )
+		if ( m_iszModelOLD != MAKE_STRING( "" ) )
 			SetModel( STRING(m_iszModelOLD) );
 		else
 			SetModel( GetPowerupModel() );
 	}
-	else SetModel( STRING(m_iszModel) );
+	else
+	{
+		SetModel(STRING(m_iszModel));
+	}
+
 	BaseClass::Spawn();
 }
 
@@ -80,14 +86,18 @@ void CHealthKit::Spawn( void )
 //-----------------------------------------------------------------------------
 void CHealthKit::Precache( void )
 {
-	if ( m_iszModel==MAKE_STRING( "" ) )
+	if ( m_iszModel == MAKE_STRING( "" ) )
 	{
-		if ( m_iszModelOLD!=MAKE_STRING( "" ) )
+		if ( m_iszModelOLD != MAKE_STRING( "" ) )
 			PrecacheModel( STRING(m_iszModelOLD) );
 		else
 			PrecacheModel( GetPowerupModel() );
 	}
-	else PrecacheModel( STRING(m_iszModel) );
+	else
+	{
+		PrecacheModel(STRING(m_iszModel));
+	}
+
 	PrecacheScriptSound( TF_HEALTHKIT_PICKUP_SOUND );
 }
 
@@ -100,36 +110,32 @@ bool CHealthKit::MyTouch( CBasePlayer *pPlayer )
 	
 	// Render debug visualization
 	if ( of_item_debug.GetBool() )
-	{
 		NDebugOverlay::EntityBounds(this, 0, 100, 255, 0 ,0) ;
-	}	
 
-	if ( ValidTouch( pPlayer ) )
+	if (!ValidTouch(pPlayer))
+		return bSuccess;
+
+	if ( pPlayer->TakeHealth( ceil(pPlayer->GetMaxHealth() * PackRatios[GetPowerupSize()]), DMG_GENERIC ) )
 	{
-		if ( pPlayer->TakeHealth( ceil(pPlayer->GetMaxHealth() * PackRatios[GetPowerupSize()]), DMG_GENERIC ) )
-		{
-			CSingleUserRecipientFilter user( pPlayer );
-			user.MakeReliable();
+		CSingleUserRecipientFilter user( pPlayer );
+		user.MakeReliable();
 
-			UserMessageBegin( user, "ItemPickup" );
-				WRITE_STRING( GetClassname() );
-			MessageEnd();
+		UserMessageBegin( user, "ItemPickup" );
+			WRITE_STRING( GetClassname() );
+		MessageEnd();
 
-			EmitSound( user, entindex(), TF_HEALTHKIT_PICKUP_SOUND );
+		EmitSound( user, entindex(), TF_HEALTHKIT_PICKUP_SOUND );
 
-			bSuccess = true;
+		bSuccess = true;
 
-			CTFPlayer *pTFPlayer = ToTFPlayer( pPlayer );
+		CTFPlayer *pTFPlayer = ToTFPlayer( pPlayer );
 
-			Assert( pTFPlayer );
+		Assert( pTFPlayer );
 
-			// Healthkits also contain a fire blanket.
-			if ( pTFPlayer->m_Shared.InCond( TF_COND_BURNING ) )
-			{
+		// Healthkits also contain a fire blanket.
+		if ( pTFPlayer->m_Shared.InCond( TF_COND_BURNING ) )
 				pTFPlayer->m_Shared.RemoveCond( TF_COND_BURNING );		
-			}
-			AddEffects( EF_NODRAW );
-		}
+		AddEffects( EF_NODRAW );
 	}
 
 	return bSuccess;

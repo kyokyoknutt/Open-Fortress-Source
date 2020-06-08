@@ -46,6 +46,8 @@ END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( dm_powerup_spawner, CCondPowerup );
 
+IMPLEMENT_AUTO_LIST( ICondPowerupAutoList );
+
 CCondPowerup::CCondPowerup()
 {
 	m_flRespawnTick = 0.0f;
@@ -60,10 +62,6 @@ CCondPowerup::CCondPowerup()
 
 void CCondPowerup::Spawn( void )
 {
-	if ( TFGameRules()->IsMutator( INSTAGIB ) || TFGameRules()->IsMutator( INSTAGIB_NO_MELEE ) ||
-		 !of_powerups.GetBool() )
-		return;
-
 	Precache();
 
 	if ( m_iszPowerupModel == MAKE_STRING( "" ) ) 

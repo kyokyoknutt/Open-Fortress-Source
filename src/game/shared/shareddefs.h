@@ -123,7 +123,11 @@ public:
 #endif
 #define MAX_WEAPON_POSITIONS	20	// max number of items within a slot
 #define MAX_ITEM_TYPES			6	// hud item selection slots
-#define MAX_WEAPONS				48	// Max number of weapons available	
+#if defined( OF_DLL ) || defined( OF_CLIENT_DLL )
+	#define MAX_WEAPONS				96
+#else
+	#define MAX_WEAPONS				48	// Max number of weapons available
+#endif
 
 #define MAX_ITEMS				9	// hard coded item types
 

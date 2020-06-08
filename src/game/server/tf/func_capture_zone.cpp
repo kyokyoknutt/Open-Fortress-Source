@@ -22,7 +22,7 @@ BEGIN_DATADESC( CCaptureZone )
 DEFINE_KEYFIELD( m_nCapturePoint, FIELD_INTEGER, "CapturePoint" ),
 
 // Functions.
-DEFINE_FUNCTION( CCaptureZoneShim::Touch ),
+DEFINE_ENTITYFUNC( CaptureTouch ),
 
 // Inputs.
 DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
@@ -53,7 +53,7 @@ IMPLEMENT_AUTO_LIST( ICaptureZoneAutoList );
 void CCaptureZone::Spawn()
 {
 	InitTrigger();
-	SetTouch( &CCaptureZoneShim::Touch );
+	SetTouch( &CCaptureZone::CaptureTouch );
 
 	if ( m_bDisabled )
 	{

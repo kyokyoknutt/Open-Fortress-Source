@@ -17,7 +17,9 @@
 // CTF HealthKit class.
 //
 
-class CHealthKit : public CTFPowerup
+DECLARE_AUTO_LIST(IHealthKitAutoList)
+
+class CHealthKit : public CTFPowerup, public IHealthKitAutoList
 {
 public:
 	DECLARE_CLASS( CHealthKit, CTFPowerup );
@@ -25,20 +27,24 @@ public:
 	void	Spawn( void );
 	void	Precache( void );
 	bool	MyTouch( CBasePlayer *pPlayer );
-	string_t m_iszModel=MAKE_STRING( "" );
-	string_t m_iszModelOLD=MAKE_STRING( "" );
-	string_t m_iszPickupSound=MAKE_STRING( "HealthKit.Touch" );
-	virtual const char *GetPowerupModel( void ) { return "models/items/medkit_large.mdl"; }
+	virtual const char *GetPowerupModel(void) { return "models/items/medkit_large.mdl"; }
+	powerupsize_t GetPowerupSize(void) { return POWERUP_FULL; }
 
-	powerupsize_t	GetPowerupSize( void ) { return POWERUP_FULL; }
+	string_t m_iszModel = MAKE_STRING( "" );
+	string_t m_iszModelOLD = MAKE_STRING( "" );
+	string_t m_iszPickupSound = MAKE_STRING( "HealthKit.Touch" );
+	
 	DECLARE_DATADESC();
+
+	bool   IsTiny( void ) { return false; }
+	bool   IsMega( void ) { return false; }
 };
 
 class CHealthKitSmall : public CHealthKit
 {
 public:
 	DECLARE_CLASS( CHealthKitSmall, CHealthKit );
-	powerupsize_t	GetPowerupSize( void ) { return POWERUP_SMALL; }
+	powerupsize_t GetPowerupSize( void ) { return POWERUP_SMALL; }
 	virtual const char *GetPowerupModel( void ) { return "models/items/medkit_small.mdl"; }
 	DECLARE_DATADESC();
 };
