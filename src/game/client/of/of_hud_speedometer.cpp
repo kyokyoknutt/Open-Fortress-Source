@@ -22,9 +22,6 @@
 #include <vgui_controls/Label.h>
 #include "view.h"
 #include <../shared/gamemovement.h>
-#undef min
-#undef max 
-#include <string>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -32,6 +29,7 @@
 using namespace vgui;
 
 #define SHADOW_OFFSET 2
+#define V_LENGTH 200
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -84,8 +82,6 @@ private:
 
 	void UpdateScreenCentre(void);
 
-	void DrawTextFromNumber(std::string, double num, Color col, int xpos, int ypos);
-
 	void QStrafeJumpHelp(void);
 };
 
@@ -129,13 +125,11 @@ extern ConVar of_color_g;
 extern ConVar of_color_b;
 
 extern CMoveData *g_pMoveData;
-extern IGameMovement *g_pGameMovement;
 extern ConVar mp_maxairspeed;
-extern ConVar sv_maxspeed;
 extern ConVar sv_airaccelerate;
-extern ConVar sv_stopspeed;
 
-void SpeedometerConvarChanged(IConVar *var, const char *pOldValue, float flOldValue) {
+void SpeedometerConvarChanged(IConVar *var, const char *pOldValue, float flOldValue)
+{
 	iSpeedometer = hud_speedometer.GetInt();
 	bDelta = hud_speedometer.GetInt() > 1;
 
@@ -149,7 +143,8 @@ void SpeedometerConvarChanged(IConVar *var, const char *pOldValue, float flOldVa
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CHudSpeedometer::CHudSpeedometer(const char *pElementName) : CHudElement(pElementName), BaseClass(NULL, "HudSpeedometer") {
+CHudSpeedometer::CHudSpeedometer(const char *pElementName) : CHudElement(pElementName), BaseClass(NULL, "HudSpeedometer")
+{
 	Panel *pParent = g_pClientMode->GetViewport();
 	SetParent(pParent);
 
@@ -174,7 +169,8 @@ CHudSpeedometer::CHudSpeedometer(const char *pElementName) : CHudElement(pElemen
 	ivgui()->AddTickSignal(GetVPanel());
 }
 
-void CHudSpeedometer::UpdateScreenCentre(void){
+void CHudSpeedometer::UpdateScreenCentre(void)
+{
 	int width, height;
 	GetSize(width, height);
 	iCentreScreenX = width / 2;
@@ -186,7 +182,8 @@ void CHudSpeedometer::UpdateScreenCentre(void){
 	FOVScale = iCentreScreenX / pPlayerBase->GetFOV();
 }
 
-Color CHudSpeedometer::GetComplimentaryColour(Color colorIn) {
+Color CHudSpeedometer::GetComplimentaryColour(Color colorIn)
+{
 	int white = 0xFFFFFF;
 	// Save the alpha for output
 	int alpha = colorIn.a();
@@ -207,7 +204,8 @@ Color CHudSpeedometer::GetComplimentaryColour(Color colorIn) {
 //-----------------------------------------------------------------------------
 // Purpose: Reloads/Applies the RES scheme
 //-----------------------------------------------------------------------------
-void CHudSpeedometer::ApplySchemeSettings(IScheme *pScheme) {
+void CHudSpeedometer::ApplySchemeSettings(IScheme *pScheme)
+{
 	// load control settings...
 	LoadControlSettings("resource/UI/HudSpeedometer.res");
 	SetDialogVariable("speeddelta", "~0");
@@ -218,7 +216,8 @@ void CHudSpeedometer::ApplySchemeSettings(IScheme *pScheme) {
 	UpdateScreenCentre();
 }
 
-void CHudSpeedometer::UpdateColours() {
+void CHudSpeedometer::UpdateColours()
+{
 
 	// Grab the colours
 	playerColourBase = Color(of_color_r.GetFloat(), of_color_g.GetFloat(), of_color_b.GetFloat(), hud_speedometer_opacity.GetFloat());
@@ -233,26 +232,30 @@ void CHudSpeedometer::UpdateColours() {
 	playerColourShadow = &playerColourShadowbase;
 
 
-	if (hud_speedometer_useplayercolour.GetInt() >= 1) {
+	if (hud_speedometer_useplayercolour.GetInt() >= 1)
+	{
 
 		// If we're using the player's colour, dropshadow with the complement
 		playerColour = &playerColourBase;
 		playerColourShadow = &playerColourComplementary;
 
 		// If 2, flip them around complimentary! (Why was >1 working for 1 ??? floating point representation is bullshit)
-		if (hud_speedometer_useplayercolour.GetInt() >= 2) {
+		if (hud_speedometer_useplayercolour.GetInt() >= 2)
+		{
 			playerColour = &playerColourComplementary;
 			playerColourShadow = &playerColourBase;
 		}
 	}
 
 	// If we're colouring the on-screen vectors according to the player, recalculate the complimentary colour
-	if (hud_speedometer_vectors_useplayercolour.GetInt() >= 1) {
+	if (hud_speedometer_vectors_useplayercolour.GetInt() >= 1)
+	{
 		// We use the player's colour and complimentary colour
 		vectorColor_input = &playerColourBase;
 		vectorColor_vel = &playerColourComplementary;
 	}
-	else {
+	else
+	{
 		// Switch back to the defaults
 		vectorColor_input = &defaultInputVectorCol;
 		vectorColor_vel = &defaultVelVectorCol;
@@ -277,14 +280,12 @@ bool CHudSpeedometer::ShouldDraw(void)
 
 	// Do I even exist?
 	if (!pPlayer)
-	{
 		return false;
-	}
 
 	// Dead men inspect no elements
-	if (!pPlayer->IsAlive()) {
+	if (!pPlayer->IsAlive())
 		return false;
-	}
+	
 	// Check convar! If 1 or 2, we draw like cowboys. Shit joke TODO deleteme
 	if (iSpeedometer <= 0)
 		return false;
@@ -311,36 +312,38 @@ bool CHudSpeedometer::ShouldDraw(void)
 *
 *    acos(x) = 2.0 * asin(sqrt((1 - x) / 2)).
 */
-float acos_zdoom(float x) {
-	if (x < -0.5f) {
+float acos_zdoom(float x)
+{
+	if (x < -0.5f)
 		return M_PI - 2.0f * asin(sqrt((1 + x) / 2));
-	}
-	else if (x > 0.5f) {
+	
+	if (x > 0.5f)
 		return 2.0f * asin(sqrt((1 - x) / 2));
-	}
-	else {
-		return M_PI / 2 - asin(x);
-	}
+
+	return M_PI / 2 - asin(x);
 }
 
 // Needed over the default % operator
-float mod(float a, float n) {
+float mod(float a, float n)
+{
 	return a - floor(a / n) * n;
 }
 
 // Wraps to -PI to +PI range for a given angle
-float NormalizedPI(float angle) {
-	while (angle > M_PI) {
+float NormalizedPI(float angle)
+{
+	while (angle > M_PI)
 		angle -= (M_PI * 2);
-	}
-	while (angle < -M_PI) {
+	
+	while (angle < -M_PI)
 		angle += (M_PI * 2);
-	}
+	
 	return angle;
 }
 
 // Signed difference between two angles in Radians
-float DeltaAngleRad(float a1, float a2) {
+float DeltaAngleRad(float a1, float a2)
+{
 	/*a1 = (int) RAD2DEG(a1) % 360;
 	a2 = (int) RAD2DEG(a2) % 360;
 	return (a2 - a1);*/
@@ -356,7 +359,8 @@ float DeltaAngleRad(float a1, float a2) {
 //-----------------------------------------------------------------------------
 // Purpose: Every think/update tick that the GUI uses
 //-----------------------------------------------------------------------------
-void CHudSpeedometer::OnTick(void) {
+void CHudSpeedometer::OnTick(void)
+{
 	C_TFPlayer *pPlayer = C_TFPlayer::GetLocalTFPlayer();
 	C_BasePlayer *pPlayerBase = C_TFPlayer::GetLocalPlayer();
 	
@@ -367,20 +371,24 @@ void CHudSpeedometer::OnTick(void) {
 	velHor = pPlayerBase->GetLocalVelocity() * Vector(1, 1, 0); // Player's horizontal velocity.
 	float horSpeed = velHor.Length();
 
-	if (m_pSpeedPercentageMeter) {
+	if (m_pSpeedPercentageMeter)
+	{
 		// Draw speed text only
-		if (iSpeedometer >= 1) {		
+		if (iSpeedometer >= 1)		
 			SetDialogVariable("speedhorizontal", RoundFloatToInt(horSpeed) );
-		}
 
 		// Draw speed bar, one might call it a "speedometer"... patent pending.
-		if (iSpeedometer >= 3) {
+		if (iSpeedometer >= 3)
+		{
 			// Set the bar completeness.
 			m_pSpeedPercentageMeter->SetProgress(clamp(horSpeed / flSpeedometermax, 0.0f, 1.0f));
 		}
 	}
-	if (m_pDeltaTextLabel) {
-		if (bDelta) {
+
+	if (m_pDeltaTextLabel)
+	{
+		if (bDelta)
+		{
 			// Are we grounded?
 			bool isGrounded = pPlayerBase->GetGroundEntity();
 
@@ -392,26 +400,24 @@ void CHudSpeedometer::OnTick(void) {
 
 				// Set the sign (More clarity, keeps width nice and consistent :)
 				// If negative, continue as usual, but otherwise prepend a + or ~ if we're >0 or ==0
-				std::string s = std::to_string(difference);
-				if (difference >= 0) {
-					s = (difference == 0 ? "~" : "+") + s;
-				}
+				char s[8];
+				char sign = (difference > 0 ? '+' : (difference == 0 ? '~' : '-'));
+				Q_snprintf(s, sizeof(s), "%c%i", sign, difference);
 
-				char const *pchar = s.c_str();
-
-				SetDialogVariable("speeddelta", pchar);
+				SetDialogVariable("speeddelta", s);
 
 				groundedInPreviousFrame = false;
-			} else {
+			}
+			else
+			{
 				groundedInPreviousFrame = isGrounded;
 			}
 		}
 	}
 }
 
-
-#define V_LENGTH 200
-void CHudSpeedometer::Paint(void) {
+void CHudSpeedometer::Paint(void)
+{
 	BaseClass::Paint();
 
 	// Omitted currently due to optimal angle display being incorrect
@@ -419,7 +425,8 @@ void CHudSpeedometer::Paint(void) {
 		QStrafeJumpHelp();
 	}*/
 
-	if (bVectors) {
+	if (bVectors)
+	{
 		C_BasePlayer *pPlayerBase = C_TFPlayer::GetLocalPlayer();
 
 		if (!pPlayerBase)
@@ -460,23 +467,6 @@ void CHudSpeedometer::Paint(void) {
 	}
 }
 
-void CHudSpeedometer::DrawTextFromNumber(std::string prefix,  double num, Color col, int x_fromcenter, int y_fromcenter) {
-	std::string str = prefix + std::to_string((int)num);
-	const char* charlist = str.c_str();
-	size_t size = strlen(charlist) + 1;
-	wchar_t* iconText = new wchar_t[size];
-	mbstowcs(iconText, charlist, size);
-
-	//shadow
-	surface()->DrawSetTextColor(0, 0, 0, 255);
-	surface()->DrawSetTextPos(iCentreScreenX + x_fromcenter + 2, iCentreScreenY + y_fromcenter + 2);
-	surface()->DrawPrintText(iconText, wcslen(iconText));
-	//text readout of num
-	surface()->DrawSetTextColor(col.r(), col.g(), col.b(), 255);
-	surface()->DrawSetTextPos(iCentreScreenX + x_fromcenter, iCentreScreenY + y_fromcenter);
-	surface()->DrawPrintText(iconText, wcslen(iconText));
-}
-
 // Working in Radians, outputting in degrees
 // DeltaAngle is implemented above.
 // VectorAngle is just atan2 according to https://zdoom.org/wiki/VectorAngle, hence atan2 has been used (radians) whereby VectorAngle(x,y) = atan2(y,x)
@@ -489,6 +479,7 @@ void CHudSpeedometer::QStrafeJumpHelp() {
 	//===============================================
 	//Gather info
 	// Unit directional input - LOCAL, angle from atan2 is 0 at East, so use (forwardmove,-sidemove)
+
 	Vector vel = g_pMoveData->m_vecVelocity;
 	vel = Vector(vel.x, vel.y, 0);
 
@@ -510,21 +501,21 @@ void CHudSpeedometer::QStrafeJumpHelp() {
 	if (!g_pMoveData->m_flForwardMove && !g_pMoveData->m_flSideMove) { return; }
 
 	// CTFGameMovement::AirMove does this clamp so we do it too (But without the pointless "wishvel" line)
-	if (wishSpeed != 0 && (wishSpeed > g_pMoveData->m_flMaxSpeed)) {
+	if (wishSpeed != 0 && (wishSpeed > g_pMoveData->m_flMaxSpeed))
 		wishSpeed = g_pMoveData->m_flMaxSpeed;
-	}
-	if (wishSpeed > mp_maxairspeed.GetFloat()) {
+	
+	if (wishSpeed > mp_maxairspeed.GetFloat())
 		wishSpeed = mp_maxairspeed.GetFloat();
-	}
 
 
-	float maxAccel = std::min(sv_airaccelerate.GetFloat() * wishSpeed * gpGlobals->interval_per_tick, wishSpeed); //often 30
+	float maxAccel = min(sv_airaccelerate.GetFloat() * wishSpeed * gpGlobals->interval_per_tick, wishSpeed); //often 30
 	float maxCurSpeed = wishSpeed - maxAccel; // often 0
 
 	float minAngle = acosf(wishSpeed / speed);
 	float optimalAngle = acosf(maxCurSpeed / speed);
 
-	if (DeltaAngleRad(PAngle, velAngle) >= 0) {
+	if (DeltaAngleRad(PAngle, velAngle) >= 0)
+	{
 		minAngle *= -1;
 		optimalAngle *= -1;
 	}
@@ -566,13 +557,15 @@ void CHudSpeedometer::QStrafeJumpHelp() {
 	yBottom = clamp(yBottom, 0 + thickness, ScreenHeight());
 
 	// Gotta do it top left to bottom right
-	if (xMin >= xOpt) {
+	if (xMin >= xOpt)
+	{
 		surface()->DrawSetColor(playerColourComplementary);
 		surface()->DrawFilledRect(xOpt + SHADOW_OFFSET, yTop + SHADOW_OFFSET, xMin + SHADOW_OFFSET, yBottom + SHADOW_OFFSET);
 		surface()->DrawSetColor(*playerColour);
 		surface()->DrawFilledRect(xOpt, yTop, xMin, yBottom);
 	}
-	else {
+	else
+	{
 		surface()->DrawSetColor(playerColourComplementary);
 		surface()->DrawFilledRect(xMin + SHADOW_OFFSET, yTop + SHADOW_OFFSET, xOpt + SHADOW_OFFSET, yBottom + SHADOW_OFFSET);
 		surface()->DrawSetColor(*playerColour);
