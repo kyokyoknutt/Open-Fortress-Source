@@ -7,6 +7,8 @@
 #include "cbase.h"
 #include "tf_weapon_crowbar.h"
 #include "decals.h"
+#include "tf_gamerules.h"
+#include "in_buttons.h"
 
 // Client specific.
 #ifdef CLIENT_DLL
@@ -15,6 +17,8 @@
 #else
 #include "tf_player.h"
 #endif
+
+ConVar of_crowbarfastbuff("of_crowbarfastbuff", "0", FCVAR_ARCHIVE | FCVAR_REPLICATED, "The faster you're moving, the harder you smack 'em.");
 
 //=============================================================================
 //
@@ -135,4 +139,26 @@ acttable_t *CTFCrowbar::ActivityList( int &iActivityCount )
 		return m_acttableMeleeAllClass;
 	}
 	return BaseClass::ActivityList( iActivityCount );
+}
+
+float CTFCrowbar::GetMeleeDamage(CBaseEntity *pTarget, int &iCustomDamage)
+{
+	if (TFGameRules()->IsMutator(NO_MUTATOR) || TFGameRules()->GetMutator() > INSTAGIB_NO_MELEE)
+	{
+		float damage = static_cast<float>(m_pWeaponInfo->GetWeaponData(m_iWeaponMode).m_nDamage);
+
+		if (of_crowbarfastbuff.GetBool())
+		{
+			CBasePlayer *pPlayer = ToBasePlayer(GetOwner());
+			Vector velocity = pPlayer->GetLocalVelocity();
+			velocity.z = 0;
+			float speed = velocity.Length();
+			if (speed < 320) { speed = 320; }
+			damage = damage * pow(speed / 320, of_crowbarfastbuff.GetFloat());
+		}
+
+		return damage;
+	}
+	else 
+		return static_cast<float>(m_pWeaponInfo->GetWeaponData(m_iWeaponMode).m_nInstagibDamage);
 }

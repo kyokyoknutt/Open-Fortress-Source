@@ -36,6 +36,7 @@ public:
 	CTFCrowbar();
 	virtual int			GetWeaponID( void ) const			{ return TF_WEAPON_CROWBAR; }
 	virtual acttable_t *ActivityList( int &iActivityCount );
+	virtual float		GetMeleeDamage( CBaseEntity *pTarget, int &iCustomDamage );
 
 private:
 
