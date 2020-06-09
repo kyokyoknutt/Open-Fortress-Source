@@ -128,10 +128,6 @@ private:
 	float		CheckRamp(float flMul, int rampMode);
 	void		CheckCSlideSound(bool CSliding);
 
-	bool		m_bBlockJump;
-	float		m_fRampJumpVel;
-	float		m_fCSlideDuration;
-
 private:
 
 	Vector		m_vecWaterPoint;
@@ -152,9 +148,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGameMovement, IGameMovement, INTERFACENAME_GA
 CTFGameMovement::CTFGameMovement()
 {
 	m_pTFPlayer = NULL;
-	m_bBlockJump = false;
-	m_fRampJumpVel = 0.f;
-	m_fCSlideDuration = 0.f;
 }
 
 //---------------------------------------------------------------------------------------- 
@@ -588,7 +581,7 @@ bool CTFGameMovement::CheckJumpButton()
 
 	// Flag that we jumped and don't jump again until it is released.
 	mv->m_nOldButtons |= IN_JUMP;
-	m_bBlockJump = JumpBuffer == 1 ? true : false; //jump successful, set the buffer
+	m_pTFPlayer->m_Shared.SetBlockJump(JumpBuffer == 1 ? true : false); //jump successful, set the buffer
 	return true;
 }
 
@@ -596,7 +589,7 @@ float CTFGameMovement::CheckRamp(float flMul, int rampMode)
 {
 	if (rampMode == 1) //Quake style
 	{
-		mv->m_vecVelocity[2] = max(0, m_fRampJumpVel); //set velocity to what it was before touching the ground
+		mv->m_vecVelocity[2] = max(0, m_pTFPlayer->m_Shared.GetRampJumpVel()); //set velocity to what it was before touching the ground
 		flMul *= mv->m_vecVelocity[2] ? of_ramp_up_multiplier.GetFloat() : 1;
 	}
 	else //source trimping
@@ -712,7 +705,7 @@ bool CTFGameMovement::CheckLunge()
 	// Flag that we jumped and don't jump again until it is released.
 	mv->m_nOldButtons |= IN_JUMP;
 	mv->m_nOldButtons |= IN_ATTACK2;
-	m_bBlockJump = true;
+	m_pTFPlayer->m_Shared.SetBlockJump(true);
 	return true;
 }
 
@@ -1625,13 +1618,13 @@ void CTFGameMovement::FullWalkMove()
 	//Jumping stuff
 	if (mv->m_nButtons & IN_JUMP)
 	{
-		if (!m_bBlockJump)
+		if (!m_pTFPlayer->m_Shared.IsJumpBlocked())
 			CheckJumpButton();
 	}
 	else
 	{
 		mv->m_nOldButtons &= ~IN_JUMP;
-		m_bBlockJump = false;
+		m_pTFPlayer->m_Shared.SetBlockJump(false);
 	}
 
 	//Zombie lunge
@@ -1651,18 +1644,17 @@ void CTFGameMovement::FullWalkMove()
 				   !m_pTFPlayer->GetWaterLevel() &&		 								//player is not in water
 				   (player->m_Local.m_bDucking || player->m_Local.m_bDucked) &&			//player is ducked/ducking
 				   (mv->m_flForwardMove || mv->m_flSideMove) &&							//player is moving
-				   gpGlobals->curtime <= m_fCSlideDuration;								//there is crouch slide charge to spend
+				   gpGlobals->curtime <= m_pTFPlayer->m_Shared.GetCSlideDuration();		//there is crouch slide charge to spend
 
 		Friction(CSliding);
 		WalkMove(CSliding);
 
 		//If not using CSlide right away clear it
 		if (!CSliding)
-			m_fCSlideDuration = 0;
+			m_pTFPlayer->m_Shared.SetCSlideDuration(0);
 
-		//if you are on the ground after the jump check you did not
-		//use the ramp jump velocity charge so clear it right away
-		m_fRampJumpVel = 0;
+		//If not using ramp jump vel right away clear it
+		m_pTFPlayer->m_Shared.SetRampJumpVel(0);
 	}
 	else
 	{
@@ -1687,8 +1679,8 @@ void CTFGameMovement::FullWalkMove()
 	else
 	{
 		//Determine ramp jump vel and crouch slide duration
-		m_fRampJumpVel = mv->m_vecVelocity[2];
-		m_fCSlideDuration = gpGlobals->curtime - mv->m_vecVelocity[2] / 200.f;
+		m_pTFPlayer->m_Shared.SetRampJumpVel(mv->m_vecVelocity[2]);
+		m_pTFPlayer->m_Shared.SetCSlideDuration(gpGlobals->curtime - mv->m_vecVelocity[2] / 200.f);
 	}
 
 	// Handling falling.

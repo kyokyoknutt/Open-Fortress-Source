@@ -1346,7 +1346,7 @@ void CTFPlayer::UpdateCosmetics()
 
 		char szDesired[64] = { '\0' };
 		if( !IsFakeClient() )
-			Q_strncpy(szDesired,engine->GetClientConVarValue( entindex(), "_Mercenary_cosmetic_loadout" ), sizeof(szDesired));
+			Q_strncpy(szDesired,engine->GetClientConVarValue( entindex(), g_aLoadoutConvarNames[ TF_CLASS_MERCENARY ] ), sizeof(szDesired));
 		else
 		{
 			// Uncomment this to test all blank loadout slots
@@ -2195,7 +2195,7 @@ void CTFPlayer::ManageArsenalWeapons(TFPlayerClassData_t *pData)
 	
 	char szDesired[64] = { '\0' };
 	if( !IsFakeClient() )
-		Q_strncpy(szDesired,engine->GetClientConVarValue( entindex(), "_Mercenary_weapon_loadout" ), sizeof(szDesired));
+		Q_strncpy(szDesired,engine->GetClientConVarValue( entindex(), g_aLoadoutConvarNames[ TF_CLASS_MERCENARY ] ), sizeof(szDesired));
 	else
 	{
 		int iMaxCosNum = GetItemSchema()->GetWeaponCount() - 1;
