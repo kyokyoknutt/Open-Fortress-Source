@@ -2577,6 +2577,21 @@ void CTFPlayerShared::SetGrapple( bool bGrapple )
 	m_bGrapple = bGrapple;
 }
 
+void CTFPlayerShared::SetBlockJump(bool buffer)
+{
+	m_bBlockJump = buffer;
+}
+
+void CTFPlayerShared::SetCSlideDuration(float duration)
+{
+	m_fCSlideDuration = duration;
+}
+
+void CTFPlayerShared::SetRampJumpVel(float vel)
+{
+	m_fRampJumpVel = vel;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

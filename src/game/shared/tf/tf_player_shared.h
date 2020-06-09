@@ -232,6 +232,12 @@ public:
 	void    SetAirDashCount( int iAirDashCount );
 	bool	IsGrappling( void ) { return m_bGrapple; }
 	void    SetGrapple( bool bGrapple );
+	void	SetBlockJump(bool buffer);
+	bool	IsJumpBlocked() { return m_bBlockJump; }
+	void	SetCSlideDuration(float duration);
+	float	GetCSlideDuration() { return m_fCSlideDuration; }
+	void	SetRampJumpVel(float vel);
+	float	GetRampJumpVel() { return m_fRampJumpVel; }
 
 	// loser state
 	bool	IsLoser( void );
@@ -384,6 +390,9 @@ private:
 	CNetworkVar( bool, m_bAirDash );
 	CNetworkVar( int,  m_iAirDashCount );
 	CNetworkVar( bool, m_bGrapple );
+	CNetworkVar( bool, m_bBlockJump );
+	CNetworkVar( float, m_fRampJumpVel );
+	CNetworkVar( float, m_fCSlideDuration );
 
 	CNetworkVar( float, m_flStealthNoAttackExpire );
 	CNetworkVar( float, m_flStealthNextChangeTime );

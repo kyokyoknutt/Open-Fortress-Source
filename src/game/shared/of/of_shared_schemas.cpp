@@ -531,8 +531,37 @@ void InitLoadoutHandle()
 	gLoadoutHandle = new CTFLoadoutHandler();
 }
 
+
 extern const char *g_aLoadoutConvarNames[];
 extern const char *g_aArsenalConvarNames[];
+
+ConVar UndefinedCosmeticLoadout( g_aLoadoutConvarNames[0], "", FCVAR_USERINFO );
+ConVar ScoutCosmeticLoadout( g_aLoadoutConvarNames[1], "", FCVAR_USERINFO );
+ConVar SniperCosmeticLoadout( g_aLoadoutConvarNames[2], "", FCVAR_USERINFO );
+ConVar SoldierCosmeticLoadout( g_aLoadoutConvarNames[3], "", FCVAR_USERINFO );
+ConVar DemomanCosmeticLoadout( g_aLoadoutConvarNames[4], "", FCVAR_USERINFO );
+ConVar MedicCosmeticLoadout( g_aLoadoutConvarNames[5], "", FCVAR_USERINFO );
+ConVar HeavyCosmeticLoadout( g_aLoadoutConvarNames[6], "", FCVAR_USERINFO );
+ConVar PryoCosmeticLoadout( g_aLoadoutConvarNames[7], "", FCVAR_USERINFO );
+ConVar SpyCosmeticLoadout( g_aLoadoutConvarNames[8], "", FCVAR_USERINFO );
+ConVar EngineerCosmeticLoadout( g_aLoadoutConvarNames[9], "", FCVAR_USERINFO );
+ConVar MercenaryCosmeticLoadout( g_aLoadoutConvarNames[10], "", FCVAR_USERINFO );
+ConVar CivilianCosmeticLoadout( g_aLoadoutConvarNames[11], "", FCVAR_USERINFO );
+ConVar JuggernautCosmeticLoadout( g_aLoadoutConvarNames[12], "", FCVAR_USERINFO );
+
+ConVar UndefinedWeaponLoadout( g_aArsenalConvarNames[0], "", FCVAR_USERINFO );
+ConVar ScoutWeaponLoadout( g_aArsenalConvarNames[1], "", FCVAR_USERINFO );
+ConVar SniperWeaponLoadout( g_aArsenalConvarNames[2], "", FCVAR_USERINFO );
+ConVar SoldierWeaponLoadout( g_aArsenalConvarNames[3], "", FCVAR_USERINFO );
+ConVar DemomanWeaponLoadout( g_aArsenalConvarNames[4], "", FCVAR_USERINFO );
+ConVar MedicWeaponLoadout( g_aArsenalConvarNames[5], "", FCVAR_USERINFO );
+ConVar HeavyWeaponLoadout( g_aArsenalConvarNames[6], "", FCVAR_USERINFO );
+ConVar PryoWeaponLoadout( g_aArsenalConvarNames[7], "", FCVAR_USERINFO );
+ConVar SpyWeaponLoadout( g_aArsenalConvarNames[8], "", FCVAR_USERINFO );
+ConVar EngineerWeaponLoadout( g_aArsenalConvarNames[9], "", FCVAR_USERINFO );
+ConVar MercenaryWeaponLoadout( g_aArsenalConvarNames[10], "", FCVAR_USERINFO );
+ConVar CivilianWeaponLoadout( g_aArsenalConvarNames[11], "", FCVAR_USERINFO );
+ConVar JuggernautWeaponLoadout( g_aArsenalConvarNames[12], "", FCVAR_USERINFO );
 
 CTFLoadoutHandler::CTFLoadoutHandler()
 {
@@ -554,11 +583,9 @@ CTFLoadoutHandler::CTFLoadoutHandler()
 					Q_snprintf( szCommand, sizeof(szCommand), "%s %s", szCommand, sub->GetString() );
 			}
 		}
-		ConVar *pLol = new ConVar( g_aLoadoutConvarNames[i], "", FCVAR_USERINFO );
-		pLol->SetValue(szCommand);
-		
-		m_hClassLoadouts.AddToTail( pLol );
-		
+		ConVar *var = cvar->FindVar(g_aLoadoutConvarNames[i]);
+		var->SetValue(szCommand);
+		m_hClassLoadouts.AddToTail(var);
 		
 		// Weapons here
 		kvClass = GetWeaponLoadoutForClass( i );
@@ -572,10 +599,9 @@ CTFLoadoutHandler::CTFLoadoutHandler()
 					Q_snprintf( szCommand, sizeof(szCommand), "%s %s", szCommand, sub->GetString() );
 			}
 		}
-		ConVar *pNewLol = new ConVar( g_aArsenalConvarNames[i], "", FCVAR_USERINFO );
-		pNewLol->SetValue(szCommand);
-		
-		m_hClassArsenal.AddToTail( pNewLol );
+		var = cvar->FindVar(g_aArsenalConvarNames[i]); //why have two pointers when you can reuse the previous one
+		var->SetValue(szCommand);
+		m_hClassArsenal.AddToTail(var);
 	}
 }
 #endif
