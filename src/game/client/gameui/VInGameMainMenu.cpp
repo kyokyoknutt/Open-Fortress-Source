@@ -192,7 +192,7 @@ void InGameMainMenu::OnCommand( const char *command )
 	{
 		CBaseModPanel::GetSingleton().OnOpenNewGameDialog();
 	}
-	else if( Q_stricmp( "#L4D360UI_Controller_Edit_Keys_Buttons", command ) == 0 )
+	else if( Q_stricmp( "#GameUI_Controller_Edit_Keys_Buttons", command ) == 0 )
 	{
 		FlyoutMenu::CloseActiveMenu();
 		CBaseModPanel::GetSingleton().OpenKeyBindingsDialog( this );
@@ -415,7 +415,7 @@ void InGameMainMenu::PerformLayout( void )
 	{
 		if ( bCanVote )
 		{
-			pVoteButton->SetText( "#L4D360UI_InGameMainMenu_CallAVote" );
+			pVoteButton->SetText( "#GameUI_InGameMainMenu_CallAVote" );
 		}
 		else
 		{
@@ -530,7 +530,7 @@ void InGameMainMenu::SetFooterState()
 	if ( footer )
 	{
 		footer->SetButtons( FB_ABUTTON | FB_BBUTTON, FF_AB_ONLY, false );
-		footer->SetButtonText( FB_ABUTTON, "#L4D360UI_Select" );
-		footer->SetButtonText( FB_BBUTTON, "#L4D360UI_Done" );
+		footer->SetButtonText( FB_ABUTTON, "#GameUI_Select" );
+		footer->SetButtonText( FB_BBUTTON, "#GameUI_Done" );
 	}
 }

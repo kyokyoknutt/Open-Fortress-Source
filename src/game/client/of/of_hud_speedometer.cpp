@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright ï¿½ 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: A comprehensive bunnyhop-helper UI system by Hogyn Melyn (twitter: @Haeferl_Kaffee / discord: HogynMelyn#2589)
 // Shows the player's horizontal speed (more clearly than cl_showpos_xy), changes in speed between jumps, input and velocity directions mapped onto the screen.
@@ -21,10 +21,10 @@
 #include <vgui_controls/ProgressBar.h>
 #include <vgui_controls/Label.h>
 #include "view.h"
-#include <string>
 #include <../shared/gamemovement.h>
+#undef min
+#undef max 
 #include <string>
-#include <cstring>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -96,10 +96,10 @@ void SpeedometerConvarChanged(IConVar *var, const char *pOldValue, float flOldVa
 // Anything considered too informative shall be flagged w ith FCVAR_CHEAT for now, just to allow people to test it themselves and judge its impact on the game.
 
 // Cofiwch! Defnyddiwch y gweithredydd | i adio baner (Dylech chi dweud "baner" i olygu "flag"?) e.g. FCVAR_ARCHIVE | FCVAR_REPLICATED
-// Hefyd, Peidiwch BYTH â rhoi FCVAR_ARCHIVE gyda FCVAR_CHEAT - Byddwch chi cadw y cheat yn config.cfg - TERRIBLE idea
+// Hefyd, Peidiwch BYTH ï¿½ rhoi FCVAR_ARCHIVE gyda FCVAR_CHEAT - Byddwch chi cadw y cheat yn config.cfg - TERRIBLE idea
 
 // const char *name, const char *defaultvalue, int flags (use pipe operator to add), const char *helpstring, bool bMin, float fMin, bool bMax, float fMax
-// Ar ôl i valve dev wiki, default value doesn't set the value. Instead you have to actually set it with pName->SetVale([value]); , if I understand?
+// Ar ï¿½l i valve dev wiki, default value doesn't set the value. Instead you have to actually set it with pName->SetVale([value]); , if I understand?
 ConVar hud_speedometer("hud_speedometer", "0", FCVAR_ARCHIVE, "0: Off. 1: Shows horizontal speed as a number under the crosshair. 2: Shows the delta (change in speed between jumps). 3: Shows the number as well as a speed meter ranging from 0 to 1000.", SpeedometerConvarChanged);
 ConVar hud_speedometer_opacity("hud_speedometer_opacity", "150", FCVAR_ARCHIVE, "Sets the opacity of the speedometer overlay.", true, 0.0f, true, 255.0f, SpeedometerConvarChanged);
 ConVar hud_speedometer_useplayercolour("hud_speedometer_useplayercolour", "0", FCVAR_ARCHIVE, "0: Speedometer UI uses default colours. 1: Speedometer UI uses the player's colour. 2: Uses complimentary colour.", SpeedometerConvarChanged);
@@ -518,7 +518,7 @@ void CHudSpeedometer::QStrafeJumpHelp() {
 	}
 
 
-	float maxAccel = min(sv_airaccelerate.GetFloat() * wishSpeed * gpGlobals->interval_per_tick, wishSpeed); //often 30
+	float maxAccel = std::min(sv_airaccelerate.GetFloat() * wishSpeed * gpGlobals->interval_per_tick, wishSpeed); //often 30
 	float maxCurSpeed = wishSpeed - maxAccel; // often 0
 
 	float minAngle = acosf(wishSpeed / speed);

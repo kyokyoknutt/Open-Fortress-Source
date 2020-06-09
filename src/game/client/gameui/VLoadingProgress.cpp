@@ -41,7 +41,6 @@ LoadingProgress::LoadingProgress(Panel *parent, const char *panelName, LoadingWi
 	m_pDefaultPosterDataKV( NULL ),
 	m_LoadingWindowType( eLoadingType )
 {
-
 	if ( IsPC() && eLoadingType == LWT_LOADINGPLAQUE )
 	{
 		MakePopup( false );
@@ -94,6 +93,8 @@ LoadingProgress::LoadingProgress(Panel *parent, const char *panelName, LoadingWi
 
 	m_pTipPanel = new CLoadingTipPanel( this );
 
+	ListenForGameEvent("server_spawn");
+
 }
 
 //=============================================================================
@@ -104,12 +105,57 @@ LoadingProgress::~LoadingProgress()
 	m_pDefaultPosterDataKV = NULL;
 }
 
+extern const char *GetMapDisplayName(const char *mapName);
+extern const char *GetMapType(const char *mapName);
+
+void LoadingProgress::FireGameEvent(IGameEvent * event)
+{
+	const char *pEventName = event->GetName();
+
+	// when we are changing levels and 
+	if (0 == Q_strcmp(pEventName, "server_spawn"))
+	{
+		const char *pMapName = event->GetString("mapname");
+		if (pMapName)
+		{
+			// set the map name in the UI
+			wchar_t wzMapName[255] = L"";
+			g_pVGuiLocalize->ConvertANSIToUnicode(GetMapDisplayName(pMapName), wzMapName, sizeof(wzMapName));
+
+			SetDialogVariable("maplabel", wzMapName);
+			SetDialogVariable("maptype", g_pVGuiLocalize->Find(GetMapType(pMapName)));
+
+			vgui::Panel *pPanelBG = dynamic_cast<Panel *>(FindChildByName("MapLabelBG"));
+			if (pPanelBG && !pPanelBG->IsVisible())
+			{
+				pPanelBG->SetVisible(true);
+			}
+
+			vgui::Label *pLabel = dynamic_cast<Label *>(FindChildByName("OnYourWayLabel"));
+			if (pLabel && !pLabel->IsVisible())
+			{
+				pLabel->SetVisible(true);
+			}
+
+			pLabel = dynamic_cast<Label *>(FindChildByName("MapLabel"));
+			if (pLabel && !pLabel->IsVisible())
+			{
+				pLabel->SetVisible(true);
+			}
+
+			pLabel = dynamic_cast<Label *>(FindChildByName("MapType"));
+			if (pLabel && !pLabel->IsVisible())
+			{
+				pLabel->SetVisible(true);
+			}
+		}
+	}
+}
+
 //=============================================================================
 void LoadingProgress::OnThink()
 {
 	UpdateWorkingAnim();
-
-//	SetDialogVariable( "MapLabel", m_szMapName );
 }
 
 //=============================================================================
@@ -185,6 +231,11 @@ void LoadingProgress::ApplySchemeSettings( IScheme *pScheme )
 		}
 	}
 #endif
+
+	if (m_LblTitle)
+	{
+		m_LblTitle->SetVisible(false);
+	}
 
 	SetupControlStates();
 }

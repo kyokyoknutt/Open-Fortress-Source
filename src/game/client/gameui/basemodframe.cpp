@@ -818,8 +818,8 @@ bool CBaseModFrame::CheckAndDisplayErrorIfNotLoggedIn()
 	GenericConfirmation* confirmation = 
 		static_cast<GenericConfirmation*>( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, CBaseModPanel::GetSingleton().GetWindow( WT_GAMELOBBY ), false ) );
 	GenericConfirmation::Data_t data;
-	data.pWindowTitle = "#L4D360UI_MsgBx_LoginRequired";
-	data.pMessageText = "#L4D360UI_MsgBx_SteamRequired";
+	data.pWindowTitle = "#GameUI_MsgBx_LoginRequired";
+	data.pMessageText = "#GameUI_MsgBx_SteamRequired";
 	data.bOkButtonEnabled = true;
 	confirmation->SetUsageData(data);
 

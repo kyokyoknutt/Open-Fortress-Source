@@ -58,7 +58,7 @@ void GetLegacyData::ApplySchemeSettings(vgui::IScheme *pScheme)
 	// If we are still installing then change from the default button state and message defined in the res file
 	if ( IsInstalled() && IsInstalling() )
 	{
-		m_LblDesc->SetText( "#L4D360UI_GetLegacyData_Installing" );
+		m_LblDesc->SetText( "#GameUI_GetLegacyData_Installing" );
 
 		FindChildByName( "BtnOK" )->SetVisible( true );
 		FindChildByName( "BtnNo" )->SetVisible( false );
