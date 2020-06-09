@@ -16,7 +16,7 @@
 
 namespace BaseModUI {
 
-class LoadingProgress : public CBaseModFrame
+class LoadingProgress : public CBaseModFrame, public CGameEventListener
 {
 	DECLARE_CLASS_SIMPLE( LoadingProgress, CBaseModFrame );
 

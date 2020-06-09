@@ -79,7 +79,7 @@ COptionsDialog::COptionsDialog(vgui::Panel *parent, OptionsDialogTabStyle iTabSt
 	}
 	else if ( iTabStyle == OPTIONS_DIALOG_ONLY_BINDING_TABS )
 	{
-		SetTitle("#L4D360UI_Controller_Edit_Keys_Buttons", true);
+		SetTitle("#GameUI_Controller_Edit_Keys_Buttons", true);
 
 		AddPage(new COptionsSubKeyboard(this), "#GameUI_Console_UserSettings");
 	}

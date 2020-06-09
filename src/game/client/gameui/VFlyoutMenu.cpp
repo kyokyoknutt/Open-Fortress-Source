@@ -229,8 +229,8 @@ void FlyoutMenu::OpenMenu( vgui::Panel * flyFrom, vgui::Panel* initialSelection,
 		}
 
 		footer->SetButtons( FB_ABUTTON | FB_BBUTTON, format, footer->GetHelpTextEnabled() );
-		footer->SetButtonText( FB_ABUTTON, "#L4D360UI_Select" );
-		footer->SetButtonText( FB_BBUTTON, "#L4D360UI_Cancel" );
+		footer->SetButtonText( FB_ABUTTON, "#GameUI_Select" );
+		footer->SetButtonText( FB_BBUTTON, "#GameUI_Cancel" );
 	}
 
 	// keep track of what menu is open
