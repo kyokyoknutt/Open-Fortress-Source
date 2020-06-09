@@ -200,6 +200,8 @@ extern const char *g_aPlayerClassNames[];				// localized class names
 extern const char *g_aPlayerClassNames_NonLocalized[];	// non-localized class names
 extern const char *g_aPlayerMutatorNames[];	// non-localized mutator names, used for special voice lines
 extern const char *g_aLoadoutCategories[];
+extern const char *g_aArsenalConvarNames[];
+extern const char *g_aLoadoutConvarNames[];
 
 bool IsPlayerClassName( const char *name );
 int GetClassIndexFromString( const char *name, int maxClass );
