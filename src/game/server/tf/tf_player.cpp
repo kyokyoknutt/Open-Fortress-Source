@@ -2421,39 +2421,45 @@ bool CTFPlayer::ManageRandomizerWeapons( TFPlayerClassData_t *pData )
 void CTFPlayer::ManageCustomSpawnWeapons( TFPlayerClassData_t *pData )
 {
 	StripWeapons();
-
-	CTFWeaponBase *pWeapon = (CTFWeaponBase *)GiveNamedItem( of_spawn_with_weapon.GetString() );
-
-	if ( pWeapon )
+	char szToken[128];
+	const char *pStr = nexttoken(szToken, of_spawn_with_weapon.GetString(), ' ', 128);
+	while (szToken[0] != 0)
 	{
-		pWeapon->DefaultTouch( this );
+		CTFWeaponBase *pWeapon = (CTFWeaponBase *)GiveNamedItem( szToken );
 
-		for ( int iWeapon = 0; iWeapon < GetCarriedWeapons()+5; ++iWeapon )
+		if ( pWeapon )
 		{
-			if( GetActiveWeapon() != NULL ) break;
-			if ( m_bRegenerating == false )
+			pWeapon->DefaultTouch( this );
+
+			for ( int iWeapon = 0; iWeapon < GetCarriedWeapons()+5; ++iWeapon )
 			{
-				SetActiveWeapon( NULL );
-				Weapon_Switch( Weapon_GetSlot( iWeapon ) );
-				Weapon_SetLast( Weapon_GetSlot( iWeapon++ ) );
+				if( GetActiveWeapon() != NULL ) break;
+				if ( m_bRegenerating == false )
+				{
+					SetActiveWeapon( NULL );
+					Weapon_Switch( Weapon_GetSlot( iWeapon ) );
+					Weapon_SetLast( Weapon_GetSlot( iWeapon++ ) );
+				}
 			}
 		}
-	}
 
-	// OFBOT: I'm not sure why but bots end up A posing when giving only 1 weapon, but normal players don't, this is a quick fix for it
-	if ( GetActiveWeapon() == nullptr )
-	{
-		CTFWeaponBase *pWeapon = (CTFWeaponBase *)GetWeapon( 0 );
-
-		for ( int iWeapon = 0; iWeapon < TF_WEAPON_COUNT; iWeapon++ )
+		// OFBOT: I'm not sure why but bots end up A posing when giving only 1 weapon, but normal players don't, this is a quick fix for it
+		if ( GetActiveWeapon() == nullptr )
 		{
-			pWeapon = (CTFWeaponBase *)GetWeapon( iWeapon );
-			if ( pWeapon )
+			CTFWeaponBase *pWeapon = (CTFWeaponBase *)GetWeapon( 0 );
+
+			for ( int iWeapon = 0; iWeapon < TF_WEAPON_COUNT; iWeapon++ )
 			{
-				Weapon_Switch( pWeapon );
-				break;
+				pWeapon = (CTFWeaponBase *)GetWeapon( iWeapon );
+				if ( pWeapon )
+				{
+					Weapon_Switch( pWeapon );
+					break;
+				}
 			}
 		}
+
+		pStr = nexttoken(szToken, pStr, ' ', 128);
 	}
 }
 
