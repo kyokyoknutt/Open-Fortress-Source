@@ -27,6 +27,7 @@
 using namespace vgui;
 
 const char *GetMapDisplayName( const char *mapName );
+const char *GetMapType(const char *mapName);
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -592,15 +593,56 @@ const char *GetMapDisplayName( const char *mapName )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-const char *CTFMapInfoMenu::GetMapType( const char *mapName )
+const char *GetMapType(const char *mapName)
 {
-	if ( IsX360() && mapName )
+	if (!IsX360())
 	{
-		for ( int i = 0; i < ARRAYSIZE( s_Maps ); ++i )
+		// we haven't found a "friendly" map name, so let's just clean up what we have
+		if (!Q_strnicmp(mapName, "cp_", 3))
 		{
-			if ( !Q_stricmp( s_Maps[i].pDiskName, mapName ) )
+			return "#Gametype_CP";
+		}
+		else if (!Q_strnicmp(mapName, "tc_", 3))
+		{
+			return "#TF_TerritoryControl";
+		}
+		else if (!Q_strnicmp(mapName, "pl_", 3))
+		{
+			return "#Gametype_Escort";
+		}
+		else if (!Q_strnicmp(mapName, "plr_", 4))
+		{
+			return "#Gametype_EscortRace";
+		}
+		else if (!Q_strnicmp(mapName, "ad_", 3))
+		{
+			return "#TF_AttackDefend";
+		}
+		else if (!Q_strnicmp(mapName, "ctf_", 4))
+		{
+			return "#Gametype_CTF";
+		}
+		else if (!Q_strnicmp(mapName, "koth_", 5))
+		{
+			return "#Gametype_Koth";
+		}
+		else if (!Q_strnicmp(mapName, "arena_", 6))
+		{
+			return "#Gametype_Arena";
+		}
+		else if (!Q_strnicmp(mapName, "sd_", 3))
+		{
+			return "#Gametype_SD";
+		}
+		else if (!Q_strnicmp(mapName, "dm_", 3))
+		{
+			return "#Gametype_DM";
+		}
+		else
+		{
+			if (TFGameRules())
 			{
-				return s_Maps[i].pGameType;
+				return TFGameRules()->GetGameTypeName();
 			}
 		}
 	}

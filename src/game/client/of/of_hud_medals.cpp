@@ -71,7 +71,8 @@ CTFHudMedals::CTFHudMedals(const char *pElementName) : CHudElement(pElementName)
 
 	m_pMedalImage->SetVisible(false);
 	
-	died = drawTime = 0;
+	died = 0;
+	drawTime = 0;
 	for (int i = 0; i <= DENIED; i++)
 		medals_counter[i] = 0;
 	medalsQueue.Purge();
@@ -93,7 +94,8 @@ void CTFHudMedals::Reset(void)
 {
 	m_pMedalImage->SetVisible(false);
 
-	died = drawTime = 0;
+	died = 0;
+	drawTime = 0;
 	for (int i = 0; i <= DENIED; i++)
 		medals_counter[i] = 0;
 	medalsQueue.Purge();
