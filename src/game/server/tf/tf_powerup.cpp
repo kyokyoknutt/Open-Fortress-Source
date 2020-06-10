@@ -85,7 +85,7 @@ void CTFPowerup::Spawn( void )
 		SetDisabled( true );
 	}
 	
-	if ( GetRespawnDelay() )
+	if ( GetRespawnDelay() > 0.0f )
 	{
 		Respawn();
 	}
