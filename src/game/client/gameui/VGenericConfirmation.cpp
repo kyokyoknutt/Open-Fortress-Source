@@ -47,12 +47,12 @@ GenericConfirmation::GenericConfirmation( Panel *parent, const char *panelName )
 
 	char* szOk;
 
-	szOk = "#L4D360UI_Ok";
+	szOk = "#GameUI_Ok";
 
 	m_pLblOkButton = new vgui::Label( this, "LblOkButton", "#GameUI_Icons_A_3DBUTTON" );
 	m_pLblOkText = new vgui::Label(this, "LblOkText", szOk);
 	m_pLblCancelButton = new vgui::Label( this, "LblCancelButton", "#GameUI_Icons_B_3DBUTTON" );
-	m_pLblCancelText = new vgui::Label( this, "LblCancelText", "#L4D360UI_Cancel" );
+	m_pLblCancelText = new vgui::Label( this, "LblCancelText", "#GameUI_Cancel" );
 	m_pPnlLowerGarnish = new vgui::Panel( this, "PnlLowerGarnish" );
 
 	m_pBtnOK = new CNB_Button( this, "BtnOK", "", this, "OK" );

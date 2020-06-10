@@ -661,7 +661,7 @@ void GenericPanelList::UpdateArrows()
 	V_snprintf(buffer, sizeof(buffer), "%d", ( nLabelCount == 0 ) ? 0 : nLabelLast + 1);
 	V_UTF8ToUnicode( buffer, wLastInView, sizeof( wLastInView ) );
 
-	g_pVGuiLocalize->ConstructString( localizedScrollProgress, sizeof( localizedScrollProgress ), g_pVGuiLocalize->Find( "#L4D360UI_Scroll_Progress" ), 3, wFirstInView, wLastInView, wTotalAchievements );
+	g_pVGuiLocalize->ConstructString( localizedScrollProgress, sizeof( localizedScrollProgress ), g_pVGuiLocalize->Find( "#GameUI_Scroll_Progress" ), 3, wFirstInView, wLastInView, wTotalAchievements );
 	m_LblScrollProgress->SetText( localizedScrollProgress );
 }
 

@@ -229,7 +229,7 @@ void MainMenu::OnCommand( const char *command )
 	{
 		CBaseModPanel::GetSingleton().OpenOptionsMouseDialog( this );
 	}
-	else if( Q_stricmp( "#L4D360UI_Controller_Edit_Keys_Buttons", command ) == 0 )
+	else if( Q_stricmp( "#GameUI_Controller_Edit_Keys_Buttons", command ) == 0 )
 	{
 		FlyoutMenu::CloseActiveMenu();
 		CBaseModPanel::GetSingleton().OpenKeyBindingsDialog( this );
@@ -296,7 +296,7 @@ void MainMenu::OnCommand( const char *command )
 		GenericConfirmation::Data_t data;
 
 		data.pWindowTitle = "#GAMEUI_CommentaryDialogTitle";
-		data.pMessageText = "#L4D360UI_Commentary_Explanation";
+		data.pMessageText = "#GameUI_Commentary_Explanation";
 
 		data.bOkButtonEnabled = true;
 		data.pfnOkCallback = &AcceptCommentaryRulesCallback;
@@ -594,8 +594,8 @@ void MainMenu::SetFooterState()
 #endif
 
 		footer->SetButtons( buttons, FF_MAINMENU, false );
-		footer->SetButtonText( FB_ABUTTON, "#L4D360UI_Select" );
-		footer->SetButtonText( FB_XBUTTON, "#L4D360UI_MainMenu_SeeAll" );
+		footer->SetButtonText( FB_ABUTTON, "#GameUI_Select" );
+		footer->SetButtonText( FB_XBUTTON, "#GameUI_MainMenu_SeeAll" );
 	}
 }
 
@@ -627,8 +627,8 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 	if ( button )
 	{
 #ifdef _X360
-		button->SetText( ( XBX_GetNumGameUsers() > 1 ) ? ( "#L4D360UI_MainMenu_PlaySplitscreen" ) : ( "#L4D360UI_MainMenu_PlaySolo" ) );
-		button->SetHelpText( ( XBX_GetNumGameUsers() > 1 ) ? ( "#L4D360UI_MainMenu_OfflineCoOp_Tip" ) : ( "#L4D360UI_MainMenu_PlaySolo_Tip" ) );
+		button->SetText( ( XBX_GetNumGameUsers() > 1 ) ? ( "#GameUI_MainMenu_PlaySplitscreen" ) : ( "#GameUI_MainMenu_PlaySolo" ) );
+		button->SetHelpText( ( XBX_GetNumGameUsers() > 1 ) ? ( "#GameUI_MainMenu_OfflineCoOp_Tip" ) : ( "#GameUI_MainMenu_PlaySolo_Tip" ) );
 #endif
 	}
 
@@ -656,7 +656,7 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 			if ( pLblPlayer1GamerTag )
 			{
 				g_pVGuiLocalize->ConvertANSIToUnicode( player1->GetName(), wszPlayerName, sizeof( wszPlayerName ) );
-				g_pVGuiLocalize->ConstructString( wszListText, sizeof( wszListText ), g_pVGuiLocalize->Find( "#L4D360UI_MainMenu_LocalProfilePlayer1" ), 1, wszPlayerName );
+				g_pVGuiLocalize->ConstructString( wszListText, sizeof( wszListText ), g_pVGuiLocalize->Find( "#GameUI_MainMenu_LocalProfilePlayer1" ), 1, wszPlayerName );
 
 				pLblPlayer1GamerTag->SetVisible( true );
 				pLblPlayer1GamerTag->SetText( wszListText );
@@ -669,7 +669,7 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 			if ( pLblPlayer2GamerTag )
 			{
 				g_pVGuiLocalize->ConvertANSIToUnicode( player2->GetName(), wszPlayerName, sizeof( wszPlayerName ) );
-				g_pVGuiLocalize->ConstructString( wszListText, sizeof( wszListText ), g_pVGuiLocalize->Find( "#L4D360UI_MainMenu_LocalProfilePlayer2" ), 1, wszPlayerName );
+				g_pVGuiLocalize->ConstructString( wszListText, sizeof( wszListText ), g_pVGuiLocalize->Find( "#GameUI_MainMenu_LocalProfilePlayer2" ), 1, wszPlayerName );
 
 				pLblPlayer2GamerTag->SetVisible( true );
 				pLblPlayer2GamerTag->SetText( wszListText );

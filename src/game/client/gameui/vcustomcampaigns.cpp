@@ -278,7 +278,7 @@ void CustomCampaigns::ApplySchemeSettings(vgui::IScheme *pScheme)
 				char const *szGameMode = m_pDataSettings->GetString( "game/mode", "campaign" );
 
 				m_lblNoCustomCampaigns->SetVisible( true );
-				m_lblNoCustomCampaigns->SetText( CFmtStr( "#L4D360UI_Some_CustomCampaigns_Installed_%s", szGameMode ) );
+				m_lblNoCustomCampaigns->SetText( CFmtStr( "#GameUI_Some_CustomCampaigns_Installed_%s", szGameMode ) );
 			}
 			else
 			{
@@ -298,14 +298,14 @@ void CustomCampaigns::ApplySchemeSettings(vgui::IScheme *pScheme)
 		if ( m_lblNoCustomCampaigns )
 		{
 			m_lblNoCustomCampaigns->SetVisible( true );
-			const char *noCampaignText = "#L4D360UI_No_CustomCampaigns_Installed";
+			const char *noCampaignText = "#GameUI_No_CustomCampaigns_Installed";
 
 			if ( m_hasAddonCampaign )
 			{
 				char const *szGameMode = m_pDataSettings->GetString( "game/mode", "campaign" );
 
 				m_lblNoCustomCampaigns->SetVisible( true );
-				m_lblNoCustomCampaigns->SetText( CFmtStr( "#L4D360UI_No_CustomCampaigns_Installed_%s", szGameMode ) );
+				m_lblNoCustomCampaigns->SetText( CFmtStr( "#GameUI_No_CustomCampaigns_Installed_%s", szGameMode ) );
 			}
 			else
 			{
@@ -334,7 +334,7 @@ void CustomCampaigns::ApplySchemeSettings(vgui::IScheme *pScheme)
 //=============================================================================
 void CustomCampaigns::PaintBackground()
 {
-	BaseClass::DrawDialogBackground( "#L4D360UI_My_CustomCampaigns", NULL, "#L4D360UI_My_CustomCampaigns_Desc", NULL );
+	BaseClass::DrawDialogBackground( "#GameUI_My_CustomCampaigns", NULL, "#GameUI_My_CustomCampaigns_Desc", NULL );
 }
 
 //=============================================================================
@@ -415,7 +415,7 @@ void CustomCampaigns::OnItemSelected( const char* panelName )
 	{
 		if ( campaignAuthor )
 		{
-			const wchar_t * authorFormat = g_pVGuiLocalize->Find( "#L4D360UI_CustomCampaign_Author" );
+			const wchar_t * authorFormat = g_pVGuiLocalize->Find( "#GameUI_CustomCampaign_Author" );
 			g_pVGuiLocalize->ConvertANSIToUnicode( campaignAuthor, convertedString, sizeof( convertedString ) );
 			if ( authorFormat )
 			{
@@ -434,7 +434,7 @@ void CustomCampaigns::OnItemSelected( const char* panelName )
 	{
 		if ( campaignWebsite )
 		{
-			const wchar_t * websiteFormat = g_pVGuiLocalize->Find( "#L4D360UI_CustomCampaign_Website" );
+			const wchar_t * websiteFormat = g_pVGuiLocalize->Find( "#GameUI_CustomCampaign_Website" );
 			g_pVGuiLocalize->ConvertANSIToUnicode( campaignWebsite, convertedString, sizeof( convertedString ) );
 			if ( websiteFormat )
 			{
