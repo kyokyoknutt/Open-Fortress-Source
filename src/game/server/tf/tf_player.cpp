@@ -2194,7 +2194,7 @@ void CTFPlayer::ManageArsenalWeapons(TFPlayerClassData_t *pData)
 	
 	char szDesired[64] = { '\0' };
 	if( !IsFakeClient() )
-		Q_strncpy(szDesired,engine->GetClientConVarValue( entindex(), g_aLoadoutConvarNames[ TF_CLASS_MERCENARY ] ), sizeof(szDesired));
+		Q_strncpy(szDesired, engine->GetClientConVarValue(entindex(), g_aArsenalConvarNames[TF_CLASS_MERCENARY]), sizeof(szDesired));
 	else
 	{
 		int iMaxCosNum = GetItemSchema()->GetWeaponCount() - 1;
