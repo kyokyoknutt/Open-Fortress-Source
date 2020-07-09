@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "tf_weapon_fists.h"
 #include "decals.h"
+#include "in_buttons.h"
 
 // Client specific.
 #ifdef CLIENT_DLL
@@ -182,4 +183,45 @@ void CTFFists::DoViewModelAnimation( void )
 	}
 
 	SendWeaponAnim( act );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CTFClaws::ItemPostFrame(void)
+{
+	CTFPlayer *pOwner = ToTFPlayer(GetPlayerOwner());
+	if (!pOwner)
+		return;
+
+	if (pOwner->IsAlive())
+	{
+		if (pOwner->m_Shared.IsLunging())
+		{
+			trace_t trace;
+			if (DoSwingTrace(trace) && trace.m_pEnt->IsPlayer())
+			{
+				SendPlayerAnimEvent(pOwner);
+				DoViewModelAnimation();
+				WeaponSound(MELEE_MISS);
+				Smack();
+				pOwner->m_Shared.StopLunge();
+				m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+			}
+		}
+		else if ((pOwner->m_nButtons & IN_ATTACK) && m_flNextPrimaryAttack < gpGlobals->curtime)
+		{
+			PrimaryAttack();
+			m_flNextPrimaryAttack = gpGlobals->curtime + GetFireRate();
+		}
+	}
+
+	// Check for smack.	
+	if ((m_flSmackTime > 0.0f && gpGlobals->curtime > m_flSmackTime))
+	{
+		Smack();
+		m_flSmackTime = -1.0f;
+	}
+
+	ShieldChargeThink();
 }

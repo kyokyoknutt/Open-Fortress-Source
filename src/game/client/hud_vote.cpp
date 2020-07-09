@@ -423,6 +423,11 @@ void CVoteSetupDialog::Activate()
 	
 	BaseClass::Activate();
 
+#ifdef OF_CLIENT_DLL 
+	// Hide gameui on activation
+	engine->ClientCmd_Unrestricted( "gameui_hide" );
+#endif
+
 	ResetData();
 
 	m_pVoteSetupList->SetVerticalScrollbar( true );

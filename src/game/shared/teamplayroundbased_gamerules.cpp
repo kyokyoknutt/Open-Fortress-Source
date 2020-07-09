@@ -13,9 +13,10 @@
 #include "tf_gamerules.h"
 #include "engine/IEngineSound.h"
 
-#if defined( GAME_DLL )
+#if defined( OF_DLL )
 #include "tf_gamestats.h"
 #include "of_music_player.h"
+#include "of_shared_schemas.h"
 #endif
 
 #endif
@@ -219,7 +220,10 @@ ConVar mp_maxrounds( "mp_maxrounds", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "max 
 ConVar mp_winlimit( "mp_winlimit", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "Max score one team can reach before server changes maps", true, 0, false, 0 );
 ConVar mp_disable_respawn_times( "mp_disable_respawn_times", "0", FCVAR_NOTIFY | FCVAR_REPLICATED );
 ConVar mp_disable_waitingforplayers( "mp_disable_waitingforplayers", "0", FCVAR_NOTIFY | FCVAR_REPLICATED );
-ConVar mp_bonusroundtime( "mp_bonusroundtime", "15", FCVAR_REPLICATED, "Time after round win until round restarts", true, 5, true, 15 );
+ConVar mp_bonusroundtime( "mp_bonusroundtime", "20", FCVAR_REPLICATED, "Time after round win until round restarts", true, 5, true, 20 );
+#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+ConVar of_winscreenratio( "of_winscreenratio", "0.5", FCVAR_REPLICATED, "The ratio of how much time the winscreen is up compared to the freeroam time.", true, 0, true, 1 );
+#endif
 ConVar mp_bonusroundtime_final( "mp_bonusroundtime_final", "15", FCVAR_REPLICATED, "Time after final round ends until round restarts", true, 5, true, 300 );
 ConVar mp_stalemate_meleeonly( "mp_stalemate_meleeonly", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "Restrict everyone to melee weapons only while in Sudden Death." );
 ConVar mp_forceautoteam( "mp_forceautoteam", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "Automatically assign players to teams when joining." );
@@ -526,8 +530,9 @@ void CTeamplayRoundBasedRules::AddTeamRespawnWaveTime( int iTeam, float flValue 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTeamplayRoundBasedRules::BroadcastSound( int iTeam, const char *sound, bool bAnnouncer, int iExcludePlayers )
+void CTeamplayRoundBasedRules::BroadcastSound( int iTeam, const char *sound, bool bAnnouncer, int iAdditionalSoundFlags, int iExcludePlayers )
 {
+	DevMsg("Sound broadcasted: %d %s %d %d\n", iTeam, sound, bAnnouncer, iExcludePlayers);
 	for (int i = TEAM_UNASSIGNED; i < TF_TEAM_COUNT; i++)
 	{
 		IGameEvent *event = gameeventmanager->CreateEvent( "teamplay_broadcast_audio" );
@@ -537,9 +542,16 @@ void CTeamplayRoundBasedRules::BroadcastSound( int iTeam, const char *sound, boo
 				i = iTeam;
 			event->SetInt( "team", i );
 			event->SetString( "sound", sound );
-			event->SetInt("additional_flags", iExcludePlayers);
+			event->SetInt("additional_flags", iAdditionalSoundFlags);
+			event->SetInt("exclude_players", iExcludePlayers);
 			event->SetBool( "announcer", bAnnouncer );
+#ifdef OF_DLL
+			DevMsg("Serverside broadcast\n");
 			gameeventmanager->FireEvent( event );
+#else
+			DevMsg("Clientside broadcast\n");
+			gameeventmanager->FireEventClientSide( event );
+#endif
 			if ( iTeam != TEAM_UNASSIGNED )
 				break;
 		}
@@ -1584,6 +1596,11 @@ void CTeamplayRoundBasedRules::State_Enter_PREROUND( void )
 #endif
 
 	StopWatchModeThink();
+	
+	IGameEvent *musicevent = gameeventmanager->CreateEvent( "music_round_start" );
+	if ( musicevent )
+		gameeventmanager->FireEvent( musicevent );
+
 }
 
 //-----------------------------------------------------------------------------
@@ -2573,58 +2590,64 @@ void CTeamplayRoundBasedRules::SetWinningTeam( int team, int iWinReason, bool bF
 	}
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
 	else
-	{
+	{		
+		int numPlayers = 0;
+		CUtlVector<PlayerRoundScore_t> vecPlayerScore;
+		
+		if ( m_iWinningTeam == TF_TEAM_MERCENARY && TFGameRules() )
+		{
+			// determine the 3 players on winning team who scored the most points this round
+			// build a vector of players & round scores
+			int iPlayerIndex;
+			for( iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
+			{
+				CTFPlayer *pTFPlayer = ToTFPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
+				if ( !pTFPlayer || !pTFPlayer->IsConnected() )
+					continue;
+				// filter out spectators and, if not stalemate, all players not on winning team
+				int iPlayerTeam = pTFPlayer->GetTeamNumber();
+				if ( ( iPlayerTeam < FIRST_GAME_TEAM ) || ( m_iWinningTeam != TEAM_UNASSIGNED && ( m_iWinningTeam != iPlayerTeam ) ) )
+					continue;
+
+				int iRoundScore = 0, iTotalScore = 0;
+				PlayerStats_t *pStats = CTF_GameStats.FindPlayerStats( pTFPlayer );
+				if ( pStats )
+				{
+					iRoundScore = TFGameRules()->CalcPlayerScore( &pStats->statsCurrentRound );
+					iTotalScore = TFGameRules()->CalcPlayerScore( &pStats->statsAccumulated );
+				}
+				PlayerRoundScore_t &playerRoundScore = vecPlayerScore[vecPlayerScore.AddToTail()];
+				playerRoundScore.iPlayerIndex = iPlayerIndex;
+				playerRoundScore.iRoundScore = iRoundScore;
+				playerRoundScore.iTotalScore = iTotalScore;
+			}
+			// sort the players by round score
+			vecPlayerScore.Sort( TFGameRules()->PlayerRoundScoreSortFunc );
+
+			// set the top (up to) 3 players by round score in the event data
+			numPlayers = min( 3, vecPlayerScore.Count() );
+		}
+
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
 			CTFPlayer *pPlayer = ToTFPlayer( UTIL_PlayerByIndex( i ) );
 			if ( !pPlayer )
 				continue;
-			pPlayer->m_Shared.SetTopThree( false );
-			if ( m_iWinningTeam == TF_TEAM_MERCENARY && TFGameRules() )
+
+			if ( m_iWinningTeam == TF_TEAM_MERCENARY )
 			{
-				// determine the 3 players on winning team who scored the most points this round
-
-				// build a vector of players & round scores
-				CUtlVector<PlayerRoundScore_t> vecPlayerScore;
-				int iPlayerIndex;
-				for( iPlayerIndex = 1 ; iPlayerIndex <= MAX_PLAYERS; iPlayerIndex++ )
-				{
-					CTFPlayer *pTFPlayer = ToTFPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
-					if ( !pTFPlayer || !pTFPlayer->IsConnected() )
-						continue;
-					// filter out spectators and, if not stalemate, all players not on winning team
-					int iPlayerTeam = pTFPlayer->GetTeamNumber();
-					if ( ( iPlayerTeam < FIRST_GAME_TEAM ) || ( m_iWinningTeam != TEAM_UNASSIGNED && ( m_iWinningTeam != iPlayerTeam ) ) )
-						continue;
-
-					int iRoundScore = 0, iTotalScore = 0;
-					PlayerStats_t *pStats = CTF_GameStats.FindPlayerStats( pTFPlayer );
-					if ( pStats )
-					{
-						iRoundScore = TFGameRules()->CalcPlayerScore( &pStats->statsCurrentRound );
-						iTotalScore = TFGameRules()->CalcPlayerScore( &pStats->statsAccumulated );
-					}
-					PlayerRoundScore_t &playerRoundScore = vecPlayerScore[vecPlayerScore.AddToTail()];
-					playerRoundScore.iPlayerIndex = iPlayerIndex;
-					playerRoundScore.iRoundScore = iRoundScore;
-					playerRoundScore.iTotalScore = iTotalScore;
-				}
-				// sort the players by round score
-				vecPlayerScore.Sort( TFGameRules()->PlayerRoundScoreSortFunc );
-
-				// set the top (up to) 3 players by round score in the event data
-				int numPlayers = min( 3, vecPlayerScore.Count() );
-				for ( int i = 0; i < numPlayers; i++ )
+				pPlayer->m_Shared.SetTopThree( false );
+				for ( int y = 0; y < numPlayers; y++ )
 				{
 					// only include players who have non-zero points this round; if we get to a player with 0 round points, stop
-					if ( 0 == vecPlayerScore[i].iRoundScore )
-						break;
-					CTFPlayer *pPlayer = ToTFPlayer( UTIL_PlayerByIndex( vecPlayerScore[i].iPlayerIndex ) );
-					if ( pPlayer )
+					if ( 0 == vecPlayerScore[y].iRoundScore )
+						continue;
+
+					if ( pPlayer && pPlayer->entindex() == vecPlayerScore[y].iPlayerIndex )
 					{
 						pPlayer->m_Shared.AddCond(TF_COND_CRITBOOSTED);
 						pPlayer->m_Shared.SetTopThree( true );
-					}						
+					}
 				}
 			}
 			else if ( pPlayer->GetTeamNumber() == m_iWinningTeam )
@@ -2890,6 +2913,19 @@ void CTeamplayRoundBasedRules::RespawnPlayers( bool bForceRespawn, bool bTeam /*
 
 			continue;
 		}
+		
+#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+		// If duel is on, only respawn the current players
+		// Regardless on if its forced or not
+/*		if( TFGameRules()->IsDuelGamemode() )
+		{
+			if( TFGameRules()->GetDuelQueuePos( pPlayer ) != 0 )
+			{
+				pPlayer->CommitSuicide(true, true);
+				continue;
+			}
+		}*/
+#endif
 
 		// If we aren't force respawning, don't respawn players that:
 		// - are alive
@@ -3580,6 +3616,12 @@ void CTeamplayRoundBasedRules::PlayWinSong( int team )
 	{
 		PlayStalemateSong();
 	}
+#ifdef OF_DLL
+	else if( team == TF_TEAM_MERCENARY )
+	{
+		return;
+	}
+#endif
 	else
 	{
 #if defined (TF_DLL) || defined (TF_CLIENT_DLL)
@@ -3660,9 +3702,8 @@ void CTeamplayRoundBasedRules::PlayStalemateSong( void )
 const char* CTeamplayRoundBasedRules::WinSongName( int nTeam )
 { 
 	if ( TFGameRules() && TFGameRules()->IsInfGamemode() )
-		return "Game.Infection.YourTeamWon";
-	else
-		return "Game.YourTeamWon"; 
+		return "Game.Infection.YourTeamWon";	
+	return "Game.YourTeamWon"; 
 }
 
 const char* CTeamplayRoundBasedRules::LoseSongName( int nTeam )

@@ -66,6 +66,7 @@ private:
 
 public:
 	CTFWinPanelDM(const char *pElementName);
+	~CTFWinPanelDM();
 
 	virtual void Reset();
 	virtual void FireGameEvent(IGameEvent *event);
@@ -75,8 +76,13 @@ public:
 	virtual bool HasInputElements(void) { return true; }
 	virtual int GetRenderGroupPriority() { return 70; }
 
+	virtual void OnTick( void );
+	void StartPanel( KeyValues *event );
 private:
-	ExitCircle	  *m_XClose;
+	ExitCircle	  	*m_XClose;
+	KeyValues 		*m_pRoundEndEvent;
+
+	float			m_flDisplayTime;
 };
 
 #endif //TFWINPANEL_H

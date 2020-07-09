@@ -38,7 +38,6 @@
 #include "game/client/IGameClientExports.h"
 #include "materialsystem/imaterialsystem.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
-#include "ixboxsystem.h"
 #include "iachievementmgr.h"
 #include "IGameUIFuncs.h"
 #include "ienginevgui.h"
@@ -73,10 +72,6 @@ ConVar of_pausegame( "of_pausegame", "0", FCVAR_ARCHIVE | FCVAR_REPLICATED, "If 
 
 ConVar ui_scaling("ui_scaling", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "Scales VGUI elements with different screen resolutions.");
 
-#ifdef _X360
-#include "xbox/xbox_win32stubs.h"
-#endif // _X360
-
 #include "tier0/dbg.h"
 #include "engine/IEngineSound.h"
 #include "gameui_util.h"
@@ -92,25 +87,18 @@ IGameUIFuncs *gameuifuncs = NULL;
 CGlobalVarsBase *gpGlobals = NULL;
 IEngineSound *enginesound = NULL;
 ISoundEmitterSystemBase *soundemitterbase = NULL;
-IXboxSystem *xboxsystem = NULL;
 
 static CSteamAPIContext g_SteamAPIContext;
 CSteamAPIContext *steamapicontext = &g_SteamAPIContext;
 #endif
 
 IEngineVGui *enginevguifuncs = NULL;
-#ifdef _X360
-IXOnline  *xonline = NULL;			// 360 only
-#endif
 vgui::ISurface *enginesurfacefuncs = NULL;
 IAchievementMgr *achievementmgr = NULL;
 
-class CGameUI;
 CGameUI *g_pGameUI = NULL;
 
-class CLoadingDialog;
 vgui::DHANDLE<CLoadingDialog> g_hLoadingDialog;
-
 static CGameUI g_GameUI;
 static WHANDLE g_hMutex = NULL;
 static WHANDLE g_hWaitMutex = NULL;
@@ -157,7 +145,6 @@ CGameUI::CGameUI()
 	m_iGameQueryPort = 0;
 	m_bActivatedUI = false;
 	m_szPreviousStatusText[0] = 0;
-	m_bIsConsoleUI = false;
 	m_bHasSavedThisMenuSession = false;
 	m_bOpenProgressOnStart = false;
 }
@@ -196,7 +183,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 	gameuifuncs = (IGameUIFuncs *)factory(VENGINE_GAMEUIFUNCS_VERSION, NULL);
 	soundemitterbase = (ISoundEmitterSystemBase *)factory(SOUNDEMITTERSYSTEM_INTERFACE_VERSION, NULL);
-	xboxsystem = (IXboxSystem *)factory(XBOXSYSTEM_INTERFACE_VERSION, NULL);
 
 	enginesound = (IEngineSound *)factory(IENGINESOUND_CLIENT_INTERFACE_VERSION, NULL);
 	engine = (IVEngineClient *)factory( VENGINE_CLIENT_INTERFACE_VERSION, NULL );
@@ -207,9 +193,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	SteamAPI_InitSafe();
 	steamapicontext->Init();
 #endif
-
-	CGameUIConVarRef var( "gameui_xbox" );
-	m_bIsConsoleUI = var.IsValid() && var.GetBool();
 
 	vgui::VGui_InitInterfacesList( "GameUI", &factory, 1 );
 	vgui::VGui_InitMatSysInterfacesList( "GameUI", &factory, 1 );
@@ -223,15 +206,10 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	// load localization file for kb_act.lst
 	g_pVGuiLocalize->AddFile( "Resource/valve_%language%.txt", "GAME", true );
 
-	//bool bFailed = false;
 	enginevguifuncs = (IEngineVGui *)factory( VENGINE_VGUI_VERSION, NULL );
 	enginesurfacefuncs = (vgui::ISurface *)factory(VGUI_SURFACE_INTERFACE_VERSION, NULL);
 	gameuifuncs = (IGameUIFuncs *)factory( VENGINE_GAMEUIFUNCS_VERSION, NULL );
-	xboxsystem = (IXboxSystem *)factory( XBOXSYSTEM_INTERFACE_VERSION, NULL );
-#ifdef _X360
-	xonline = (IXOnline *)factory( XONLINE_INTERFACE_VERSION, NULL );
-#endif
-	if (!enginesurfacefuncs || !gameuifuncs || !enginevguifuncs || !xboxsystem)
+	if (!enginesurfacefuncs || !gameuifuncs || !enginevguifuncs)
 	{
 		Warning( "CGameUI::Initialize() failed to get necessary interfaces\n" );
 	}
@@ -239,14 +217,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 void CGameUI::PostInit()
 {
-	if ( IsX360() )
-	{
-		enginesound->PrecacheSound( "player/suit_denydevice.wav", true, true );
-
-		enginesound->PrecacheSound( "UI/buttonclick.wav", true, true );
-		enginesound->PrecacheSound( "UI/buttonrollover.wav", true, true );
-		enginesound->PrecacheSound( "UI/buttonclickrelease.wav", true, true );
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -544,6 +514,12 @@ void CGameUI::OnGameUIActivated()
 			panel->OnGameUIActivated();
 		}
 	}
+
+	vgui::Panel *pGameUIPanel = vgui::ipanel()->GetPanel( GetGameUIBasePanel(), "GameUI" );
+	if ( pGameUIPanel )
+	{
+		pGameUIPanel->SetVisible( true );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -561,6 +537,22 @@ void CGameUI::OnGameUIHidden()
 	{
 		panel->OnGameUIHidden();
 	}
+
+	// Close old panels
+	if ( m_hCreateMultiplayerGameDialog )
+	{
+		m_hCreateMultiplayerGameDialog->Close();
+	}
+	if ( m_hPlayerListDialog )
+	{
+		m_hPlayerListDialog->Close();
+	}
+	if ( m_hOptionsDialog )
+	{
+		m_hOptionsDialog->Close();
+	}
+
+	g_VModuleLoader.DeactivateModule( "Servers" );
 }
 
 //-----------------------------------------------------------------------------
@@ -836,7 +828,7 @@ bool CGameUI::IsInMultiplayer()
 //-----------------------------------------------------------------------------
 bool CGameUI::IsConsoleUI()
 {
-	return m_bIsConsoleUI;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1004,31 +996,17 @@ void CGameUI::SetMainMenuOverride(vgui::VPANEL panel)
 
 void CGameUI::SendMainMenuCommand(const char *pszCommand)
 {
-	vgui::Panel *pGameUIPanel = vgui::ipanel()->GetPanel(GetGameUIBasePanel(), "GameUI");
-
 	if (!Q_strcmp(pszCommand, "OpenOptionsDialog"))
 	{
-		GameUI().OpenOptionsDialog(pGameUIPanel);
-	}
-	else if (!Q_strcmp(pszCommand, "OpenOptionsMouseDialog"))
-	{
-		GameUI().OpenOptionsMouseDialog(pGameUIPanel);
-	}
-	else if (!Q_strcmp(pszCommand, "OpenKeyBindingsDialog"))
-	{
-		GameUI().OpenKeyBindingsDialog(pGameUIPanel);
+		GameUI().OpenOptionsDialog();
 	}
 	else if (!Q_strcmp(pszCommand, "OpenCreateMultiplayerGameDialog"))
 	{
-		GameUI().OpenCreateMultiplayerGameDialog(pGameUIPanel);
+		GameUI().OpenCreateMultiplayerGameDialog();
 	}
 	else if (!Q_strcmp(pszCommand, "OpenPlayerListDialog"))
 	{
-		GameUI().OpenPlayerListDialog(pGameUIPanel);
-	}
-	else if (!Q_strcmp(pszCommand, "OpenOptionsMouseDialog"))
-	{
-		GameUI().OpenOptionsMouseDialog(pGameUIPanel);
+		GameUI().OpenPlayerListDialog();
 	}
 }
 
@@ -1049,100 +1027,51 @@ static void BaseUI_PositionDialog(vgui::PHandle dlg)
 }
 
 //=============================================================================
-void CGameUI::OpenCreateMultiplayerGameDialog(vgui::Panel *parent)
+void CGameUI::OpenOptionsDialog()
 {
-	if (IsPC())
+	if ( !m_hOptionsDialog.Get() )
 	{
-		if (!m_hCreateMultiplayerGameDialog.Get())
-		{
-			m_hCreateMultiplayerGameDialog = new CCreateMultiplayerGameDialog(parent);
-			BaseUI_PositionDialog(m_hCreateMultiplayerGameDialog);
-		}
-		if (m_hCreateMultiplayerGameDialog)
-			m_hCreateMultiplayerGameDialog->Activate();
+		m_hOptionsDialog = new COptionsDialog( NULL );
+		m_hOptionsDialog->SetParent( GetGameUIBasePanel() );
+		BaseUI_PositionDialog( m_hOptionsDialog );
 	}
+	m_hOptionsDialog->Activate();
 }
 
 //=============================================================================
-void CGameUI::OpenPlayerListDialog(vgui::Panel *parent)
+void CGameUI::OpenCreateMultiplayerGameDialog()
 {
-	if (IsPC())
+	if ( !m_hCreateMultiplayerGameDialog.Get() )
 	{
-		if (!m_hPlayerListDialog.Get())
-		{
-			m_hPlayerListDialog = new CPlayerListDialog(parent);
-			BaseUI_PositionDialog(m_hPlayerListDialog);
-		}
-
-		m_hPlayerListDialog->Activate();
+		m_hCreateMultiplayerGameDialog = new CCreateMultiplayerGameDialog( NULL );
+		m_hCreateMultiplayerGameDialog->SetParent( GetGameUIBasePanel() );
+		BaseUI_PositionDialog( m_hCreateMultiplayerGameDialog );
 	}
-}
-
-void CGameUI::OnOpenServerBrowser(vgui::Panel * parent)
-{
-	g_VModuleLoader.ActivateModule("Servers");
+	m_hCreateMultiplayerGameDialog->Activate();
 }
 
 //=============================================================================
-void CGameUI::OpenOptionsDialog(vgui::Panel *parent)
+void CGameUI::OpenPlayerListDialog()
 {
-	if (IsPC())
+	if ( !m_hPlayerListDialog.Get() )
 	{
-		if (!m_hOptionsDialog.Get())
-		{
-			m_hOptionsDialog = new COptionsDialog(parent);
-			BaseUI_PositionDialog(m_hOptionsDialog);
-		}
-
-		m_hOptionsDialog->Activate();
+		m_hPlayerListDialog = new CPlayerListDialog( NULL );
+		m_hPlayerListDialog->SetParent( GetGameUIBasePanel() );
+		BaseUI_PositionDialog( m_hPlayerListDialog );
 	}
+	m_hPlayerListDialog->Activate();
 }
 
-//=============================================================================
-void CGameUI::OpenOptionsMouseDialog(vgui::Panel *parent)
+void CGameUI::OnOpenServerBrowser()
 {
-	if (IsPC())
-	{
-		if (!m_hOptionsMouseDialog.Get())
-		{
-			m_hOptionsMouseDialog = new COptionsMouseDialog(parent);
-			BaseUI_PositionDialog(m_hOptionsMouseDialog);
-		}
-
-		m_hOptionsMouseDialog->Activate();
-	}
-}
-
-//=============================================================================
-void CGameUI::OpenKeyBindingsDialog(vgui::Panel *parent)
-{
-	if (IsPC())
-	{
-		if (!m_hOptionsDialog.Get())
-		{
-			m_hOptionsDialog = new COptionsDialog(parent, OPTIONS_DIALOG_ONLY_BINDING_TABS);
-			BaseUI_PositionDialog(m_hOptionsDialog);
-		}
-
-		m_hOptionsDialog->Activate();
-	}
+	g_VModuleLoader.ActivateModule( "Servers" );
 }
 
 static char *g_rgValidCommands[] =
 {
-	"OpenGameMenu",
 	"OpenPlayerListDialog",
-	"OpenNewGameDialog",
-	"OpenLoadGameDialog",
-	"OpenSaveGameDialog",
-	"OpenCustomMapsDialog",
 	"OpenOptionsDialog",
-	"OpenBenchmarkDialog",
-	"OpenFriendsDialog",
-	"OpenLoadDemoDialog",
 	"OpenCreateMultiplayerGameDialog",
-	"OpenChangeGameDialog",
-	"OpenLoadCommentaryDialog",
 	"Quit",
 	"QuitNoConfirm",
 	"ResumeGame",
@@ -1160,13 +1089,6 @@ static void CC_GameMenuCommand(const CCommand &args)
 
 	g_pGameUI->SendMainMenuCommand(args[1]);
 }
-
-// This is defined in ulstring.h at the bottom in 2013 MP
-/*
-static bool UtlStringLessFunc(const CUtlString &lhs, const CUtlString &rhs)
-{
-	return Q_stricmp(lhs.String(), rhs.String()) < 0;
-}*/
 
 static int CC_GameMenuCompletionFunc(char const *partial, char commands[COMMAND_COMPLETION_MAXITEMS][COMMAND_COMPLETION_ITEM_LENGTH])
 {

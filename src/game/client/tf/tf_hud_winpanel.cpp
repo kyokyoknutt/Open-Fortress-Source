@@ -28,6 +28,7 @@
 #include "KeyValues.h"
 #include "tier2/tier2.h"
 #include "of_shared_schemas.h"
+#include "c_of_music_player.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -382,6 +383,16 @@ CTFWinPanelDM::CTFWinPanelDM(const char *pElementName) : EditablePanel(NULL, "Wi
 
 	//Exit button
 	m_XClose = new ExitCircle(this, "X_Circle", "cancelmenu");
+	
+	m_flDisplayTime = -1;
+	
+	m_pRoundEndEvent = new KeyValues("RoundEndEvent");
+}
+
+CTFWinPanelDM::~CTFWinPanelDM()
+{
+	// We dont want to memory leaks here
+	m_pRoundEndEvent->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -390,6 +401,7 @@ CTFWinPanelDM::CTFWinPanelDM(const char *pElementName) : EditablePanel(NULL, "Wi
 void CTFWinPanelDM::Reset()
 {
 	SetVisible(false);
+	m_flDisplayTime = -1;
 }
 
 void CTFWinPanelDM::SetVisible(bool state)
@@ -407,24 +419,75 @@ void CTFWinPanelDM::SetVisible(bool state)
 //-----------------------------------------------------------------------------
 bool CTFWinPanelDM::ShouldDraw()
 {
+	if( m_flDisplayTime != -1 && m_flDisplayTime < gpGlobals->curtime )
+		StartPanel( m_pRoundEndEvent );
+	
 	if (!IsVisible())
 		return false;
 
 	return CHudElement::ShouldDraw();
 }
 
+extern ConVar of_winscreenratio;
+extern ConVar mp_bonusroundtime;
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTFWinPanelDM::FireGameEvent(IGameEvent * event)
+void CTFWinPanelDM::FireGameEvent(IGameEvent *event)
 {
+	if( TFGameRules() && TFGameRules()->IsDMGamemode() && !TFGameRules()->DontCountKills() )
+		m_flDisplayTime = gpGlobals->curtime + ( mp_bonusroundtime.GetFloat() * of_winscreenratio.GetFloat() );
+	else
+		m_flDisplayTime = gpGlobals->curtime;
+	
+	// Really hacky but transfer all the values to the round end event
+	
+	m_pRoundEndEvent->SetName(event->GetName());
+	
+	m_pRoundEndEvent->SetInt( "panel_style", event->GetInt("panel_style") );
+	m_pRoundEndEvent->SetInt( "winning_team", event->GetInt("winning_team") );
+	m_pRoundEndEvent->SetInt( "winreason", event->GetInt("winreason") );
+	m_pRoundEndEvent->SetInt( "flagcaplimit", event->GetInt("flagcaplimit") );
+	m_pRoundEndEvent->SetInt( "blue_score", event->GetInt("blue_score") );
+	m_pRoundEndEvent->SetInt( "red_score", event->GetInt("red_score") );
+	m_pRoundEndEvent->SetInt( "blue_score_prev", event->GetInt("blue_score_prev") );
+	m_pRoundEndEvent->SetInt( "red_score_prev", event->GetInt("red_score_prev") );
+	m_pRoundEndEvent->SetInt( "round_complete", event->GetInt("round_complete") );
+	m_pRoundEndEvent->SetInt( "rounds_remaining", event->GetInt("rounds_remaining") );	
+	m_pRoundEndEvent->SetString( "cappers", event->GetString("cappers") );
+	
+	
+	DevMsg("%d %d\n", event->GetInt("winreason"), event->GetInt("winning_team"));
+	for( int i = 0; i < 3; i++ )
+	{
+		char szPlayerIndexVal[64]="", szPlayerScoreVal[64]="";
+		Q_snprintf( szPlayerIndexVal, ARRAYSIZE( szPlayerIndexVal ), "player_%d", i+ 1 );
+		Q_snprintf( szPlayerScoreVal, ARRAYSIZE( szPlayerScoreVal ), "player_%d_points", i+ 1 );
+
+		DevMsg("%s %d\n", szPlayerIndexVal, event->GetInt( szPlayerIndexVal ) );
+		DevMsg("%s %d\n", szPlayerScoreVal, event->GetInt( szPlayerScoreVal ) );
+		
+		m_pRoundEndEvent->SetInt( szPlayerIndexVal, event->GetInt( szPlayerIndexVal ) );
+		m_pRoundEndEvent->SetInt( szPlayerScoreVal, event->GetInt( szPlayerScoreVal ) );
+	}
+	
+		// play a sound
+	CLocalPlayerFilter filter;
+	C_BaseEntity::EmitSound(filter, SOUND_FROM_LOCAL_PLAYER, "Hud.DMEndRoundScored");
+}
+
+void CTFWinPanelDM::StartPanel( KeyValues *event )
+{
+	m_flDisplayTime = -1;
+
 	//Should it draw or not
-	if (Q_strcmp("teamplay_win_panel", event->GetName()) || event->GetInt("winning_team") != TF_TEAM_MERCENARY)
+	if( Q_strcmp("teamplay_win_panel", event->GetName() ) || event->GetInt("winning_team") != TF_TEAM_MERCENARY )
 	{
 		SetVisible(false);
 		return;
 	}
-
+	
 	if (!g_PR)
 		return;
 
@@ -454,6 +517,26 @@ void CTFWinPanelDM::FireGameEvent(IGameEvent * event)
 	KeyValues *pModelAttachement = new KeyValues("Models");
 	pModelAttachement->LoadFromFile(filesystem, "resource/ui/winpaneldm_objects.txt");
 
+	char szWinTheme[32] = { "Game.DMWin" };
+	char szLooseTheme[32] = { "Game.DMLoose" };
+	
+	if( DMMusicManager() )
+	{
+		KeyValues *pMusic = GetSoundscript( DMMusicManager()->szRoundMusic );
+		if( pMusic )
+		{
+			Q_strncpy( szWinTheme, pMusic->GetString("win", "Game.DMWin"), sizeof(szWinTheme) );
+			Q_strncpy( szLooseTheme, pMusic->GetString("loose", "Game.DMLoose"), sizeof(szLooseTheme) );
+		}
+	}
+	
+	DevMsg( "%s\n", szWinTheme );
+	DevMsg( "%s\n", szLooseTheme );
+	
+	int iPlayerAmount = 0;
+	
+	bool bLost = true;
+	
 	for (int i = 1; i <= 3; i++)
 	{
 		// get player index and round points from the event
@@ -462,9 +545,27 @@ void CTFWinPanelDM::FireGameEvent(IGameEvent * event)
 
 		Q_snprintf(szPlayerVal, ARRAYSIZE(szPlayerVal), "player_%d_points", i);
 		iRoundScore = event->GetInt(szPlayerVal, 0);
+		
+		if( iPlayerIndex == C_BasePlayer::GetLocalPlayer()->entindex() && TeamplayRoundBasedRules() )
+		{
+			bLost = false;
+			TeamplayRoundBasedRules()->BroadcastSoundFFA( iPlayerIndex, szWinTheme, "", false );
+			switch( i )
+			{
+				case 1:
+				TeamplayRoundBasedRules()->BroadcastSoundFFA( iPlayerIndex, "FirstPlace", "" );
+				break;
+				case 2:
+				TeamplayRoundBasedRules()->BroadcastSoundFFA( iPlayerIndex, "SecondPlace", "" );
+				break;
+				case 3:
+				TeamplayRoundBasedRules()->BroadcastSoundFFA( iPlayerIndex, "ThirdPlace", "" );
+				break;
+			}
+		}
 
 		// round score of 0 means no player to show for that position (not enough players, or didn't score any points that round)
-		if (iRoundScore <= 0)
+		if( iRoundScore <= 0 )
 			continue;
 
 		pPlayerName = dynamic_cast<Label *>(FindChildByName(CFmtStr("Player%dName", i)));
@@ -545,7 +646,26 @@ void CTFWinPanelDM::FireGameEvent(IGameEvent * event)
 		// show or hide labels for this player position
 		pPlayerName->SetVisible(true);
 		playerScore->SetVisible(true);
+		iPlayerAmount++;
+	}
+	
+	if( bLost && TeamplayRoundBasedRules() )
+	{
+		TeamplayRoundBasedRules()->BroadcastSoundFFA( C_BasePlayer::GetLocalPlayer()->entindex(), "LastPlace", "" );
+		TeamplayRoundBasedRules()->BroadcastSoundFFA( C_BasePlayer::GetLocalPlayer()->entindex(), szLooseTheme, "", false );
+	}
+	
+	switch( iPlayerAmount )
+	{
+		case 1:
+		g_pClientMode->GetViewportAnimationController()->StartAnimationSequence(this, "HudDMWinpanelFirst");
+		break;
+		case 2:
+		g_pClientMode->GetViewportAnimationController()->StartAnimationSequence(this, "HudDMWinpanelSecond");
+		break;
+		case 3:
 		g_pClientMode->GetViewportAnimationController()->StartAnimationSequence(this, "HudDMWinpanelIntro");
+		break;
 	}
 
 	pModelAttachement->deleteThis();
@@ -554,6 +674,11 @@ void CTFWinPanelDM::FireGameEvent(IGameEvent * event)
 
 	if (m_XClose)
 		m_XClose->RequestFocus();
+}
+
+void CTFWinPanelDM::OnTick( void )
+{
+	BaseClass::OnTick();
 }
 
 //-----------------------------------------------------------------------------

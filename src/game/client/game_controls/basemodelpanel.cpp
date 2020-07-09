@@ -73,7 +73,7 @@ CModelPanel::~CModelPanel()
 //-----------------------------------------------------------------------------
 void CModelPanel::ApplySettings( KeyValues *inResourceData )
 {
-	BaseClass::ApplySettings( inResourceData );
+	BaseClass::ApplySettings(inResourceData);
 
 	m_nFOV = inResourceData->GetInt( "fov", 54 );
 	m_bStartFramed = inResourceData->GetInt( "start_framed", false );
@@ -312,19 +312,42 @@ void CModelPanel::SwapModel( const char *pszName, const char *pszAttached )
 	m_bPanelDirty = true;
 }
 
-void CModelPanel::GetModelPos( float &x, float &y, float &z )
+#ifdef OF_CLIENT_DLL	
+
+void CModelPanel::GetHUDModelPos( float &x, float &y, float &z )
 {
 	x = m_pModelInfo->m_vecOriginOffset.x;
 	y = m_pModelInfo->m_vecOriginOffset.y;
 	z = m_pModelInfo->m_vecOriginOffset.z;
 }
 
-void CModelPanel::SetModelPos( float x, float y, float z )
+void CModelPanel::SetHUDModelPos( float x, float y, float z )
 {
 	m_pModelInfo->m_vecOriginOffset.x = x;
 	m_pModelInfo->m_vecOriginOffset.y = y;
 	m_pModelInfo->m_vecOriginOffset.z = z;
 }
+
+void CModelPanel::GetHUDModelAng( float &x, float &y, float &z )
+{
+	x = m_pModelInfo->m_vecAbsAngles.x;
+	y = m_pModelInfo->m_vecAbsAngles.y;
+	z = m_pModelInfo->m_vecAbsAngles.z;
+}
+
+void CModelPanel::SetHUDModelAng( float x, float y, float z )
+{
+	m_pModelInfo->m_vecAbsAngles.x = x;
+	m_pModelInfo->m_vecAbsAngles.y = y;
+	m_pModelInfo->m_vecAbsAngles.z = z;
+}
+
+void CModelPanel::ResetAnim()
+{
+	m_bPanelDirty = true;
+}
+
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 

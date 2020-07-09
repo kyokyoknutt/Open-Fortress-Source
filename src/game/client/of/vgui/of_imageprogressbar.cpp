@@ -10,7 +10,6 @@
 #include "iclientmode.h"
 #include "ienginevgui.h"
 #include "of_imageprogressbar.h"
-#include "entity_bossresource.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

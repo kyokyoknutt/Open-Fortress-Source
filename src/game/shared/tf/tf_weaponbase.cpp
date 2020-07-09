@@ -162,6 +162,7 @@ BEGIN_NETWORK_TABLE( CTFWeaponBase, DT_TFWeaponBase )
 	RecvPropInt( RECVINFO( m_iDamageIncrease ) ),
 	RecvPropInt( RECVINFO( m_iSlotOverride ) ),
 	RecvPropInt( RECVINFO( m_iPositionOverride ) ),
+	RecvPropInt( RECVINFO( m_iTeamNum ) ),
 	RecvPropFloat( RECVINFO( m_flBlastRadiusIncrease ) ),
 // Server specific.
 #else
@@ -176,6 +177,7 @@ BEGIN_NETWORK_TABLE( CTFWeaponBase, DT_TFWeaponBase )
 	SendPropInt( SENDINFO( m_iDamageIncrease ) ),
 	SendPropInt( SENDINFO( m_iSlotOverride ) ),
 	SendPropInt( SENDINFO( m_iPositionOverride ) ),
+	SendPropInt( SENDINFO( m_iTeamNum ) ),
 	SendPropFloat( SENDINFO( m_flBlastRadiusIncrease ) ),
 	// World models have no animations so don't send these.
 	SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
@@ -276,6 +278,8 @@ CTFWeaponBase::CTFWeaponBase()
 	
 	m_iSlotOverride = -1;
 	m_iPositionOverride = -1;
+	
+	m_iTeamNum = TEAM_UNASSIGNED;
 }
 
 CTFWeaponBase::~CTFWeaponBase()
@@ -782,6 +786,21 @@ void CTFWeaponBase::Drop( const Vector &vecVelocity )
 #endif
 
 	BaseClass::Drop( vecVelocity );
+}
+
+void CTFWeaponBase::Detach()
+{
+#ifdef GAME_DLL
+	CTFPlayer *pTFOwner = ToTFPlayer( GetOwner() );
+	if ( !pTFOwner )
+		return;
+	WeaponHandle hHandle;
+	hHandle = this;	
+	if ( pTFOwner->m_hWeaponInSlot && pTFOwner->m_hWeaponInSlot[GetSlot()][GetPosition()] == hHandle )
+		pTFOwner->m_hWeaponInSlot[GetSlot()][GetPosition()] = NULL;
+	
+	pTFOwner->m_hSuperWeapons.FindAndRemove(hHandle);
+#endif
 }
 
 void CTFWeaponBase::PlayWeaponShootSound(void)

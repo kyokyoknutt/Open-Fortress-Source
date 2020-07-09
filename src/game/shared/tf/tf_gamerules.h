@@ -320,11 +320,6 @@ public:
 	void			SetInfectionRoundTimer(CTeamRoundTimer *pTimer) { m_hInfectionTimer.Set( pTimer ); }
 	void			SetRedKothRoundTimer(CTeamRoundTimer *pTimer) { m_hRedKothTimer.Set( pTimer ); }
 	void			SetBlueKothRoundTimer(CTeamRoundTimer *pTimer) { m_hBlueKothTimer.Set( pTimer ); }
-	
-	void			RegisterBoss( CBaseCombatCharacter *pNPC )  { if( m_hBosses.Find( pNPC ) == m_hBosses.InvalidIndex() ) m_hBosses.AddToHead( pNPC ); }
-	void			RemoveBoss( CBaseCombatCharacter *pNPC )    { EHANDLE hNPC( pNPC ); m_hBosses.FindAndRemove( hNPC ); }
-	CBaseCombatCharacter *GetActiveBoss( void ) const           { if ( m_hBosses.IsEmpty() ) return nullptr; return m_hBosses[0]; }
-	void			StartBossTimer( float time )				{ m_bossSpawnTimer.Start( time ); }
 
 	virtual void	Activate();
 
@@ -487,6 +482,7 @@ public:
 	virtual void ClientDisconnected( edict_t *pClient );
 
 	virtual void  RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc, float flRadius, int iClassIgnore, CBaseEntity *pEntityIgnore );
+	bool		  TraceRadiusDamage( const CTakeDamageInfo &info, const CBaseEntity *entity, const Vector &vecSrc, const Vector &vecSpot, const Vector &delta, trace_t *tr  );
 
 	virtual float FlPlayerFallDamage( CBasePlayer *pPlayer );
 
@@ -496,22 +492,19 @@ public:
 
 	int		GetPreviousRoundWinners( void ) { return m_iPreviousRoundWinners; }
 
-	void			PushAllPlayersAway( Vector const &vecPos, float flRange, float flForce, int iTeamNum, CUtlVector<CTFPlayer *> *outVector );
+	void	PushAllPlayersAway( Vector const &vecPos, float flRange, float flForce, int iTeamNum, CUtlVector<CTFPlayer *> *outVector );
 
 	void	SendHudNotification( IRecipientFilter &filter, HudNotification_t iType );
 	void	SendHudNotification( IRecipientFilter &filter, const char *pszText, const char *pszIcon, int iTeam = TEAM_UNASSIGNED );
 
+	void	ResetDeathInflictor(int index);
+
 private:
 
 	int				DefaultFOV( void ) { return 90; }
-
-	void			SpawnHalloweenBoss( void );
-	void			SpawnZombieMob( void );
-	CountdownTimer	m_bossSpawnTimer;
-	CountdownTimer	m_mobSpawnTimer;
-	int				m_nZombiesToSpawn;
-	Vector			m_vecMobSpawnLocation;
 	bool			m_bFirstBlood;
+	CBaseEntity		*m_InflictorsArray[64 + 1];
+
 #endif
 
 private:
@@ -543,6 +536,9 @@ private:
 	CHandle<CTeamTrainWatcher> m_hBlueDefendTrain;
 
 #endif
+
+	CUtlVector< int > m_hDuelQueueL;
+    CUtlVector< int > m_hDuelQueueR;
 	CNetworkVar( int, m_nGameType ); // Type of game this map is (CTF, CP)
 	CNetworkVar( int, m_nMutator ); // What mutator are we using?
 	CNetworkVar( int, m_nRetroMode ); // The TFC mode type
@@ -596,6 +592,7 @@ public:
 	int				m_iRequiredKills;
 	bool			m_bIsFreeRoamMap;
 	bool			m_bIsCoop;
+
 	bool	IsDMGamemode(void);
 	bool	IsTDMGamemode(void);
 	bool	IsDOMGamemode(void);
@@ -605,6 +602,7 @@ public:
 	bool	IsGGGamemode(void);
 	bool	Is3WaveGamemode(void);
 	bool	IsArenaGamemode(void);
+	bool	IsDuelGamemode(void);
 	bool	IsESCGamemode(void);
 	bool	IsZSGamemode(void);
 	bool	IsInfGamemode(void);
@@ -628,7 +626,7 @@ public:
 
 	bool InGametype( int nGametype );
 	void AddGametype( int nGametype );	
-	void RemoveGametype( int nGametype );	
+	void RemoveGametype( int nGametype );
 
 	int GetMutator( void );
 	bool IsMutator( int nMutator );
@@ -638,6 +636,11 @@ public:
 #ifdef GAME_DLL
 	void SetRetroMode( int nRetroMode );
 #endif
+
+	int		GetDuelQueuePos( CBasePlayer *pPlayer );
+	void 	PlaceIntoDuelQueue( CBasePlayer *pPlayer );
+	void	RemoveFromDuelQueue( CBasePlayer *pPlayer );
+	void	ProgressDuelQueues();
 
 	bool	IsAllClassEnabled( void ) { return m_bAllClass; }
 	bool	IsAllClassZombieEnabled( void ) { return m_bAllClassZombie; }

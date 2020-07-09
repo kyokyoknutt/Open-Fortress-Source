@@ -540,7 +540,7 @@ bool CTFPlayerAnimState::HandleMoving( Activity &idealActivity )
 	}
 
 	// grappling state
-	if ( m_pTFPlayer->m_Shared.IsGrappling() )
+	if ( m_pTFPlayer->m_Shared.GetHook() )
 	{
 		idealActivity = ACT_GRAPPLE_PULL_IDLE;
 		return true;

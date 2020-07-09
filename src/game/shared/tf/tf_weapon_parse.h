@@ -140,6 +140,8 @@ public:
 	bool	m_bAlwaysDrop;
 	bool 	m_bCanSoftZoom;
 	
+	float	m_flDespawnTime;
+	
 	int		m_iContinuousFireDamageIncrease;
 	float	m_flContinuousFireBlastRadiusIncrease;
 	

@@ -3,7 +3,6 @@
 #include "iclientmode.h"
 #include "ienginevgui.h"
 #include "tf_hud_bosshealthmeter.h"
-#include "entity_bossresource.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -53,7 +52,7 @@ bool CHudBossHealthMeter::ShouldDraw( void )
 	if(!pLocalPlayer || pLocalPlayer->GetObserverMode() == OBS_MODE_FREEZECAM)
 		return false;
 
-	if (!CHudElement::ShouldDraw() || !g_pMonsterResource)
+	if (!CHudElement::ShouldDraw() )
 		return false;
 
 	return g_pMonsterResource->GetBossHealthPercentage() > 0.0f;

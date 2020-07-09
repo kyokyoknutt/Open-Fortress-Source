@@ -16,7 +16,6 @@
 #include "convar.h"
 
 #include "OptionsDialog.h"
-#include "optionsmousedialog.h"
 #include "PlayerListDialog.h"
 #include "CreateMultiplayerGameDialog.h"
 
@@ -108,12 +107,10 @@ public:
  	bool HasSavedThisMenuSession();
  	void SetSavedThisMenuSession( bool bState );
 
-	void OpenOptionsDialog(vgui::Panel *parent);
-	void OpenOptionsMouseDialog(vgui::Panel *parent);
-	void OpenKeyBindingsDialog(vgui::Panel *parent);
-	void OpenCreateMultiplayerGameDialog(vgui::Panel *parent);
-	void OpenPlayerListDialog(vgui::Panel *parent);
-	void OnOpenServerBrowser(vgui::Panel *parent);
+	void OpenOptionsDialog();
+	void OpenCreateMultiplayerGameDialog();
+	void OpenPlayerListDialog();
+	void OnOpenServerBrowser();
 
 private:
 	void SendConnectedToGameMessage();
@@ -139,7 +136,6 @@ private:
 	vgui::DHANDLE<COptionsDialog> m_hOptionsDialog;	// standalone options dialog - PC only
 	vgui::DHANDLE<CCreateMultiplayerGameDialog> m_hCreateMultiplayerGameDialog;	// standalone options dialog - PC only	
 	vgui::DHANDLE<CPlayerListDialog> m_hPlayerListDialog;	// standalone options dialog - PC only	
-	vgui::DHANDLE<COptionsMouseDialog> m_hOptionsMouseDialog;	// standalone options dialog - PC only	
 
 	vgui::DHANDLE<class CCDKeyEntryDialog> m_hCDKeyEntryDialog;
 };

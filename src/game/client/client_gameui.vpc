@@ -11,12 +11,11 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	".\tf;.\tf\vgui;$SRCDIR\game\shared\Multiplayer;$SRCDIR\game\shared\tf;$BASE;.\of;.\of\vgui;$SRCDIR\game\shared\of;$SRCDIR\fmod_studio\api\core\inc;$SRCDIR\fmod_studio\api\studio\inc"
+		$AdditionalIncludeDirectories	".\tf;.\tf\vgui;$SRCDIR\game\shared\Multiplayer;$SRCDIR\game\shared\tf;$BASE;.\of;.\of\vgui;$SRCDIR\game\shared\of;$SRCDIR\fmod_studio\api\core\inc"
 		$PreprocessorDefinitions		"$BASE;GLOWS_ENABLE;OF_CLIENT_DLL"
 	}
 	$Linker
 	{
-		$AdditionalLibraryDirectories	"$SRCDIR\fmod\api\lib"
 	}
 }
 

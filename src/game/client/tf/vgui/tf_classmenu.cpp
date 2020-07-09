@@ -148,7 +148,7 @@ void CTFClassMenu::ApplySchemeSettings( IScheme *pScheme )
 		if ( button )
 		{
 			button->SetPreserveArmedButtons( true );
-			button->SetUpdateDefaultButtons( true );
+			GetFocusNavGroup().SetDefaultButton(button);
 		}
 	}
 }
@@ -181,6 +181,7 @@ CTFImageMouseOverButton<CTFClassInfoPanel> *CTFClassMenu::GetCurrentClassButton(
 	}
 
 	m_iCurrentClassIndex = GetIndexForClass( iClass );
+	
 	return m_pClassButtons[iClass];
 }
 
@@ -231,6 +232,13 @@ void CTFClassMenu::ShowPanel( bool bShow )
 			{
 				if ( button == pInitialButton )
 				{
+					button->ShowPage();
+					button->SetArmed( true );
+					button->SetAsDefaultButton( 1 );
+					GetFocusNavGroup().SetDefaultButton(button);
+
+					g_lastButton = button;
+
 					CModelPanel *pModelPanel = dynamic_cast<CModelPanel *>(button->FindChildByName( "classModel" ) );
 					if ( pModelPanel )
 					{
@@ -257,11 +265,6 @@ void CTFClassMenu::ShowPanel( bool bShow )
 						iVisibleTeam = GetTeamNumber() < TF_TEAM_RED ? TF_TEAM_MERCENARY : GetTeamNumber();
 						pModelPanel->SetAttachmentsSkin( iVisibleTeam - 2 );
 					}
-					button->ShowPage();
-					button->SetArmed( true );
-					button->SetAsDefaultButton( 1 );
-
-					g_lastButton = button;
 				}
 				else
 				{

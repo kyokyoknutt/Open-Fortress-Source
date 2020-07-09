@@ -77,13 +77,15 @@ public:
 
 	CTFClaws() {}
 	virtual int			GetWeaponID( void ) const			{ return TF_WEAPON_CLAWS; }
+	virtual void		ItemPostFrame(void);
+	bool				CanPrimaryAttack(void) { return m_flNextPrimaryAttack < gpGlobals->curtime; }
 
 private:
 
 	CTFClaws( const CTFClaws & ) {}
 };
 
-class CTFJuggernaught : public CTFWeaponBaseMelee
+class CTFJuggernaught : public CTFClaws
 {
 public:
 
@@ -91,9 +93,9 @@ public:
 	DECLARE_NETWORKCLASS(); 
 	DECLARE_PREDICTABLE();
 	
-	virtual bool	CanHolster( void ) const { return false; }
 	CTFJuggernaught() {}
-	virtual int			GetWeaponID( void ) const			{ return TF_WEAPON_JUGGERNAUGHT; }
+	virtual bool		CanHolster( void ) const { return false; }
+	virtual int			GetWeaponID( void ) const { return TF_WEAPON_JUGGERNAUGHT; }
 
 private:
 

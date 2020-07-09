@@ -37,6 +37,11 @@ LINK_ENTITY_TO_CLASS( tf_dropped_weapon, CTFDroppedWeapon );
 
 PRECACHE_REGISTER( tf_dropped_weapon );
 
+CTFDroppedWeapon::CTFDroppedWeapon()
+{
+	m_iTeamNum = TEAM_UNASSIGNED;
+}
+
 void CTFDroppedWeapon::Spawn( void )
 {
 	Precache();
@@ -53,8 +58,11 @@ void CTFDroppedWeapon::Spawn( void )
 	// no pickup until flythink
 	m_bAllowOwnerPickup = false;
 
+	float flDespawnTime = pWeaponInfo ? pWeaponInfo->m_flDespawnTime : 30.0f;
+	
 	// Die in 30 seconds
-	SetContextThink( &CBaseEntity::SUB_Remove, gpGlobals->curtime + 30, "DieContext" );
+	if( flDespawnTime > 0 )
+		SetContextThink( &CBaseEntity::SUB_Remove, gpGlobals->curtime + flDespawnTime, "DieContext" );
 
 	if ( IsX360() )
 	{
@@ -121,15 +129,13 @@ void CTFDroppedWeapon::PackTouch( CBaseEntity *pOther )
 	if( GetOwnerEntity() == pOther && m_bAllowOwnerPickup == false )
 		return;
 
-	CBasePlayer *pPlayer = ToBasePlayer( pOther );
-
-	CTFPlayer *pTFPlayer = NULL;
-
-	if ( pPlayer )
-		pTFPlayer = ToTFPlayer( pPlayer );
+	CTFPlayer *pTFPlayer = ToTFPlayer( pOther );
 
 	if ( !pTFPlayer )
 		return;
+	
+//	if( GetTeamNum() != TEAM_UNASSIGNED && GetTeamNum() > LAST_SHARED_TEAM && pTFPlayer->GetTeamNumber() != GetTeamNum() )
+//		return;
 
 	if ( pTFPlayer->m_Shared.IsZombie() )
 		return;
@@ -206,10 +212,10 @@ void CTFDroppedWeapon::PackTouch( CBaseEntity *pOther )
 	{
 		CSingleUserRecipientFilter filter( pTFPlayer );		// Filter the sound to the player who picked this up
 		EmitSound( filter, entindex(), "AmmoPack.Touch" );	// Play the sound
-		CTFWeaponBase *pGivenWeapon =(CTFWeaponBase *)pPlayer->GiveNamedItem( pszWeaponName ); 	// Create the weapon
+		CTFWeaponBase *pGivenWeapon =(CTFWeaponBase *)pTFPlayer->GiveNamedItem( pszWeaponName ); 	// Create the weapon
 		if( pGivenWeapon )
 		{
-			pGivenWeapon->GiveTo( pPlayer );	// and give it to the player
+			pGivenWeapon->GiveTo( pTFPlayer );	// and give it to the player
 			if ( pTFPlayer->GetActiveWeapon() && pGivenWeapon->GetSlot() == pTFPlayer->GetActiveWeapon()->GetSlot() 
 				&& pGivenWeapon->GetPosition() == pTFPlayer->GetActiveWeapon()->GetPosition() )
 				pTFPlayer->Weapon_Switch( pGivenWeapon );

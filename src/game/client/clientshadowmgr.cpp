@@ -2497,7 +2497,10 @@ void CClientShadowMgr::BuildRenderToTextureShadow( IClientRenderable* pRenderabl
 	Vector boxSize;
 	VectorSubtract( maxs, mins, boxSize );
 	
+	// we initialize this, not because its ever read,
+	// but just to satisfy gcc :(  				-Nopey
 	Vector yvec;
+	yvec.x = ( yvec.y = ( yvec.z = 0 ) );
 	float fProjMax = 0.0f;
 	for( int i = 0; i != 3; ++i )
 	{
@@ -3317,7 +3320,7 @@ bool CClientShadowMgr::CullReceiver( ClientShadowHandle_t handle, IClientRendera
 									IClientRenderable* pSourceRenderable )
 {
 #ifdef OF_CLIENT_DLL
-	if ( !pRenderable )
+	if ( !pRenderable || !pSourceRenderable )
 		return true;
 #endif
 

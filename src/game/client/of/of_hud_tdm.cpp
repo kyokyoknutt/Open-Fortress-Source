@@ -199,18 +199,3 @@ void CTFHudTDM::OnThink()
 		m_flNextThink = gpGlobals->curtime + 0.1f;
 	}
 }
-
-ConVar uv1_1_x( "uv1_1_x", "1", FCVAR_CHEAT );
-ConVar uv2_1_x( "uv2_1_x", "1", FCVAR_CHEAT );
-ConVar uv2_2_x( "uv2_2_x", "1", FCVAR_CHEAT );
-ConVar uv1_2_x( "uv1_2_x", "1", FCVAR_CHEAT );
-
-ConVar uv1_1_y( "uv1_1_y", "1", FCVAR_CHEAT );
-ConVar uv2_1_y( "uv2_1_y", "1", FCVAR_CHEAT );
-ConVar uv2_2_y( "uv2_2_y", "1", FCVAR_CHEAT );
-ConVar uv1_2_y( "uv1_2_y", "1", FCVAR_CHEAT );
-
-ConVar vert0_x( "vert0_x", "1", FCVAR_CHEAT );
-ConVar vert1_x( "vert1_x", "1", FCVAR_CHEAT );
-ConVar vert2_x( "vert2_x", "1", FCVAR_CHEAT );
-ConVar vert3_x( "vert3_x", "1", FCVAR_CHEAT );

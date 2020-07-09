@@ -115,6 +115,9 @@ class CTFWeaponBase : public CBaseCombatWeapon
 	virtual bool IsPredicted() const			{ return true; }
 	virtual void FallInit( void );
 
+	int		GetTeamNum(){ return m_iTeamNum; };
+	void	SetTeamNum( int iTeam ){ m_iTeamNum = iTeam; };
+	
 	// Weapon Data.
 	CTFWeaponInfo const	&GetTFWpnData() const;
 	virtual int GetWeaponID( void ) const;
@@ -137,6 +140,7 @@ class CTFWeaponBase : public CBaseCombatWeapon
 #endif
 
 	virtual void Drop( const Vector &vecVelocity );
+	virtual void Detach();
 	virtual bool Holster( CBaseCombatWeapon *pSwitchingTo = NULL );
 	virtual bool CanHolster( void ) const;
 	virtual bool Deploy( void );
@@ -313,7 +317,7 @@ protected:
 protected:
 
 	int				m_iWeaponMode;
-	CNetworkVar(	int,	m_iReloadMode );
+	CNetworkVar( int,	m_iReloadMode );
 	CTFWeaponInfo	*m_pWeaponInfo;
 	bool			m_bInAttack;
 	bool			m_bInAttack2;
@@ -334,20 +338,21 @@ protected:
 
 	char			m_szTracerName[MAX_TRACER_NAME];
 
-	CNetworkVar(	bool, m_bResetParity );
+	CNetworkVar( bool, m_bResetParity );
 
 #ifdef CLIENT_DLL
 	bool m_bOldResetParity;
 #endif
 protected:
-	CNetworkVar(	bool,	m_bReloadedThroughAnimEvent );
+	CNetworkVar( bool, m_bReloadedThroughAnimEvent );
 
-	CNetworkVar(float, m_flNextShotTime);
+	CNetworkVar( float, m_flNextShotTime );
 
 	CNetworkVar( int, m_iShotsDue );
 	CNetworkVar( bool, m_bInBarrage );
 	CNetworkVar( int, m_iDamageIncrease );
 	CNetworkVar( float, m_flBlastRadiusIncrease );
+	CNetworkVar( int, m_iTeamNum );
 private:
 	CTFWeaponBase( const CTFWeaponBase & );
 };

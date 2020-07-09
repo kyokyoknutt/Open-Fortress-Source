@@ -986,7 +986,7 @@ void CHudWeaponSelection::CycleToNextWeapon( void )
 		return;
 
 	CTFWeaponBase *pNextWeapon = NULL;
-	if ( IsInSelectionMode() )
+	if ( IsInSelectionMode() && hud_fastswitch.GetInt() != HUDTYPE_FASTSWITCH )
 	{
 		// find the next selection spot
 		CTFWeaponBase *pWeapon = GetSelectedWeapon();
@@ -1044,7 +1044,7 @@ void CHudWeaponSelection::CycleToPrevWeapon( void )
 		return;
 
 	CTFWeaponBase *pNextWeapon = NULL;
-	if ( IsInSelectionMode() )
+	if ( IsInSelectionMode() && hud_fastswitch.GetInt() != HUDTYPE_FASTSWITCH )
 	{
 		// find the next selection spot
 		CTFWeaponBase *pWeapon = GetSelectedWeapon();

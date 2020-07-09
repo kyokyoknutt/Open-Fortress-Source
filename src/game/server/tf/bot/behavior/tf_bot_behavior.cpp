@@ -490,12 +490,17 @@ void CTFBotMainAction::Dodge( CTFBot *actor )
 		}
 	}
 	else
-	{*/
+	*/
+	{
 		if ( !actor->IsLineOfFireClear( threat->GetLastKnownPosition() ) )
 		{
 			return;
 		}
-	//}
+	}
+
+	float flDistance = actor->GetRangeTo( threat->GetLastKnownPosition() );
+	if ( flDistance < 128.0f )
+		return;
 
 	Vector vecFwd;
 	actor->EyeVectors( &vecFwd );

@@ -78,6 +78,11 @@ public:
 	virtual void PerformLayout();
 	virtual void SetText( const char *text );
 	virtual void SetText( const wchar_t *text );
+	
+	virtual vgui::HFont GetFont( void )
+	{ 
+		return vgui::scheme()->GetIScheme( GetScheme() )->GetFont( m_szFont ); 
+	};
 
 	virtual void OnTick( void );
 	void SetScrollBarImagesVisible( bool visible );

@@ -15,8 +15,6 @@
 #include "vgui_controls/MessageDialog.h"
 #include "tier1/utllinkedlist.h"
 
-#include <GameUI/gameui_shared.h>
-
 
 //=============================================================================
 //

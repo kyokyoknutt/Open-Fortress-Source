@@ -1222,13 +1222,13 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 #endif
 
 			EmitSound_t et;
-#ifdef OF_CLIENT_DLL			
+#ifndef OF_CLIENT_DLL			
 			et.m_pSoundName = event->GetString("sound");
 #else
 			et.m_pSoundName = szFullSound;
 #endif
 			et.m_nFlags = event->GetInt("additional_flags");
-
+			
 			CLocalPlayerFilter filter;
 			C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, et );
 		}
@@ -1575,15 +1575,8 @@ const char* ClientModeShared::GetAnnouncer()
 			if ( pAnnouncer && TFGameRules() )
 			{
 				if ( (TFGameRules()->InGametype(TF_GAMETYPE_CTF) && pAnnouncer->GetBool( "CTF" ) )
-					
-					|| ( ( TFGameRules()->InGametype(TF_GAMETYPE_CP) 
-					|| TFGameRules()->InGametype(TF_GAMETYPE_PAYLOAD) 
-					|| TFGameRules()->InGametype(TF_GAMETYPE_DOM) ) && pAnnouncer->GetBool( "CP" ) )
-					
+					|| ( ( TFGameRules()->InGametype(TF_GAMETYPE_CP) || TFGameRules()->InGametype(TF_GAMETYPE_PAYLOAD) || TFGameRules()->InGametype(TF_GAMETYPE_DOM) ) && pAnnouncer->GetBool( "CP" ) )
 					|| ( TFGameRules()->InGametype(TF_GAMETYPE_ESC) && pAnnouncer->GetBool( "ESC" ) )
-					
-					|| ( TFGameRules()->InGametype(TF_GAMETYPE_INF) && pAnnouncer->GetBool( "INFECTION" ) )
-					
 					|| ( TFGameRules()->InGametype(TF_GAMETYPE_ARENA) && pAnnouncer->GetBool( "ARENA" ) )
 					|| ( TFGameRules()->IsDMGamemode() && !TFGameRules()->DontCountKills() && pAnnouncer->GetBool( "DM" ) ) )
 					return of_announcer_override.GetString();

@@ -241,6 +241,8 @@ public:
 
 	int		GetMaxAmmo( int iAmmoIndex, int iClassNumber = -1 );
 
+	float	GetSurfaceFriction() { return m_surfaceFriction; }
+
 public:
 	// Ragdolls.
 	virtual C_BaseAnimating *BecomeRagdollOnClient();
@@ -399,6 +401,11 @@ public:
 	CNewParticleEffect	*m_pBurningEffect;
 	float				m_flBurnEffectStartTime;
 	float				m_flBurnEffectEndTime;
+
+	// Poison
+	CNewParticleEffect	*m_pPoisonEffect;
+	float				m_flPoisonEffectStartTime;
+	float				m_flPoisonEffectEndTime;
 
 	CNewParticleEffect	*m_pDisguisingEffect;
 	float m_flDisguiseEffectStartTime;

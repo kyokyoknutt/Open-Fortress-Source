@@ -16,14 +16,12 @@
 #include "tier3/tier3.h"
 #include "tf_weapon_grenade_pipebomb.h"
 #include "gameeventdefs.h"
-#include "tf_halloween_boss.h"
-#include "tf_zombie.h"
-#include "entity_bossresource.h"
 	
 #ifdef CLIENT_DLL
 	#include <game/client/iviewport.h>
 	#include "c_tf_player.h"
 	#include "c_tf_objective_resource.h"
+	#include "dt_utlvector_recv.h"
 #else
 	#include "basemultiplayerplayer.h"
 	#include "voice_gamemgr.h"
@@ -72,7 +70,9 @@
 	#include "tf_voteissues.h"
 	#include "nav_mesh.h"
 	#include "bot/tf_bot_manager.h"
-
+	#include <../shared/gamemovement.h>
+	
+	#include "dt_utlvector_send.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -109,12 +109,6 @@ static int g_TauntCamAchievements[] =
 	0,		// TF_CLASS_COUNT_ALL,
 };
 
-extern ConVar of_movementmode;
-extern ConVar of_q3airaccelerate;
-extern ConVar of_cslide;
-extern ConVar of_cslideaccelerate;
-extern ConVar of_cslidefriction;
-
 extern ConVar mp_capstyle;
 extern ConVar sv_turbophysics;
 extern ConVar of_bunnyhop;
@@ -142,6 +136,7 @@ ConVar of_infection					( "of_infection", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, 
 ConVar of_threewave					( "of_threewave", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Toggles Threewave." );
 ConVar of_juggernaught				( "of_juggernaught", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Toggles Juggernaught mode." );
 ConVar of_coop						( "of_coop", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Toggles Coop mode. (Pacifism)" );
+ConVar of_duel						( "of_duel", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Toggles Duel mode." );
 
 ConVar of_allow_allclass_pickups 	( "of_allow_allclass_pickups", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Non-Mercenary Classes can pickup dropped weapons.");
 ConVar of_allow_allclass_spawners 	( "of_allow_allclass_spawners", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Non-Mercenary Classes can pickup weapons from spawners.");
@@ -317,7 +312,6 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFGameRules, DT_TFGameRules )
 	RecvPropInt( RECVINFO( m_nGameType ) ),
 	RecvPropInt( RECVINFO( m_nMutator ) ),
 	RecvPropInt( RECVINFO( m_nRetroMode ) ),
-	RecvPropInt( RECVINFO( m_iCosmeticCount ) ),
 	RecvPropInt( RECVINFO( m_nCurrFrags ) ),
 	RecvPropInt( RECVINFO( m_nHuntedCount_red ) ),
 	RecvPropInt( RECVINFO( m_nMaxHunted_red ) ),
@@ -346,12 +340,14 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFGameRules, DT_TFGameRules )
 	RecvPropEHandle( RECVINFO( m_hInfectionTimer ) ),
 	RecvPropInt( RECVINFO( m_halloweenScenario ) ),
 	RecvPropInt( RECVINFO( m_iMaxLevel ) ),
+	
+	RecvPropUtlVector( RECVINFO_UTLVECTOR( m_hDuelQueueR ), 32, RecvPropInt(NULL, 0, sizeof(int)) ),
+	RecvPropUtlVector( RECVINFO_UTLVECTOR( m_hDuelQueueL ), 32, RecvPropInt(NULL, 0, sizeof(int)) ),
 #else
 
 	SendPropInt( SENDINFO( m_nGameType ), TF_GAMETYPE_LAST, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN ),
 	SendPropInt( SENDINFO( m_nMutator ), 3, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN ),
 	SendPropInt( SENDINFO( m_nRetroMode ), 3, SPROP_UNSIGNED ),
-	SendPropInt( SENDINFO( m_iCosmeticCount ) ),
 	SendPropInt( SENDINFO( m_nCurrFrags ), 3, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO( m_nHuntedCount_red ), 7, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO( m_nMaxHunted_red ), 7, SPROP_UNSIGNED ),
@@ -379,7 +375,10 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFGameRules, DT_TFGameRules )
 	SendPropEHandle( SENDINFO( m_hInfectionTimer ) ),
 	SendPropEHandle( SENDINFO( m_itHandle ) ),
 	SendPropInt( SENDINFO( m_halloweenScenario ) ),
-	SendPropInt( SENDINFO( m_iMaxLevel ) )
+	SendPropInt( SENDINFO( m_iMaxLevel ) ),
+	
+	SendPropUtlVector( SENDINFO_UTLVECTOR( m_hDuelQueueR ), 32, SendPropInt( NULL, 0, sizeof(int) ) ),
+	SendPropUtlVector( SENDINFO_UTLVECTOR( m_hDuelQueueL ), 32, SendPropInt( NULL, 0, sizeof(int) ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -1340,6 +1339,8 @@ CTFGameRules::CTFGameRules()
 	m_bEntityLimitPrevented = false;
 
 	m_bFirstBlood = false;
+	for(int i = 1; i <= 64; i++)
+		m_InflictorsArray[i] = NULL;
 
 	m_flIntermissionEndTime = 0.0f;
 	m_flNextPeriodicThink = 0.0f;
@@ -1479,6 +1480,61 @@ void CTFGameRules::SetRetroMode( int nRetroMode)
 }
 #endif
 
+int CTFGameRules::GetDuelQueuePos( CBasePlayer *pPlayer )
+{
+	if( m_hDuelQueueR.HasElement( pPlayer->entindex() ) )
+		return m_hDuelQueueR.Find(pPlayer->entindex());
+	else
+		return m_hDuelQueueL.Find( pPlayer->entindex() );
+
+}
+
+void CTFGameRules::PlaceIntoDuelQueue( CBasePlayer *pPlayer )
+{
+	if( m_hDuelQueueR.Count() > m_hDuelQueueL.Count() )
+		m_hDuelQueueL.AddToTail( pPlayer->entindex() );
+	else
+		m_hDuelQueueR.AddToTail( pPlayer->entindex() );
+}
+
+void CTFGameRules::RemoveFromDuelQueue( CBasePlayer *pPlayer )
+{
+	CUtlVector<int> *m_hMyQueue;
+	CUtlVector<int> *m_hOtherQueue;
+	if( m_hDuelQueueR.HasElement( pPlayer->entindex() ) )
+	{
+		m_hMyQueue = &m_hDuelQueueR;
+		m_hOtherQueue = &m_hDuelQueueL;
+	}
+	else
+	{
+		m_hMyQueue = &m_hDuelQueueL;
+		m_hOtherQueue = &m_hDuelQueueR;
+	}
+	m_hMyQueue->FindAndRemove( pPlayer->entindex() );
+	
+	if( m_hOtherQueue->Count() - m_hMyQueue->Count() >= 2 )
+	{
+		m_hMyQueue->AddToTail( m_hOtherQueue->Tail() );
+		m_hOtherQueue->Remove( m_hOtherQueue->Count() - 1 );
+	}
+}
+
+void CTFGameRules::ProgressDuelQueues()
+{
+	int iFirst = m_hDuelQueueR[0];
+	int iSecond = m_hDuelQueueL[0];
+
+	// We do it this way round so that we dont accidentally
+	// remove the only person on one team
+	
+	m_hDuelQueueL.Remove(0);
+	m_hDuelQueueR.Remove(0);
+	
+	m_hDuelQueueL.AddToTail( iFirst  );
+	m_hDuelQueueR.AddToTail( iSecond );
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -1580,6 +1636,8 @@ static const char *s_PreserveEnts[] =
 	"tf_logic_competitive",
 	"tf_wearable_razorback",
 	"info_ladder",
+	"of_music_player",
+	"dm_music_manager",
 	"", // END Marker
 };
 
@@ -2085,6 +2143,11 @@ bool CTFGameRules::Is3WaveGamemode( void )
 bool CTFGameRules::IsArenaGamemode( void )
 { 
 	return InGametype( TF_GAMETYPE_ARENA );
+}
+
+bool CTFGameRules::IsDuelGamemode( void )
+{ 
+	return of_duel.GetBool();
 }
 
 bool CTFGameRules::IsESCGamemode( void )
@@ -2601,7 +2664,7 @@ void CTFGameRules::SetupOnRoundStart( void )
 			for ( int i = FIRST_GAME_TEAM; i < GetNumberOfTeams(); i++ )
 			{
 				BroadcastSound( i, "InfectionMusic.Warmup", false );
-				BroadcastSound( i, "Benja.RoundStart" );
+				BroadcastSound( i, "RoundStart" );
 			}
 		}
 	}
@@ -2907,9 +2970,40 @@ ConVar tf_fixedup_damage_radius ( "tf_fixedup_damage_radius", "1", FCVAR_CHEAT )
 //			iClassIgnore - 
 //			*pEntityIgnore - 
 //-----------------------------------------------------------------------------
-void CTFGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrcIn, float flRadius, int iClassIgnore, CBaseEntity *pEntityIgnore )
+
+bool CTFGameRules::TraceRadiusDamage( const CTakeDamageInfo &info, const CBaseEntity *entity, const Vector &vecSrc, const Vector &vecSpot, const Vector &delta, trace_t *tr  )
 {
 	const int MASK_RADIUS_DAMAGE = MASK_SHOT&(~CONTENTS_HITBOX);
+	CTraceFilterIgnorePlayers filter( info.GetInflictor(), COLLISION_GROUP_PROJECTILE );
+
+	//feet, center, eyes
+	for(int i = -1; i < 2; i++)
+	{
+		UTIL_TraceLine( vecSrc, vecSpot + i * delta, MASK_RADIUS_DAMAGE, &filter, tr );
+
+		if ( tr->fraction == 1.0 || tr->m_pEnt == entity )
+			return true;
+	}
+
+	//evaluate elbows as last resource since it is more expensive
+	float flElbowAngle = entity->EyeAngles().y + 90.f;
+	Vector ElbowVector = Vector(cos(flElbowAngle), sin(flElbowAngle), 0.f);
+	VectorNormalize(ElbowVector);
+	ElbowVector *= entity->BoundingRadius();
+
+	UTIL_TraceLine( vecSrc, vecSpot + ElbowVector, MASK_RADIUS_DAMAGE, &filter, tr );
+	if ( tr->fraction == 1.0 || tr->m_pEnt == entity )
+		return true;;
+
+	UTIL_TraceLine( vecSrc, vecSpot - ElbowVector, MASK_RADIUS_DAMAGE, &filter, tr );
+	if ( tr->fraction == 1.0 || tr->m_pEnt == entity )
+		return true;
+
+	return false;
+}
+
+void CTFGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrcIn, float flRadius, int iClassIgnore, CBaseEntity *pEntityIgnore )
+{
 	CBaseEntity *pEntity = NULL;
 	trace_t		tr;
 	float		falloff;
@@ -2949,11 +3043,12 @@ void CTFGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecS
 		}
 
 		// Check that the explosion can 'see' this entity.
-		vecSpot = pEntity->BodyTarget( vecSrc, false );
-		CTraceFilterIgnorePlayers filter( info.GetInflictor(), COLLISION_GROUP_PROJECTILE );
-		UTIL_TraceLine( vecSrc, vecSpot, MASK_RADIUS_DAMAGE, &filter, &tr );
-
-		if ( tr.fraction != 1.0 && tr.m_pEnt != pEntity )
+		// Ivory: edited to have multiple traceline checks on top of player center for better accuracy
+		// (feet, eyes, elbows). If one check is successful all other checks are skipped
+		vecSpot = pEntity->WorldSpaceCenter() - (pEntity->WorldSpaceCenter() - pEntity->GetAbsOrigin()) * .25;		//feet position as calculated in pEntity->BodyTarget()
+		Vector halfDeltaHeight = Vector(vecSpot - pEntity->EyePosition()) * 0.5;									//half height as calculated in pEntity->BodyTarget()
+		vecSpot += halfDeltaHeight;																					//body center
+		if(!TraceRadiusDamage(info, pEntity, vecSrc, vecSpot, halfDeltaHeight, &tr))
 			continue;
 
 		// Adjust the damage - apply falloff.
@@ -3437,8 +3532,6 @@ void CTFGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecS
 			}
 		} // Game playerdie
 		// Play( MineOddity );
-		
-		SpawnHalloweenBoss();
 
 		if ( !m_bEntityLimitPrevented )
 			EntityLimitPrevention();
@@ -3509,263 +3602,6 @@ void CTFGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecS
 
 		RunPlayerConditionThink();
 	}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CTFGameRules::SpawnHalloweenBoss( void )
-{
-	//if ( !IsHolidayActive( kHoliday_Halloween ) )
-	//{
-	//	SpawnZombieMob();
-	//	return;
-	//}
-
-	float fSpawnInterval;
-	float fSpawnVariation;
-	CHalloweenBaseBoss::HalloweenBossType eBossType;
-
-	if ( IsHalloweenScenario( HALLOWEEN_SCENARIO_MANOR ) )
-	{
-		eBossType = CHalloweenBaseBoss::HEADLESS_HATMAN;
-		fSpawnInterval = tf_halloween_boss_spawn_interval.GetFloat();
-		fSpawnVariation = tf_halloween_boss_spawn_interval_variation.GetFloat();
-	}
-	else if ( IsHalloweenScenario( HALLOWEEN_SCENARIO_VIADUCT ) )
-	{
-		eBossType = CHalloweenBaseBoss::EYEBALL_BOSS;
-		fSpawnInterval = tf_halloween_eyeball_boss_spawn_interval.GetFloat();
-		fSpawnVariation = tf_halloween_eyeball_boss_spawn_interval_variation.GetFloat();
-	}
-	else if ( /*IsHalloweenScenario( HALLOWEEN_SCENARIO_LAKESIDE )*/false )
-	{
-		/*CWheelOfDoom *pWheelOfDoom = (CWheelOfDoom *)gEntList.FindEntityByClassname( NULL, "wheel_of_doom" );
-		if ( pWheelOfDoom && !pWheelOfDoom->IsDoneBoardcastingEffectSound() )
-			return;
-		if (CMerasmus::m_level > 3)
-		{
-			fSpawnInterval = 60.0f;
-			fSpawnVariation = 0.0f;
-		}
-		else
-		{
-			fSpawnInterval = tf_merasmus_spawn_interval.GetFloat();
-			fSpawnVariation = tf_merasmus_spawn_interval_variation.GetFloat();
-		}*/
-		eBossType = CHalloweenBaseBoss::MERASMUS;
-	}
-	else
-	{
-		SpawnZombieMob();
-		return;
-	}
-
-	if ( !m_hBosses.IsEmpty() )
-	{
-		if ( m_hBosses[0] )
-		{
-			isBossForceSpawning = false;
-			StartBossTimer( RandomFloat( fSpawnInterval - fSpawnVariation, fSpawnInterval + fSpawnVariation ) );
-			return;
-		}
-	}
-
-	if ( !m_bossSpawnTimer.HasStarted() && !isBossForceSpawning )
-	{
-		if ( IsHalloweenScenario( HALLOWEEN_SCENARIO_LAKESIDE ) )
-			StartBossTimer( RandomFloat( fSpawnInterval - fSpawnVariation, fSpawnInterval + fSpawnVariation ) );
-		else
-			StartBossTimer( RandomFloat( 0, fSpawnInterval + fSpawnVariation ) * 0.5 );
-
-		return;
-	}
-
-	if ( m_bossSpawnTimer.IsElapsed() || isBossForceSpawning )
-	{
-		if ( !isBossForceSpawning )
-		{
-			if ( InSetup() || IsInWaitingForPlayers() )
-				return;
-
-			CUtlVector<CTFPlayer *> players;
-			CollectPlayers( &players, TF_TEAM_RED, true );
-			CollectPlayers( &players, TF_TEAM_BLUE, true, true );
-
-			int nNumHumans = 0;
-			for ( int i=0; i<players.Count(); ++i )
-			{
-				if ( !players[i]->IsBot() )
-					nNumHumans++;
-			}
-
-			if ( tf_halloween_bot_min_player_count.GetInt() > nNumHumans )
-				return;
-		}
-
-		Vector vecSpawnLoc = vec3_origin;
-		if ( !g_hControlPointMasters.IsEmpty() && g_hControlPointMasters[0] )
-		{
-			CTeamControlPointMaster *pMaster = g_hControlPointMasters[0];
-			for ( int i=0; i<pMaster->GetNumPoints(); ++i )
-			{
-				CTeamControlPoint *pPoint = pMaster->GetControlPoint( i );
-				if ( !pMaster->IsInRound( pPoint ) )
-					continue;
-
-				if ( ObjectiveResource()->GetOwningTeam( pPoint->GetPointIndex() ) == TF_TEAM_BLUE )
-					continue;
-
-				if ( !TFGameRules()->TeamMayCapturePoint( TF_TEAM_BLUE, pPoint->GetPointIndex() ) )
-					continue;
-
-				vecSpawnLoc = pPoint->GetAbsOrigin();
-				if ( eBossType > CHalloweenBaseBoss::HEADLESS_HATMAN )
-				{
-					pPoint->ForceOwner( TEAM_UNASSIGNED );
-
-					if ( TFGameRules()->IsInKothMode() )
-					{
-						CTeamRoundTimer *pRedTimer = TFGameRules()->GetRedKothRoundTimer();
-						CTeamRoundTimer *pBluTimer = TFGameRules()->GetBlueKothRoundTimer();
-						
-						if ( pRedTimer )
-						{
-							variant_t emptyVar;
-							pRedTimer->AcceptInput( "Pause", NULL, NULL, emptyVar, 0 );
-						}
-						if ( pBluTimer )
-						{
-							variant_t emptyVar;
-							pBluTimer->AcceptInput( "Pause", NULL, NULL, emptyVar, 0 );				
-						}
-					}
-				}
-			}
-			
-			CBaseEntity *pSpawnPoint = gEntList.FindEntityByClassname( NULL, "spawn_boss" );
-			if ( pSpawnPoint )
-			{
-				vecSpawnLoc = pSpawnPoint->GetAbsOrigin();
-			}		
-		}
-		else
-		{
-			CBaseEntity *pSpawnPoint = gEntList.FindEntityByClassname( NULL, "spawn_boss" );
-			if ( pSpawnPoint )
-			{
-				vecSpawnLoc = pSpawnPoint->GetAbsOrigin();
-			}
-			else
-			{
-				CUtlVector<CNavArea *> candidates;
-				for ( int i=0; i<TheNavAreas.Count(); ++i )
-				{
-					CNavArea *area = TheNavAreas[i];
-					if ( area->GetSizeX() >= 100.0f && area->GetSizeY() >= 100.0f )
-						candidates.AddToTail( area );
-				}
-
-				if ( !candidates.IsEmpty() )
-				{
-					CNavArea *area = candidates.Random();
-					vecSpawnLoc = area->GetCenter();
-				}
-			}
-		}
-
-		if( !vecSpawnLoc.IsZero() )
-		{
-			CHalloweenBaseBoss::SpawnBossAtPos( eBossType, vecSpawnLoc );
-			isBossForceSpawning = false;
-			StartBossTimer( RandomFloat( fSpawnInterval - fSpawnVariation, fSpawnInterval + fSpawnVariation ) );
-		}
-	}
-}
-
-void CTFGameRules::SpawnZombieMob( void )
-{
-	if ( !tf_halloween_zombie_mob_enabled.GetBool() )
-		return;
-
-	if ( InSetup() || IsInWaitingForPlayers() )
-	{
-		m_mobSpawnTimer.Start( tf_halloween_zombie_mob_spawn_interval.GetFloat() );
-		return;
-	}
-	
-	if ( isZombieMobForceSpawning )
-	{
-		isZombieMobForceSpawning = false;
-		m_mobSpawnTimer.Invalidate();
-	}
-
-	if ( m_nZombiesToSpawn > 0 && IsSpaceToSpawnHere( m_vecMobSpawnLocation ) )
-	{
-		if ( CZombie::SpawnAtPos( m_vecMobSpawnLocation, 0 ) )
-			--m_nZombiesToSpawn;
-	}
-
-	CUtlVector<CTFPlayer *> players;
-	CollectPlayers( &players, TF_TEAM_RED, true );
-	CollectPlayers( &players, TF_TEAM_BLUE, true, true );
-
-	int nHumans = 0;
-	for ( CTFPlayer *pPlayer : players )
-	{
-		if ( !pPlayer->IsBot() )
-			++nHumans;
-	}
-
-	if ( nHumans <= 0 || !m_mobSpawnTimer.IsElapsed() )
-		return;
-
-	m_mobSpawnTimer.Start( tf_halloween_zombie_mob_spawn_interval.GetFloat() );
-
-	CUtlVector<CTFNavArea *> validAreas;
-	const float flSearchRange = 2000.0f;
-
-	// populate a vector of valid spawn locations
-	for ( CTFPlayer *pPlayer : players )
-	{
-		CUtlVector<CTFNavArea *> nearby;
-		// ignore bots
-		if ( pPlayer->IsBot() )
-			continue;
-		// are they on mesh?
-		if ( pPlayer->GetLastKnownArea() == nullptr )
-			continue;
-
-		CollectSurroundingAreas( &nearby, pPlayer->GetLastKnownArea(), flSearchRange );
-		for ( CTFNavArea *pArea : nearby )
-		{
-			if ( !pArea->IsValidForWanderingPopulation() )
-				continue;
-
-			if ( pArea->IsBlocked( TF_TEAM_RED ) || pArea->IsBlocked( TF_TEAM_BLUE ) )
-				continue;
-
-			validAreas.AddToTail( pArea );
-		}
-	}
-
-	if ( validAreas.IsEmpty() )
-		return;
-
-	int iAttempts = 10;
-	while( true )
-	{
-		CTFNavArea *pArea = validAreas.Random();
-		m_vecMobSpawnLocation = pArea->GetCenter() + Vector( 0, 0, StepHeight );
-		if ( IsSpaceToSpawnHere( m_vecMobSpawnLocation ) )
-			break;
-
-		if ( --iAttempts == 0 )
-			return;
-	}
-
-	m_nZombiesToSpawn = tf_halloween_zombie_mob_spawn_count.GetInt();
-}
-
 
 	bool CTFGameRules::CheckCapsPerRound()
 	{
@@ -4977,7 +4813,13 @@ void CTFGameRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &in
 
 					if ( pTFPlayerScorer->FragCount() >= iFragLimit )
 					{
-						SetWinningTeam( TF_TEAM_MERCENARY, WINREASON_POINTLIMIT, true, true, false);
+/*						if( IsDuelGamemode() )
+						{
+							SetWinningTeam( TF_TEAM_MERCENARY, WINREASON_POINTLIMIT, false, false, true);
+							ProgressDuelQueues();
+						}
+						else*/
+							SetWinningTeam( TF_TEAM_MERCENARY, WINREASON_POINTLIMIT, true, true, false);
 					}
 
 					// one of our players is at 80% of the fragcount, start voting for next map
@@ -5269,6 +5111,9 @@ CBasePlayer *CTFGameRules::GetDeathScorer( CBaseEntity *pKiller, CBaseEntity *pI
 //			*pKiller - 
 //			*pInflictor - 
 //-----------------------------------------------------------------------------
+
+extern CMoveData *g_pMoveData;
+
 void CTFGameRules::DeathNotice(CBasePlayer *pVictim, const CTakeDamageInfo &info)
 {
 	// Find the killer & the scorer
@@ -5307,6 +5152,8 @@ void CTFGameRules::DeathNotice(CBasePlayer *pVictim, const CTakeDamageInfo &info
 		//medals, only activate after warmup
 		if(!IsInWaitingForPlayers())
 		{
+			int weaponType = 0;
+
 			if(pScorer)
 			{
 				//streaks
@@ -5314,30 +5161,75 @@ void CTFGameRules::DeathNotice(CBasePlayer *pVictim, const CTakeDamageInfo &info
 				event->SetInt("killer_pupkills", pTFPlayerScorer->m_iPowerupKills);
 				event->SetInt("killer_kspree", pTFPlayerScorer->m_iSpreeKills);
 				event->SetInt("ex_streak", pTFPlayerScorer->m_iEXKills);
-
-				//weapon specifics
-				int weaponType = GetKillingWeaponType(pInflictor, pScorer);
-				event->SetBool("humiliation", weaponType == 1 ? true : false);
-				event->SetBool("midair", !(pTFPlayerVictim->GetFlags() & (FL_ONGROUND|FL_INWATER)) && weaponType == 2 ? true : false); //not on the ground and not in water
-
-				//Kamikaze, suicide entity exists, inflictor is the suicide entity of the scorer, inflictor is an explosive projectile
-				bool Kamikaze = pVictim != pKiller && pTFPlayerScorer->m_SuicideEntity && pInflictor == pTFPlayerScorer->m_SuicideEntity && weaponType == 2;
-				event->SetBool("kamikaze", Kamikaze);
-				if(Kamikaze)
-					pTFPlayerScorer->m_SuicideEntity = NULL;
+				weaponType = GetKillingWeaponType(pInflictor, pScorer);
 			}
-
-			//first blood
-			event->SetBool("firstblood", !m_bFirstBlood ? true : false);
-			m_bFirstBlood = true;
 
 			//more streaks
 			event->SetInt("victim_pupkills", !pTFPlayerVictim->m_bHadPowerup ? -1 : pTFPlayerVictim->m_iPowerupKills);
 			event->SetInt("victim_kspree", pTFPlayerVictim->m_iSpreeKills);
+
+			//Humiliation
+			event->SetBool("humiliation", weaponType == 1 ? true : false);
+			
+			if(weaponType == 2) //inflictor is an explosive projectile
+			{
+				//***************************
+				//Midair
+				bool MidAirTime = pTFPlayerVictim->m_fAirStartTime && gpGlobals->curtime >= pTFPlayerVictim->m_fAirStartTime + (g_pMoveData->m_vecVelocity[2] >= 0.f ? 0.4f : 0.8f);
+				event->SetBool("midair", MidAirTime ? true : false);
+
+				//***************************
+				//Kamikaze
+				m_InflictorsArray[pVictim->entindex()] = pInflictor;
+				bool Kamikaze = false;
+
+				if(pVictim != pKiller) //evaluating death of the victim
+				{
+					//scorer was killed by the same inflictor of the victim
+					Kamikaze = m_InflictorsArray[pKiller->entindex()] && pInflictor == m_InflictorsArray[pKiller->entindex()];
+					if(Kamikaze)
+					{
+						m_InflictorsArray[pKiller->entindex()] = NULL;
+						m_InflictorsArray[pVictim->entindex()] = NULL;
+					}
+				}
+				else //evaluating death of the suicidal killer
+				{
+					//kiler killed itself with something that might have caused the death of a player
+					//who died before it, we need to scout through the array to see if we find a match
+					for(int i = 1; i <= gpGlobals->maxClients; i++)
+					{
+						if(!m_InflictorsArray[i] || i == pKiller->entindex()) //ignore the index of the killer, it's a suicide of course it will match
+							continue;
+
+						if(pInflictor == m_InflictorsArray[i])
+						{
+							Kamikaze = true;
+							m_InflictorsArray[pVictim->entindex()] = NULL;
+							m_InflictorsArray[i] = NULL;
+							break;
+						}
+					}
+				}
+
+				event->SetBool("kamikaze", Kamikaze);
+			}
+
+			//first blood
+			if(!m_bFirstBlood && pVictim != pKiller) //only award first blood if it's not a suicide kill
+			{
+				event->SetBool("firstblood", true);
+				m_bFirstBlood = true;
+			}
 		}
 
 		gameeventmanager->FireEvent(event);
 	}
+}
+
+void CTFGameRules::ResetDeathInflictor(int index)
+{
+	m_InflictorsArray[index] = NULL;
 }
 
 int CTFGameRules::GetKillingWeaponType(CBaseEntity *pInflictor, CBasePlayer *pScorer)
@@ -5510,7 +5402,7 @@ void CTFGameRules::SendWinPanelInfo( void )
 		for ( int i = 0; i < numPlayers; i++ )
 		{
 			// only include players who have non-zero points this round; if we get to a player with 0 round points, stop
-			if ( 0 == vecPlayerScore[i].iRoundScore )
+			if( 0 == vecPlayerScore[i].iRoundScore )
 				break;
 
 			// set the player index and their round score in the event

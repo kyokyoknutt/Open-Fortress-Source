@@ -7,71 +7,71 @@
 
 #include "cbase.h"
 #include "tf_player.h"
-#include "nav_pathfind.h"
-#include "baseanimating.h"
+//#include "nav_pathfind.h"
+//#include "baseanimating.h"
 #include "tf_gamerules.h"
 #include "of_shared_schemas.h"
 #include "tf_gamestats.h"
-#include "KeyValues.h"
+//#include "KeyValues.h"
 #include "viewport_panel_names.h"
-#include "client.h"
-#include "team.h"
+//#include "client.h"
+//#include "team.h"
 #include "nav_mesh/tf_nav_mesh.h"
 #include "tf_weaponbase.h"
 #include "tf_weaponbase_gun.h"
-#include "tf_client.h"
+//#include "tf_client.h"
 #include "tf_team.h"
 #include "tf_viewmodel.h"
-#include "tf_item.h"
+//#include "tf_item.h"
 #include "in_buttons.h"
 #include "entity_capture_flag.h"
 #include "effect_dispatch_data.h"
-#include "te_effect_dispatch.h"
-#include "game.h"
+//#include "te_effect_dispatch.h"
+//#include "game.h"
 #include "tf_weapon_builder.h"
 #include "tf_obj.h"
 #include "tf_ammo_pack.h"
 #include "of_dropped_weapon.h"
 #include "datacache/imdlcache.h"
 #include "particle_system.h"
-#include "particle_parse.h"
-#include "props_shared.h"
-#include "filesystem.h"
-#include "toolframework_server.h"
+//#include "particle_parse.h"
+//#include "props_shared.h"
+//#include "filesystem.h"
+//#include "toolframework_server.h"
 #include "IEffects.h"
-#include "func_respawnroom.h"
-#include "networkstringtable_gamedll.h"
-#include "team_control_point_master.h"
+//#include "func_respawnroom.h"
+//#include "networkstringtable_gamedll.h"
+//#include "team_control_point_master.h"
 #include "tf_weapon_pda.h"
 #include "sceneentity.h"
 #include "fmtstr.h"
 #include "tf_weapon_sniperrifle.h"
 #include "tf_weapon_minigun.h"
-#include "trigger_area_capture.h"
-#include "triggers.h"
+//#include "trigger_area_capture.h"
+//#include "triggers.h"
 #include "tf_weapon_medigun.h"
 #include "hl2orange.spa.h"
 #include "te_tfblood.h"
-#include "activitylist.h"
-#include "steam/steam_api.h"
-#include "cdll_int.h"
-#include "tf_weaponbase.h"
-#include "tf_playerclass_shared.h"
+//#include "activitylist.h"
+//#include "steam/steam_api.h"
+//#include "cdll_int.h"
+//#include "tf_weaponbase.h"
+//#include "tf_playerclass_shared.h"
 #include "of_weapon_physcannon.h"
-#include "tf_powerup.h"
-#include "IVehicle.h"
-#include "player_pickup.h"
+//#include "tf_powerup.h"
+//#include "IVehicle.h"
+//#include "player_pickup.h"
 #include "eventqueue.h"
-#include "ammodef.h"
-#include "saverestore_utlvector.h"
-#include "tf_obj_sentrygun.h"
-#include "teamplayroundbased_gamerules.h"
+//#include "ammodef.h"
+//#include "saverestore_utlvector.h"
+//#include "tf_obj_sentrygun.h"
+//#include "teamplayroundbased_gamerules.h"
 #include "tf_weaponbase_melee.h"
 #include "of_music_player.h"
 #include "entity_ammopack.h"
 #include "entity_healthkit.h"
 #include "of_dropped_powerup.h"
-
+#include "basegrenade_shared.h"
 #include "dt_utlvector_send.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -325,17 +325,20 @@ int SendProxyArrayLength_PlayerObjects( const void *pStruct, int objectID )
 }
 
 BEGIN_DATADESC( CTFPlayer )
-	DEFINE_INPUTFUNC( FIELD_STRING, "SetCustomModel", SetCustomModel ),
-	DEFINE_INPUTFUNC( FIELD_STRING, "SetCustomArmModel", SetCustomArmModel ),
-	DEFINE_INPUTFUNC( FIELD_INTEGER, "AddMoney", AddMoney ),
-	DEFINE_INPUTFUNC( FIELD_INTEGER, "SetMoney", SetMoney ),
-	DEFINE_INPUTFUNC( FIELD_VOID, "StripWeapons", InputStripWeapons ),
-	DEFINE_INPUTFUNC( FIELD_STRING, "SpeakResponseConcept", InputSpeakResponseConcept ),
-	DEFINE_INPUTFUNC( FIELD_VOID,	"IgnitePlayer",	InputIgnitePlayer ),
-	DEFINE_INPUTFUNC( FIELD_VOID,	"ExtinguishPlayer",	InputExtinguishPlayer ),
-	DEFINE_INPUTFUNC( FIELD_BOOLEAN, "SetZombie", InputSetZombie ),
-	DEFINE_INPUTFUNC( FIELD_BOOLEAN, "SetTeamNoKill", InputSetTeamNoKill ),
+	DEFINE_INPUTFUNC( FIELD_STRING,		"SetCustomModel",		SetCustomModel ),
+	DEFINE_INPUTFUNC( FIELD_STRING,		"SetCustomArmModel",	SetCustomArmModel ),
+	DEFINE_INPUTFUNC( FIELD_INTEGER,	"AddMoney",				AddMoney ),
+	DEFINE_INPUTFUNC( FIELD_INTEGER,	"SetMoney",				SetMoney ),
+	DEFINE_INPUTFUNC( FIELD_VOID,		"StripWeapons",			InputStripWeapons ),
+	DEFINE_INPUTFUNC( FIELD_STRING,		"SpeakResponseConcept", InputSpeakResponseConcept ),
+	DEFINE_INPUTFUNC( FIELD_VOID,		"IgnitePlayer",			InputIgnitePlayer ),
+	DEFINE_INPUTFUNC( FIELD_VOID,		"ExtinguishPlayer",		InputExtinguishPlayer ),
+	DEFINE_INPUTFUNC( FIELD_VOID,		"PoisonPlayer",			InputPoisonPlayer),
+	DEFINE_INPUTFUNC( FIELD_VOID,		"DePoisonPlayer",		InputDePoisonPlayer),
+	DEFINE_INPUTFUNC( FIELD_BOOLEAN,	"SetZombie",			InputSetZombie ),
+	DEFINE_INPUTFUNC( FIELD_BOOLEAN,	"SetTeamNoKill",		InputSetTeamNoKill ),
 END_DATADESC()
+
 extern void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
 
 // specific to the local player
@@ -571,6 +574,18 @@ void CTFPlayer::TFPlayerThink()
 		}
 	}
 */
+
+	//midair medal, record player airtime
+	if (!GetGroundEntity() && GetWaterLevel() <= WL_Feet) //always go here when player is in the air
+	{
+		if (!m_fAirStartTime)
+			m_fAirStartTime = gpGlobals->curtime;
+	}
+	else
+	{
+		m_fAirStartTime = 0.f;
+	}
+
 	SetContextThink( &CTFPlayer::TFPlayerThink, gpGlobals->curtime, "TFPlayerThink" );
 }
 
@@ -1327,9 +1342,10 @@ void CTFPlayer::Spawn()
 	m_iPowerupKills = 0;
 	m_iEXKills = 0;
 	m_fEXTime = 0;
+	m_fAirStartTime = 0.f;
 	m_iSpreeKills = 0;
 	m_iImpressiveCount = 0;
-	m_SuicideEntity = NULL;
+	TFGameRules()->ResetDeathInflictor(entindex());
 }
 
 void CTFPlayer::UpdateCosmetics()
@@ -1488,14 +1504,13 @@ void CTFPlayer::Regenerate( void )
 	
 	m_bRegenerating = false;
 	if ( iCurrentHealth > GetHealth() )
-	{
 		SetHealth( iCurrentHealth );
-	}
 
-	if ( m_Shared.InCond( TF_COND_BURNING ) )
-	{
-		m_Shared.RemoveCond( TF_COND_BURNING );
-	}
+	if ( m_Shared.InCond(TF_COND_BURNING))
+		m_Shared.RemoveCond(TF_COND_BURNING);
+
+	if (m_Shared.InCond(TF_COND_POISON))
+		m_Shared.RemoveCond(TF_COND_POISON);
 }
 
 //-----------------------------------------------------------------------------
@@ -2902,7 +2917,7 @@ void CTFPlayer::HandleCommand_JoinTeam( const char *pTeamName, bool bNoKill )
 	if ( ( TFGameRules()->IsESCGamemode() && IsPlayerClass( TF_CLASS_CIVILIAN ) ) )
 		return;
 
-	if ( stricmp(pTeamName, "spectate") != 0 && TFGameRules()->IsDMGamemode() )
+	if ( stricmp(pTeamName, "spectate") && TFGameRules()->IsDMGamemode() )
 	{
 		if ( TFGameRules()->IsTeamplay() ) 
 		{
@@ -2913,16 +2928,20 @@ void CTFPlayer::HandleCommand_JoinTeam( const char *pTeamName, bool bNoKill )
 		{
 			if ( !of_allowteams.GetBool() )			
 				ChangeTeam( TF_TEAM_MERCENARY, false );
+
 			if ( !TFGameRules()->IsAllClassEnabled() ) 
 				SetDesiredPlayerClassIndex(TF_CLASS_MERCENARY);
 			else
 				ShowViewPortPanel( PANEL_CLASS );
-
+			
+			// TFGameRules()->PlaceIntoDuelQueue( this );
+			
 			if ( !of_allowteams.GetBool() ) 
 				return;
 		}
-		
 	}
+	
+	// TFGameRules()->RemoveFromDuelQueue( this );
 	
 	int iTeam = TEAM_INVALID;
 	if ( stricmp( pTeamName, "auto" ) == 0 )
@@ -5665,15 +5684,10 @@ void CTFPlayer::Event_Killed( const CTakeDamageInfo &info )
 	{
 		pPlayerAttacker = ToTFPlayer( info.GetAttacker() );
 
-		//Kamikaze
-		if (pPlayerAttacker == this)
-		{
-			m_SuicideEntity = pInflictor;
-		}
-		else
+		if (pPlayerAttacker != this)
 		{
 			//Powerup Massacre
-			pPlayerAttacker->m_iPowerupKills = m_Shared.InPowerupCond() ? pPlayerAttacker->m_iPowerupKills + 1 : 0; //count kills while holding powerup
+			pPlayerAttacker->m_iPowerupKills += m_Shared.InPowerupCond() ? 1 : 0; //count kills while holding powerup
 
 			//Excellent
 			if (pPlayerAttacker->m_iEXKills >= 9) //reset after achieving the highest EX medal
@@ -6386,10 +6400,13 @@ void CTFPlayer::DropAmmoPack( void )
 //-----------------------------------------------------------------------------
 void CC_DropWeapon( void )
 {
+
 	if ( !of_dropweapons.GetBool() )
 		return;
+
 	if( of_randomizer.GetBool() )
 		return;
+
 	CTFPlayer *pPlayer = ToTFPlayer( UTIL_GetCommandClient() );
 	if ( !pPlayer )
 		return;
@@ -6645,6 +6662,11 @@ void CTFPlayer::DropWeapon( CTFWeaponBase *pActiveWeapon, bool bThrown, bool bDi
 		else
 			pDroppedWeapon->m_nSkin = 2;
 		
+		if( pWeapon->GetTeamNumber() > LAST_SHARED_TEAM )
+			pDroppedWeapon->SetTeamNum( pWeapon->GetTeamNumber() );
+		else
+			pDroppedWeapon->SetTeamNum( TEAM_UNASSIGNED );
+		
 		// Give the ammo pack some health, so that trains can destroy it.
 		pDroppedWeapon->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		pDroppedWeapon->m_takedamage = DAMAGE_YES;		
@@ -6867,6 +6889,9 @@ void CTFPlayer::TeamFortress_ClientDisconnected( void )
 	DeathSound( info );
 
 	EmitSound( "Player.Gib" );
+	
+	if( TFGameRules() )
+		TFGameRules()->RemoveFromDuelQueue( this );
 
 	RemoveNemesisRelationships();
 
@@ -9235,9 +9260,6 @@ IResponseSystem *CTFPlayer::GetResponseSystem()
 	{
 		iClass = m_Shared.GetDisguiseClass();
 	}
-	else if (m_bSpeakingConceptAsDisguisedSpy && V_atoi(engine->GetClientConVarValue(entindex(), "of_snipervoice")) && !IsFakeClient()) {
-		iClass = TF_CLASS_SNIPER;
-	}
 
 	bool bValidClass = ( iClass >= TF_CLASS_SCOUT && iClass < TF_CLASS_COUNT_ALL );
 	bool bValidConcept = ( m_iCurrentConcept >= 0 && m_iCurrentConcept < MP_TF_CONCEPT_COUNT );
@@ -9318,30 +9340,8 @@ bool CTFPlayer::SpeakConceptIfAllowed( int iConcept, const char *modifiers, char
 	}
 	else
 	{
-		if (V_atoi(engine->GetClientConVarValue(entindex(), "of_snipervoice")) && !IsFakeClient())
-		{
-			// sniper voice!
-			CSingleUserRecipientFilter filter(this);
-			CMultiplayer_Expresser *pExpresser = GetMultiplayerExpresser();
-			pExpresser->AllowMultipleScenes();
-			char buf[128];
-			Q_snprintf(buf, sizeof(buf), "disguiseclass:%s", g_aPlayerClassNames_NonLocalized[TF_CLASS_SNIPER]);
-			if (modifiers)
-			{
-				Q_strncat(buf, ",", sizeof(buf), 1);
-				Q_strncat(buf, modifiers, sizeof(buf), COPY_ALL_CHARACTERS);
-			}
-			CBroadcastRecipientFilter everyoneFilter;
-			m_bSpeakingConceptAsDisguisedSpy = true;
-			bReturn = SpeakIfAllowed(g_pszMPConcepts[iConcept], buf, pszOutResponseChosen, bufsize, &everyoneFilter);
-			m_bSpeakingConceptAsDisguisedSpy = false;
-			pExpresser->DisallowMultipleScenes();
-		}
-		else
-		{
-			// play normally
-			bReturn = SpeakIfAllowed( g_pszMPConcepts[iConcept], modifiers, pszOutResponseChosen, bufsize, filter );
-		}
+		// play normally
+		bReturn = SpeakIfAllowed( g_pszMPConcepts[iConcept], modifiers, pszOutResponseChosen, bufsize, filter );	
 	}
 
 	//Add bubble on top of a player calling for medic.
@@ -9592,14 +9592,27 @@ void CTFPlayer::InputIgnitePlayer( inputdata_t &inputdata )
 	m_Shared.Burn( ToTFPlayer( inputdata.pActivator ), inputdata.value.Float() );
 }
 
-void CTFPlayer::InputExtinguishPlayer( inputdata_t &inputdata )
+void CTFPlayer::InputExtinguishPlayer(inputdata_t &inputdata)
 {
 	if ( m_Shared.InCond( TF_COND_BURNING ) )
 	{
 		EmitSound( "TFPlayer.FlameOut" );
-
 		m_Shared.RemoveCond( TF_COND_BURNING );
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CTFPlayer::InputPoisonPlayer(inputdata_t &inputdata)
+{
+	m_Shared.Poison(ToTFPlayer(inputdata.pActivator), inputdata.value.Float());
+}
+
+void CTFPlayer::InputDePoisonPlayer(inputdata_t &inputdata)
+{
+	if (m_Shared.InCond(TF_COND_POISON))
+		m_Shared.RemoveCond(TF_COND_POISON);
 }
 
 //-----------------------------------------------------------------------------

@@ -23,10 +23,6 @@
 #include "viewrender.h"
 
 #include "c_ai_basenpc.h"
-#include "c_eyeball_boss.h"
-#include "c_headless_hatman.h"
-#include "tf_zombie.h"
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -319,40 +315,6 @@ void CTFFreezePanel::FireGameEvent( IGameEvent * event )
 				{
 					m_pBasePanel->SetDialogVariable( "objectkiller", wszLocalized );
 				}
-			}
-			else if ( pKiller->IsNextBot() )
-			{
-				C_Zombie *pZombie = nullptr;
-				C_HeadlessHatman *pHHH = nullptr;
-				C_EyeBallBoss *pEyeball = nullptr;
-
-				pZombie = dynamic_cast<C_Zombie*>( pKiller );
-
-				if ( !pZombie )
-				{
-					pHHH = dynamic_cast<C_HeadlessHatman*>( pKiller );
-
-					if ( !pHHH )
-					{
-						pEyeball = dynamic_cast<C_EyeBallBoss*>( pKiller );
-					}
-				}
-
-				if ( !pKiller->IsAlive() )
-				{
-					m_pFreezeLabel->SetText( "#FreezePanel_Killer_Dead" ) ;
-				}
-				else
-				{
-					m_pFreezeLabel->SetText( "#FreezePanel_Killer" );
-				}
-
-				if ( pZombie )
-					m_pBasePanel->SetDialogVariable( "killername", "#TF_HALLOWEEN_SKELETON_DEATHCAM_NAME" );
-				else if ( pHHH )
-					m_pBasePanel->SetDialogVariable( "killername", "#TF_HALLOWEEN_BOSS_DEATHCAM_NAME" );
-				else if ( pEyeball )
-					m_pBasePanel->SetDialogVariable( "killername", "#TF_HALLOWEEN_EYEBALL_BOSS_DEATHCAM_NAME" );
 			}
 			else if ( pKiller->IsNPC() )
 			{
