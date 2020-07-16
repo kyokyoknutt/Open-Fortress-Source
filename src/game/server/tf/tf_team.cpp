@@ -3,13 +3,10 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_team.h"
-#include "entitylist.h"
-#include "util.h"
 #include "tf_obj.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
 
 //-----------------------------------------------------------------------------
 // Purpose: SendProxy that converts the UtlVector list of objects to entindexes, where it's reassembled on the client

@@ -9,23 +9,9 @@
 #include "UI_Shared.h"
 #include "VGenericConfirmation.h"
 #include "VFooterPanel.h"
-#include "VFlyoutMenu.h"
 #include "vhybridbutton.h"
-
 #include "fmtstr.h"
-
-#include "game/client/IGameClientExports.h"
-// #include "GameUI_Interface.h"
-#include "cdll_client_int.h"
-
-#include "vgui/ILocalize.h"
-#include "vgui_controls/Button.h"
-#include "vgui_controls/ImagePanel.h"
-#include "vgui/ISurface.h"
-
 #include "materialsystem/materialsystem_config.h"
-
-#include "gameui_util.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

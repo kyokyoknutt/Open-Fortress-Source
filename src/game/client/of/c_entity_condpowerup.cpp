@@ -1,5 +1,3 @@
-#include "cbase.h"
-#include "c_tf_player.h"
 //====== Copyright � 1996-2005, Valve Corporation, All rights reserved. =======//
 //
 // Purpose: Powerup spawner
@@ -7,12 +5,8 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "c_tf_player.h"
 #include "view.h"
-#include "tier0/memdbgon.h"
-#include "glow_outline_effect.h"
 #include "tf_gamerules.h"
-#include "teamplayroundbased_gamerules.h"
 
 extern ConVar building_cubemaps;
 extern ConVar of_glow_alpha;

@@ -6,38 +6,10 @@
 //=============================================================================
 
 #include "cbase.h"
-
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
 #include <vgui_controls/ComboBox.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/RichText.h>
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/QueryBox.h>
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
-#include "ienginevgui.h"
-#include <game/client/iviewport.h>
-#include "tf_tips.h"
-#include "renderparm.h"
-#include "animation.h"
-#include "tf_controls.h"
 #include "cvartogglecheckbutton.h"
-#include "datacache/imdlcache.h"
-
 #include "of_colorpanel.h"
-
-#include "engine/IEngineSound.h"
-#include "basemodelpanel.h"
-#include "tf_gamerules.h"
-#include "of_shared_schemas.h"
-#include <convar.h>
-#include <vgui_controls/ScrollBarSlider.h>
-#include <vgui_controls/Slider.h>
-#include "fmtstr.h"
-
-#include "tier0/dbg.h"
 
 using namespace vgui;
 
@@ -47,13 +19,15 @@ using namespace vgui;
 // Maybe we should try to do this with inline assembly code later?
 // Definetly beneficial for such a common function
 
-typedef struct {
+typedef struct
+{
     double r;       // a fraction between 0 and 1
     double g;       // a fraction between 0 and 1
     double b;       // a fraction between 0 and 1
 } rgb;
 
-typedef struct {
+typedef struct
+{
     double h;       // angle in degrees
     double s;       // a fraction between 0 and 1
     double v;       // a fraction between 0 and 1
@@ -81,19 +55,22 @@ hsv rgb2hsv(rgb in)
         out.h = 0; // undefined, maybe nan?
         return out;
     }
-    if( max > 0.0 ) { // NOTE: if Max is == 0, this divide would cause a crash
+    if( max > 0.0 )
+	{ // NOTE: if Max is == 0, this divide would cause a crash
         out.s = (delta / max);                  // s
-    } else {
+    }
+	else
+	{
         // if max is 0, then r = g = b = 0              
         // s = 0, h is undefined
         out.s = 0.0;
         out.h = NAN;                            // its now undefined
         return out;
     }
+
     if( in.r >= max )                           // > is bogus, just keeps compilor happy
         out.h = ( in.g - in.b ) / delta;        // between yellow & magenta
-    else
-    if( in.g >= max )
+    else if( in.g >= max )
         out.h = 2.0 + ( in.b - in.r ) / delta;  // between cyan & yellow
     else
         out.h = 4.0 + ( in.r - in.g ) / delta;  // between magenta & cyan
@@ -112,7 +89,8 @@ rgb hsv2rgb(hsv in)
     long        i;
     rgb         out;
 
-    if(in.s <= 0.0) {       // < is bogus, just shuts up warnings
+    if(in.s <= 0.0)
+	{       // < is bogus, just shuts up warnings
         out.r = in.v;
         out.g = in.v;
         out.b = in.v;
@@ -127,7 +105,8 @@ rgb hsv2rgb(hsv in)
     q = in.v * (1.0 - (in.s * ff));
     t = in.v * (1.0 - (in.s * (1.0 - ff)));
 
-    switch(i) {
+    switch(i)
+	{
     case 0:
         out.r = in.v;
         out.g = t;

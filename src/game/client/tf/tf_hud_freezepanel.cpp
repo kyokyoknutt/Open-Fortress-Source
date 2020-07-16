@@ -9,20 +9,14 @@
 #include "tf_hud_freezepanel.h"
 #include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"
-#include "c_tf_player.h"
 #include "c_tf_playerresource.h"
-#include <vgui_controls/Label.h>
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
 #include "c_baseobject.h"
-#include "fmtstr.h"
 #include "tf_gamerules.h"
 #include "tf_hud_statpanel.h"
 #include "view.h"
-#include "ivieweffects.h"
 #include "viewrender.h"
+#include <vgui/ILocalize.h>
 
-#include "c_ai_basenpc.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

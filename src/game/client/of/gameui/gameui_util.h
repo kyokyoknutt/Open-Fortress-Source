@@ -11,9 +11,6 @@
 #endif
 
 char	*VarArgs( const char *format, ... );
-
-#include "tier1/convar.h"
-
 void GameUI_MakeSafeName( const char *oldName, char *newName, int newNameBufSize );
 
 //-----------------------------------------------------------------------------

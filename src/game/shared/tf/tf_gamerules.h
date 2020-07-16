@@ -19,19 +19,14 @@
 #pragma once
 #endif
 
-
 #include "teamplayroundbased_gamerules.h"
-#include "convar.h"
-#include "gamevars_shared.h"
-#include "GameEventListener.h"
 #include "tf_gamestats_shared.h"
 
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
-#include "trains.h"
-#include "team_train_watcher.h"
+	#include "tf_player.h"
+	#include "pathtrack.h"
 #endif
 
 #ifdef CLIENT_DLL
@@ -474,8 +469,7 @@ public:
 
 	void CalcDominationAndRevenge( CTFPlayer *pAttacker, CTFPlayer *pVictim, bool bIsAssist, int *piDeathFlags );
 
-	int GetKillingWeaponType(CBaseEntity *pInflictor, CBasePlayer *pScorer);
-	const char *GetKillingWeaponName( const CTakeDamageInfo &info, CTFPlayer *pVictim );
+	const char *GetKillingWeaponName( const CTakeDamageInfo &info, CTFPlayer *pVictim, int *weaponType = NULL );
 	CBasePlayer *GetAssister( CBasePlayer *pVictim, CBasePlayer *pScorer, CBaseEntity *pInflictor );
 	CTFPlayer *GetRecentDamager( CTFPlayer *pVictim, int iDamager, float flMaxElapsed );
 
@@ -534,11 +528,8 @@ private:
 	CHandle<CTeamTrainWatcher> m_hBlueAttackTrain;
 	CHandle<CTeamTrainWatcher> m_hRedDefendTrain;
 	CHandle<CTeamTrainWatcher> m_hBlueDefendTrain;
-
 #endif
 
-	CUtlVector< int > m_hDuelQueueL;
-    CUtlVector< int > m_hDuelQueueR;
 	CNetworkVar( int, m_nGameType ); // Type of game this map is (CTF, CP)
 	CNetworkVar( int, m_nMutator ); // What mutator are we using?
 	CNetworkVar( int, m_nRetroMode ); // The TFC mode type
@@ -554,6 +545,7 @@ private:
 	CNetworkString( m_pszTeamGoalStringRed, MAX_TEAMGOAL_STRING );
 	CNetworkString( m_pszTeamGoalStringBlue, MAX_TEAMGOAL_STRING );
 	CNetworkString( m_pszTeamGoalStringMercenary, MAX_TEAMGOAL_STRING );
+
 public:
 	bool m_bControlSpawnsPerTeam[ MAX_TEAMS ][ MAX_CONTROL_POINTS ];
 	int	 m_iPreviousRoundWinners;
@@ -637,10 +629,16 @@ public:
 	void SetRetroMode( int nRetroMode );
 #endif
 
+#ifdef GAME_DLL
 	int		GetDuelQueuePos( CBasePlayer *pPlayer );
+	bool	CheckDuelOvertime();
+	bool	IsDueler( CBasePlayer *pPlayer );
+	bool	IsRageQuitter(CBasePlayer *pPlayer) { return IsDueler(pPlayer) && !IsInWaitingForPlayers() && State_Get() > GR_STATE_PREGAME; }
 	void 	PlaceIntoDuelQueue( CBasePlayer *pPlayer );
 	void	RemoveFromDuelQueue( CBasePlayer *pPlayer );
-	void	ProgressDuelQueues();
+	void	DuelRageQuit( CTFPlayer *pRager );
+	void	ProgressDuelQueues( CTFPlayer *pWinner, CTFPlayer *pLoser, bool rageQuit = false );
+#endif
 
 	bool	IsAllClassEnabled( void ) { return m_bAllClass; }
 	bool	IsAllClassZombieEnabled( void ) { return m_bAllClassZombie; }

@@ -11,10 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/ImagePanel.h>
 #include "tf_controls.h"
-#include "tf_imagepanel.h"
-#include "GameEventListener.h"
 #include "c_tf_player.h"
 
 //-----------------------------------------------------------------------------

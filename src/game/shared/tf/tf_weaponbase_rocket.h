@@ -11,18 +11,12 @@
 
 #include "cbase.h"
 #include "tf_shareddefs.h"
-// Client specific.
-#ifdef CLIENT_DLL
-#include "c_baseanimating.h"
-// Server specific.
-#else
-#include "baseanimating.h"
-#include "smoke_trail.h"
-#endif
 #include "tf_weaponbase.h"
 
 #ifdef CLIENT_DLL
-#define CTFBaseRocket C_TFBaseRocket
+	#include "c_baseanimating.h"
+
+	#define CTFBaseRocket C_TFBaseRocket
 #endif
 
 //#define TF_ROCKET_RADIUS	(110.0f * 1.1f)	//radius * TF scale up factor

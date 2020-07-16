@@ -57,7 +57,7 @@ public:
 	DECLARE_CLASS( CTFGasGrenadeEffect, CBaseEntity );
 	DECLARE_NETWORKCLASS();
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 
 	virtual int UpdateTransmitState( void );
 

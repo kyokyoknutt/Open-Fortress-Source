@@ -7,9 +7,7 @@
 #pragma once
 #endif
 
-#include "utlvector.h"
 #include "team.h"
-#include "tf_shareddefs.h"
 
 class CBaseObject;
 

@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "baseentity.h"
 
 class CTFBotHint : public CBaseEntity
 {

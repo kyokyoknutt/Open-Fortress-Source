@@ -6,7 +6,6 @@
 
 #include "cbase.h"
 #include "usermessages.h"
-#include "shake.h"
 #include "voice_gamemgr.h"
 #include "haptics/haptic_msgs.h"
 

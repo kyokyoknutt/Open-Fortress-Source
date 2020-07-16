@@ -4,8 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
+
 #include "cbase.h"
-#include "clientmode_tf.h"
 #include "c_tf_objective_resource.h"
 #include "teamplayroundbased_gamerules.h"
 

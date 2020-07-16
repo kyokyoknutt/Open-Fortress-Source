@@ -6,35 +6,15 @@
 //=============================================================================//
 
 #include "cbase.h"
-
-#include <tier1/fmtstr.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/RichText.h>
-#include <vgui_controls/Frame.h>
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
 #include <vgui_controls/SectionedListPanel.h>
 #include <vgui_controls/ImageList.h>
-#include <game/client/iviewport.h>
-#include <KeyValues.h>
-#include <filesystem.h>
-#include "IGameUIFuncs.h" // for key bindings
-
-#include "tf_controls.h"
-#include "tf_shareddefs.h"
 #include "tf_clientscoreboard.h"
-#include "tf_gamestats_shared.h"
 #include "tf_hud_statpanel.h"
 #include "tf_gamerules.h"
-#include "c_playerresource.h"
 #include "c_tf_playerresource.h"
 #include "c_tf_team.h"
-#include "c_tf_player.h"
-#include "vgui_avatarimage.h"
+#include <vgui/ILocalize.h>
+#include "tf_playerclass_shared.h"
 
 #if defined ( _X360 )
 #include "engine/imatchmaking.h"
@@ -91,6 +71,25 @@ void CTFClientScoreBoardDialog::PerformLayout()
 	BaseClass::PerformLayout();
 }
 
+extern TFPlayerClassData_t s_aTFPlayerClassData[TF_CLASS_COUNT_ALL];
+
+const char *g_aClassIcons[TF_CLASS_COUNT_ALL] =
+{
+	"",
+	"../hud/leaderboard_class_scout",
+	"../hud/leaderboard_class_sniper",
+	"../hud/leaderboard_class_soldier",
+	"../hud/leaderboard_class_demo",
+	"../hud/leaderboard_class_medic",
+	"../hud/leaderboard_class_heavy",
+	"../hud/leaderboard_class_pyro",
+	"../hud/leaderboard_class_spy",
+	"../hud/leaderboard_class_engineer",
+	"../hud/leaderboard_class_mercenary",
+	"../hud/leaderboard_class_civilian",
+	"../hud/leaderboard_class_juggernaut"
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -103,6 +102,11 @@ void CTFClientScoreBoardDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 		m_iImageDead = m_pImageList->AddImage( scheme()->GetImage( "../hud/leaderboard_dead", true ) );
 		m_iImageDominated = m_pImageList->AddImage( scheme()->GetImage( "../hud/leaderboard_dominated", true ) );
 		m_iImageNemesis = m_pImageList->AddImage( scheme()->GetImage( "../hud/leaderboard_nemesis", true ) );
+		
+		for( int i = TF_FIRST_NORMAL_CLASS; i < TF_CLASS_COUNT_ALL; i++ )
+		{
+			m_iClassIcon[i] = m_pImageList->AddImage( scheme()->GetImage( g_aClassIcons[i], true ) );
+		}
 		
 		// resize the images to our resolution
 		for (int i = 1; i < m_pImageList->GetImageCount(); i++ )
@@ -227,17 +231,27 @@ void CTFClientScoreBoardDialog::InitPlayerList( SectionedListPanel *pPlayerList 
 	pPlayerList->AddColumnToSection( 0, "name", "#TF_Scoreboard_Name", 0, m_iNameWidth );
 	pPlayerList->AddColumnToSection( 0, "status", "", SectionedListPanel::COLUMN_IMAGE | SectionedListPanel::COLUMN_CENTER, m_iStatusWidth );
 	pPlayerList->AddColumnToSection( 0, "nemesis", "", SectionedListPanel::COLUMN_IMAGE, m_iNemesisWidth );
-	pPlayerList->AddColumnToSection( 0, "class", "", 0, m_iClassWidth );
-	if ( TFGameRules() && TFGameRules()->IsDMGamemode() && !TFGameRules()->IsGGGamemode() && !TFGameRules()->InGametype(TF_GAMETYPE_TDM) )
+	
+	const char *szScoreLabel[] =
 	{
-		if ( !TFGameRules()->DontCountKills() )
-			pPlayerList->AddColumnToSection( 0, "kills", "#TF_Scoreboard_Kills", SectionedListPanel::COLUMN_RIGHT, m_iKillsWidth );
+		"#TF_Scoreboard_Score",
+		"#TF_Scoreboard_Kills",
+		"#TF_ScoreBoard_GGLevel"
+	};
+
+	int iScoreLabel = 0;
+	
+	if ( TFGameRules() )
+	{
+		if( TFGameRules()->IsGGGamemode() )
+			iScoreLabel = 2;
+		else if( TFGameRules()->IsDMGamemode() && !TFGameRules()->InGametype(TF_GAMETYPE_TDM) && !TFGameRules()->DontCountKills() )
+			iScoreLabel = 1;
 	}
-	else if ( TFGameRules() && TFGameRules()->IsGGGamemode() )
-		pPlayerList->AddColumnToSection( 0, "level", "#TF_ScoreBoard_GGLevel", SectionedListPanel::COLUMN_RIGHT, m_iKillsWidth );
-	else
-		pPlayerList->AddColumnToSection( 0, "score", "#TF_Scoreboard_Score", SectionedListPanel::COLUMN_RIGHT, m_iScoreWidth );
-	pPlayerList->AddColumnToSection( 0, "ping", "#TF_Scoreboard_Ping", SectionedListPanel::COLUMN_RIGHT, m_iPingWidth );
+
+	pPlayerList->AddColumnToSection( 0, "score", szScoreLabel[iScoreLabel], SectionedListPanel::COLUMN_CENTER , m_iScoreWidth );
+	pPlayerList->AddColumnToSection( 0, "class", "",  SectionedListPanel::COLUMN_IMAGE | SectionedListPanel::COLUMN_CENTER, m_iClassWidth );
+	pPlayerList->AddColumnToSection( 0, "ping", "#TF_Scoreboard_Ping", SectionedListPanel::COLUMN_CENTER, m_iPingWidth );
 }
 
 void CTFClientScoreBoardDialog::RemovePlayerList( SectionedListPanel *pPlayerList )
@@ -437,16 +451,22 @@ void CTFClientScoreBoardDialog::UpdatePlayerList()
 
 			const char *szName = tf_PR->GetPlayerName( playerIndex );
 			int score = tf_PR->GetTotalScore( playerIndex );
-			int kills = tf_PR->GetPlayerScore( playerIndex );
-			int level = tf_PR->GetGGLevel( playerIndex );
+
 
 			KeyValues *pKeyValues = new KeyValues( "data" );
 
 			pKeyValues->SetInt( "playerIndex", playerIndex );
 			pKeyValues->SetString( "name", szName );
+			
+			if( TFGameRules() )
+			{
+				if( TFGameRules()->IsGGGamemode() )
+					score = tf_PR->GetGGLevel( playerIndex );
+				else if( TFGameRules()->IsDMGamemode() && !TFGameRules()->InGametype(TF_GAMETYPE_TDM) && !TFGameRules()->DontCountKills() )
+					score = tf_PR->GetPlayerScore( playerIndex );
+			}
+
 			pKeyValues->SetInt( "score", score );
-			pKeyValues->SetInt( "kills", kills );
-			pKeyValues->SetInt( "level", level );
 
 			// can only see class information if we're on the same team
 			if ( !AreEnemyTeams( g_PR->GetTeam( playerIndex ), localteam ) && !( localteam == TEAM_UNASSIGNED ) )
@@ -473,11 +493,7 @@ void CTFClientScoreBoardDialog::UpdatePlayerList()
 
 					if( iClass >= TF_FIRST_NORMAL_CLASS && iClass <= TF_CLASS_COUNT_ALL )
 					{
-						pKeyValues->SetString( "class", g_aPlayerClassNames[iClass] );
-					}
-					else
-					{
-						pKeyValues->SetString( "class", "" );
+						pKeyValues->SetInt( "class", m_iClassIcon[iClass] );
 					}
 				}				
 			}
@@ -485,23 +501,15 @@ void CTFClientScoreBoardDialog::UpdatePlayerList()
 			{
 				C_TFPlayer *pPlayerOther = ToTFPlayer( UTIL_PlayerByIndex( playerIndex ) );
 
-#ifdef _X360
-				bool bUseTruncatedNames = true;
-#else
-				bool bUseTruncatedNames = false;
-#endif
-
 				if ( pPlayerOther && pPlayerOther->m_Shared.IsPlayerDominated( pLocalPlayer->entindex() ) )
 				{
 					// if local player is dominated by this player, show a nemesis icon
 					pKeyValues->SetInt( "nemesis", m_iImageNemesis );
-					pKeyValues->SetString( "class", bUseTruncatedNames ? "#TF_Nemesis_lodef" : "#TF_Nemesis" );
 				}
 				else if ( pLocalPlayer->m_Shared.IsPlayerDominated( playerIndex) )
 				{
 					// if this player is dominated by the local player, show the domination icon
 					pKeyValues->SetInt( "nemesis", m_iImageDominated );
-					pKeyValues->SetString( "class", bUseTruncatedNames ? "#TF_Dominated_lodef" : "#TF_Dominated" );
 				}
 			}
 
@@ -736,24 +744,13 @@ bool CTFClientScoreBoardDialog::TFPlayerSortFunc( vgui::SectionedListPanel *list
 	Assert(it1 && it2);
 
 	// first compare score
-	if ( TFGameRules()->IsDMGamemode() )
-	{
-		int v1 = it1->GetInt("kills");
-		int v2 = it2->GetInt("kills");
-		if (v1 > v2)
-			return true;
-		else if (v1 < v2)
-			return false;
-	}
-	else
-	{
-		int v1 = it1->GetInt("score");
-		int v2 = it2->GetInt("score");
-		if (v1 > v2)
-			return true;
-		else if (v1 < v2)
-			return false;
-	}
+	int v1 = it1->GetInt("score");
+	int v2 = it2->GetInt("score");
+	if (v1 > v2)
+		return true;
+	else if (v1 < v2)
+		return false;
+
 	// if score is the same, use player index to get deterministic sort
 	int iPlayerIndex1 = it1->GetInt( "playerIndex" );
 	int iPlayerIndex2 = it2->GetInt( "playerIndex" );

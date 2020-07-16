@@ -3,26 +3,14 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hud.h"
 #include "hudelement.h"
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
 #include "iclientmode.h"
-#include <vgui_controls/Label.h>
-
-#include "hud_controlpointicons.h"
 #include "tf_gamerules.h"
 #include "c_tf_player.h"
-#include "c_tf_playerresource.h"
-#include "engine/IEngineSound.h"
 #include "of_hud_medals.h"
-
-using namespace vgui;
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-//DECLARE_HUDELEMENT(CTFHudMedals);
 
 #define MEDAL_TIME 2.5f
 #define MEDAL_SIZE 128
@@ -170,11 +158,8 @@ void CTFHudMedals::FireGameEvent(IGameEvent *event)
 	}
 	else if (!Q_strcmp("player_death", eventname))
 	{
-		if (event->GetInt("userid") == pIndex) //you dead, funny
-		{
-			died = true;
-		}
-		else if (event->GetInt("attacker") == pIndex) //you killed
+		//you killed
+		if (event->GetInt("attacker") == pIndex)
 		{
 			//Kamikaze
 			if (event->GetBool("kamikaze"))
@@ -241,6 +226,10 @@ void CTFHudMedals::FireGameEvent(IGameEvent *event)
 			else
 				AddMedal(DENIED);
 		}
+
+		//you were killed
+		if (event->GetInt("userid") == pIndex)
+			died = true;
 	}
 }
 

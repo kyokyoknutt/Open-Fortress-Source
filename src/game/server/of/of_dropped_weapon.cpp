@@ -110,10 +110,11 @@ void CTFDroppedWeapon::FlyThink( void )
 void CTFDroppedWeapon::PackTouch( CBaseEntity *pOther )
 {
 	// bail out early if the weaponid somehow doesn't exist
-	if ( WeaponID == TF_WEAPON_NONE )
+	if (WeaponID == TF_WEAPON_NONE)
 		return;
 
-	Assert( pOther );
+	if (!pOther)
+		return;
 
 	if ( !pOther->IsPlayer() )
 		return;
@@ -142,8 +143,6 @@ void CTFDroppedWeapon::PackTouch( CBaseEntity *pOther )
 
 	if( !pTFPlayer->GetPlayerClass()->IsClass( TF_CLASS_MERCENARY ) && !of_allow_allclass_pickups.GetBool() ) // Dont let non Mercenary classes pick up weapons unless thats turned on
 		return;
-
-	Assert( pPlayer );
 
 	bool bSuccess = true;
 

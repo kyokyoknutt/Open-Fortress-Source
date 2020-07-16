@@ -8,13 +8,8 @@
 #include "cbase.h"
 #include "tf_hud_mediccallers.h"
 #include "iclientmode.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
 #include "view.h"
-#include "ivieweffects.h"
-#include "viewrender.h"
-#include "prediction.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

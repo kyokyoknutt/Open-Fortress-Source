@@ -5,23 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "hudelement.h"
-#include "hud_macros.h"
-#include "c_playerresource.h"
-#include "iclientmode.h"
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Panel.h>
-#include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
-#include <KeyValues.h>
-#include "c_baseplayer.h"
-#include "c_team.h"
-
 #include "tf_gamerules.h"
-#include "teamplayroundbased_gamerules.h"
-#include "tf_shareddefs.h"
 #include "clientmode_tf.h"
-#include "c_tf_player.h"
 #include "c_tf_playerresource.h"
 #include "tf_hud_freezepanel.h"
 #include "engine/IEngineSound.h"

@@ -7,26 +7,9 @@
 #ifndef __UIGAMEDATA_H__
 #define __UIGAMEDATA_H__
 
-#include "vgui_controls/Panel.h"
-#include "vgui_controls/Frame.h"
-#include "vgui_controls/Button.h"
-#include "tier1/utllinkedlist.h"
-#include "tier1/utlmap.h"
-#include "tier1/KeyValues.h"
-#include "tier1/fmtstr.h"
-
 #ifndef _X360
-#include "steam/steam_api.h"
+	#include "steam/steam_api.h"
 #endif // _X360
-
-#include "ixboxsystem.h"
-
-#include "BaseModPanel.h"
-#include "basemodframe.h"
-//#include "UIAvatarImage.h"
-//#include "tokenset.h"
-
-// #include "EngineInterface.h"
 
 extern ConVar x360_audio_english;
 

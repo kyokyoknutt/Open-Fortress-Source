@@ -15,40 +15,19 @@
 
 #pragma warning( disable : 4800  )  // disable forcing int to bool performance warning
 
-// VGUI panel includes
-#include <vgui_controls/Panel.h>
-#include <vgui/ISurface.h>
-#include <KeyValues.h>
-#include <vgui/Cursor.h>
-#include <vgui/IScheme.h>
-#include <vgui/IVGui.h>
-#include <vgui/ILocalize.h>
-#include <vgui/VGUI.h>
-
 // client dll/engine defines
-#include "hud.h"
 #include <voice_status.h>
-
 // viewport definitions
-#include <baseviewport.h>
 #include "tf_viewport.h"
 #include "tf_teammenu.h"
-
-#include "vguicenterprint.h"
-#include "text_message.h"
 #include "tf_classmenu.h"
-
 #include "tf_textwindow.h"
 #include "tf_clientscoreboard.h"
 #include "tf_spectatorgui.h"
 #include "intromenu.h"
 #include "tf_intromenu.h"
-
-#include "tf_controls.h"
 #include "tf_mapinfomenu.h"
 #include "tf_roundinfo.h"
-
-//#include "tf_overview.h"
 
 /*
 CON_COMMAND( spec_help, "Show spectator help screen")

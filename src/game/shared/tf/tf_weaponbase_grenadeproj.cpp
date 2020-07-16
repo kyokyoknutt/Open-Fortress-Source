@@ -5,26 +5,14 @@
 //=============================================================================//
 #include "cbase.h"
 #include "tf_weaponbase_grenadeproj.h"
-#include "tf_weapon_grenade_pipebomb.h"
-#include "tf_gamerules.h"
 
-// Client specific.
-#ifdef CLIENT_DLL
-#include "c_tf_player.h"
-#include "iefx.h"
-#include "dlight.h"
-#include "tempent.h"
-#include "c_te_legacytempents.h"
-// Server specific.
-#else
-#include "soundent.h"
-#include "te_effect_dispatch.h"
-#include "tf_player.h"
-#include "func_break.h"
-#include "func_nogrenades.h"
-#include "Sprite.h"
-#include "tf_fx.h"
-#include "tf_projectile_bomblet.h"
+#ifdef GAME_DLL
+	#include "tf_gamerules.h"
+	#include "soundent.h"
+	#include "func_nogrenades.h"
+	#include "Sprite.h"
+	#include "tf_fx.h"
+	#include "tf_projectile_bomblet.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -83,7 +71,7 @@ END_NETWORK_TABLE()
 //-----------------------------------------------------------------------------
 CTFWeaponBaseGrenadeProj::CTFWeaponBaseGrenadeProj()
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	m_bUseImpactNormal = false;
 	m_vecImpactNormal.Init();
 #endif
@@ -131,7 +119,7 @@ void CTFWeaponBaseGrenadeProj::Precache( void )
 {
 	BaseClass::Precache();
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	PrecacheModel( NOGRENADE_SPRITE );
 	PrecacheParticleSystem( "critical_grenade_blue" );
 	PrecacheParticleSystem( "critical_grenade_red" );

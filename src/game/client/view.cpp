@@ -1215,7 +1215,11 @@ void CViewRender::Render( vrect_t *rect )
 		    // On Posix, on ATI, we always clear color if we're antialiasing
 		    if ( adapterInfo.m_VendorID == 0x1002 )
 		    {
+#if defined ( OF_CLIENT_DLL )
+			    if ( g_pMaterialSystem->GetCurrentConfigForVideoCard().m_nAASamples > 1 )
+#else
 			    if ( g_pMaterialSystem->GetCurrentConfigForVideoCard().m_nAASamples > 0 )
+#endif
 			    {
 				    nClearFlags |= VIEW_CLEAR_COLOR;
 			    }

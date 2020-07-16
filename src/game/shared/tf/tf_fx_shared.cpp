@@ -10,13 +10,11 @@
 #include "tf_shareddefs.h"
 #include "tf_gamerules.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "fx_impact.h"
-// Server specific.
+	#include "fx_impact.h"
 #else
-#include "tf_fx.h"
-#include "ilagcompensationmanager.h"
+	#include "tf_fx.h"
+	#include "ilagcompensationmanager.h"
 #endif
 
 ConVar tf_use_fixed_weaponspreads( "tf_use_fixed_weaponspreads", "1", FCVAR_NOTIFY|FCVAR_REPLICATED, "If set to 1, weapons that fire multiple pellets per shot will use a non-random pellet distribution." );

@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "tf_controls.h"
+#include <vgui_controls/EditablePanel.h>
 #include <vgui_controls/Slider.h>
 
 class CTFColorPanel;

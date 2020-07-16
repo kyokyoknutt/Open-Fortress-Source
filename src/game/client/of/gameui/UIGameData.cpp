@@ -1,5 +1,4 @@
 #include "cbase.h"
-#include "UIGameData.h"
 #include "VGenericConfirmation.h"
 
 //setup in GameUI_Interface.cpp

@@ -8,8 +8,6 @@
 #define __VGETLEGACYDATA_2_H__
 
 #include "vgui_controls/cvartogglecheckbutton.h"
-// #include "gameui_util.h"
-
 #include "basemodui.h"
 
 namespace BaseModUI {

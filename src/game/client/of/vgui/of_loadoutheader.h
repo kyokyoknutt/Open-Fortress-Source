@@ -11,7 +11,6 @@
 #pragma once
 #endif
 
-#include "tf_controls.h"
 #include "of_headeritem.h"
 #include "of_scrollableitemlist.h"
 

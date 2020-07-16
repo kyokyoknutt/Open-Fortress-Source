@@ -5,21 +5,17 @@
 //=====================================================================================//
 
 #include "cbase.h"
-#include "vhybridbutton.h"
-#include "BaseModPanel.h"
 #include "VFooterPanel.h"
 #include "VFlyoutMenu.h"
 #include "vgui/ISurface.h"
-#include "vgui_controls/Tooltip.h"
 #include "vgui/IVGui.h"
-#include "tier1/KeyValues.h"
 #include "vgui/ILocalize.h"
 #include "VDropDownMenu.h"
 #include "VSliderControl.h"
 #include "gamemodes.h"
 
 #ifndef _X360
-#include <ctype.h>
+	#include <ctype.h>
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -1,4 +1,3 @@
-
 #ifndef C_OFD_TRIGGER_JUMP_H
 #define C_OFD_TRIGGER_JUMP_H
 

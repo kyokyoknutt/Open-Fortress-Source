@@ -6,23 +6,12 @@
 //=============================================================================
 
 #include "cbase.h"
-
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
 #include <vgui_controls/ComboBox.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/RichText.h>
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/QueryBox.h>
-#include <vgui/IScheme.h>
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include "ienginevgui.h"
-#include <game/client/iviewport.h>
 #include "tf_tips.h"
-
 #include "tf_statsummary.h"
-#include <convar.h>
 #include "fmtstr.h"
 
 using namespace vgui;

@@ -11,12 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
-#include <game/client/iviewport.h>
-#include <vgui/IScheme.h>
-#include "hud.h"
 #include "hudelement.h"
-#include "../game/shared/tf/tf_shareddefs.h"
 #include "../game/shared/tf/tf_gamestats_shared.h"
 #include "tf_hud_playerstatus.h"
 

@@ -8,9 +8,7 @@
 
 #include "cbase.h"
 #include "iclientmode.h"
-#include "hud.h"
 #include "hudelement.h"
-#include <vgui/IScheme.h>
 #include <vgui_controls/EditablePanel.h>
 #include <vgui_controls/Label.h>
 

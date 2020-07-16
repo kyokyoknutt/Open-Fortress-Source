@@ -9,7 +9,6 @@
 #pragma once
 #endif
 
-//#include "networkvar.h"
 #include "tf_shareddefs.h"
 #include "tf_weaponbase.h"
 
@@ -226,7 +225,7 @@ public:
 	int     GetAirDashCount( void ) { return m_iAirDashCount; }
 	void    AddAirDashCount();
 	void    SetAirDashCount( int iAirDashCount );
-	const	CBaseEntity *GetHook( void ) { return m_Hook; }
+	CBaseEntity *GetHook( void ) { return m_Hook; }
 	void    SetHook(CBaseEntity *hook);
 	void    SetHookProperty(float pull);
 	float	GetHookProperty() { return m_flGHookProp; }
@@ -234,8 +233,6 @@ public:
 	bool	GetJumpBuffer() { return m_bBlockJump; }
 	void	SetCSlideDuration(float duration);
 	float	GetCSlideDuration() { return m_flCSlideDuration; }
-	void	SetRampJumpVel(float vel);
-	float	GetRampJumpVel() { return m_flRampJumpVel; }
 
 	// loser state
 	bool	IsLoser( void );

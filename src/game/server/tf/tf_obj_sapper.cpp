@@ -5,14 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "tf_player.h"
-#include "tf_team.h"
-#include "tf_gamerules.h"
-#include "tf_obj.h"
 #include "tf_obj_sentrygun.h"
 #include "tf_obj_sapper.h"
 #include "tf_obj_teleporter.h"
-#include "ndebugoverlay.h"
 
 // ------------------------------------------------------------------------ //
 

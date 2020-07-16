@@ -12,12 +12,8 @@
 #endif
 
 #include <vgui_controls/EditablePanel.h>
-#include <game/client/iviewport.h>
-#include <vgui/IScheme.h>
-#include "hud.h"
+#include <vgui_controls/ImagePanel.h>
 #include "hudelement.h"
-#include "basemodelpanel.h"
-#include "tf_controls.h"
 
 using namespace vgui;
 
@@ -72,16 +68,15 @@ public:
 	virtual void FireGameEvent(IGameEvent *event);
 	virtual bool ShouldDraw(void);
 	virtual void SetVisible(bool state);
-	virtual void OnCommand(const char *command);
 	virtual bool HasInputElements(void) { return true; }
 	virtual int GetRenderGroupPriority() { return 70; }
 
 	virtual void OnTick( void );
 	void StartPanel( KeyValues *event );
-private:
-	ExitCircle	  	*m_XClose;
-	KeyValues 		*m_pRoundEndEvent;
 
+private:
+
+	KeyValues 		*m_pRoundEndEvent;
 	float			m_flDisplayTime;
 };
 

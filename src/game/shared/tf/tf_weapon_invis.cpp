@@ -6,13 +6,11 @@
 
 #include "cbase.h"
 #include "tf_weapon_invis.h"
-#include "in_buttons.h"
 
-#if !defined( CLIENT_DLL )
-	#include "vguiscreen.h"
-	#include "tf_player.h"
-#else
+#ifdef CLIENT_DLL
 	#include "c_tf_player.h"
+#else
+	#include "tf_player.h"
 #endif
 
 extern ConVar tf_spy_invis_unstealth_time;
@@ -125,7 +123,7 @@ void CTFWeaponInvis::ItemBusyFrame( void )
 	// do nothing
 }
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 
 void CTFWeaponInvis::GetControlPanelInfo( int nPanelIndex, const char *&pPanelName )
 {

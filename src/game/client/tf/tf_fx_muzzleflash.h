@@ -8,10 +8,9 @@
 #define TF_FX_MUZZLEFLASH_H
 
 #include "particles_simple.h"
+#include "c_te_effect_dispatch.h"
 #include "particles_localspace.h"
 #include "fx.h"
-#include "c_te_effect_dispatch.h"
-#include "c_baseanimating.h"
 
 class CMuzzleFlashEmitter_1stPerson : public CLocalSpaceEmitter
 {

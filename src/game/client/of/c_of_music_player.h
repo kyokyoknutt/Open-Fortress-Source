@@ -8,12 +8,6 @@
 
 #include "saverestore_utlvector.h"
 
-// HUD
-#include <vgui/IScheme.h>
-#include "hud.h"
-#include "hudelement.h"
-#include "tf_controls.h"
-
 class C_TFMusicPlayer : public C_BaseEntity
 {
 public:
@@ -86,35 +80,5 @@ public:
 };
 
 extern C_TFDMMusicManager* DMMusicManager();
-
-class CTFImagePanel;
-class CExLabel;
-
-class CTFHudNowPlaying : public vgui::EditablePanel, public CHudElement
-{
-private:
-	DECLARE_CLASS_SIMPLE(CTFHudNowPlaying, EditablePanel);
-
-public:
-	CTFHudNowPlaying(const char *pElementName);
-
-	virtual void FireGameEvent(IGameEvent * event);
-	virtual void OnThink();
-	virtual bool ShouldDraw(void);
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-
-	virtual int GetRenderGroupPriority() { return 70; }
-
-private:
-	float flDrawTime;
-	
-	EditablePanel 	*m_pNameContainer;
-	CTFImagePanel 	*m_pNameBG;
-	CExLabel 		*m_pNameLabel;
-	
-	EditablePanel 	*m_pArtistContainer;
-	CTFImagePanel 	*m_pArtistBG;
-	CExLabel 		*m_pArtistLabel;
-};
 
 #endif //OF_MUSIC_PLAYER_H

@@ -6,7 +6,6 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_bot.h"
-#include "tf_gamerules.h"
 #include "entity_capture_flag.h"
 #include "tf_bot_attack_flag_defenders.h"
 #include "tf_bot_escort_flag_carrier.h"

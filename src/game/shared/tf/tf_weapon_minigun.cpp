@@ -5,19 +5,13 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_weapon_minigun.h"
-#include "decals.h"
 #include "in_buttons.h"
-#include "tf_fx_shared.h"
 
-
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-#include "soundenvelope.h"
-
-// Server specific.
+	#include "c_tf_player.h"
+	#include "soundenvelope.h"
 #else
-#include "tf_player.h"
+	#include "tf_player.h"
 #endif
 
 #define MAX_BARREL_SPIN_VELOCITY	20
@@ -79,7 +73,7 @@ extern ConVar of_beta_muzzleflash;
 #endif
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFMinigun )
 END_DATADESC()
 #endif
@@ -353,7 +347,7 @@ void CTFMinigun::WindUp( void )
 	if ( !IsChainGun() )
 		pPlayer->m_Shared.AddCond( TF_COND_AIMING );
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	pPlayer->StopRandomExpressions();
 #endif
 

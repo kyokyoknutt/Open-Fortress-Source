@@ -1,4 +1,3 @@
-
 //========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
@@ -10,10 +9,7 @@
 #include "tf_steamstats.h"
 #include "tf_hud_statpanel.h"
 #include "achievementmgr.h"
-#include "engine/imatchmaking.h"
 #include "ipresence.h"
-#include "../game/shared/tf/tf_shareddefs.h"
-#include "../game/shared/tf/tf_gamestats_shared.h"
 
 struct StatMap_t
 {

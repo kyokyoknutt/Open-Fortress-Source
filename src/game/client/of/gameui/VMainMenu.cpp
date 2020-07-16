@@ -8,44 +8,14 @@
 #include "VMainMenu.h"
 #include "UI_Shared.h"
 #include "VFooterPanel.h"
-#include "vhybridbutton.h"
-#include "VFlyoutMenu.h"
 #include "VGenericConfirmation.h"
 #ifdef ENABLE_ADDONS
-#include "VAddons.h"
+	#include "VAddons.h"
 #endif
-//#include "VQuickJoin.h"
-//#include "BaseModPanel.h"
-//#include "UIGameData.h"
-//#include "VGameSettings.h"
-//#include "VSteamCloudConfirmation.h"
-#include "vaddonassociation.h"
-
-//#include "VSignInDialog.h"
-// #include "VGuiSystemModuleLoader.h"
-//#include "VAttractScreen.h"
 #include "gamemodes.h"
 #include "filesystem.h"
-
-#include "vgui/ILocalize.h"
-#include "vgui_controls/Label.h"
-#include "vgui_controls/Button.h"
-#include "vgui_controls/Tooltip.h"
-#include "vgui_controls/ImagePanel.h"
-#include "vgui_controls/Image.h"
-
-#include "steam/isteamremotestorage.h"
 #include "materialsystem/materialsystem_config.h"
-
-#include "ienginevgui.h"
-#include "BaseModPanel.h"
-#include "vgui/ISurface.h"
-#include "tier0/icommandline.h"
-#include "fmtstr.h"
-
 #include "vgui/of_dmmodelpanel.h"
-
-#include <IVGuiModuleLoader.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

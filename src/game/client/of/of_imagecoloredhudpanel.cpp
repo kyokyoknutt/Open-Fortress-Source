@@ -1,22 +1,7 @@
 #include "cbase.h"
-#include <KeyValues.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui/IScheme.h>
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui/ISurface.h>
-#include <vgui/IImage.h>
-#include <vgui_controls/Label.h>
-
 #include "of_imagecoloredhudpanel.h"
-#include "c_tf_player.h"
 #include "tf_gamerules.h"
-#include "c_playerresource.h"
 #include "c_tf_playerresource.h"
-#include "tf_shareddefs.h"
 
 using namespace vgui;
 

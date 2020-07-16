@@ -6,13 +6,11 @@
 
 #include "cbase.h"
 #include "tf_ammo_pack.h"
-#include "tf_shareddefs.h"
-#include "ammodef.h"
 #include "tf_gamerules.h"
-#include "explode.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
 #define TF_AMMOPACK_PICKUP_SOUND	"AmmoPack.Touch"
 //----------------------------------------------
 

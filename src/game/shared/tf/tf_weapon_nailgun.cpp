@@ -21,7 +21,7 @@ LINK_ENTITY_TO_CLASS( tf_weapon_nailgun, CTFNailgun );
 //PRECACHE_WEAPON_REGISTER( tf_weapon_nailgun);
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFNailgun )
 END_DATADESC()
 #endif
@@ -39,7 +39,7 @@ LINK_ENTITY_TO_CLASS( tfc_weapon_nailgun, CTFCNailgun );
 //PRECACHE_WEAPON_REGISTER( tfc_weapon_nailgun);
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFCNailgun )
 END_DATADESC()
 #endif
@@ -57,7 +57,7 @@ LINK_ENTITY_TO_CLASS( tfc_weapon_nailgun_super, CTFCNailgunSuper );
 //PRECACHE_WEAPON_REGISTER( tfc_weapon_nailgun_super );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFCNailgunSuper )
 END_DATADESC()
 #endif

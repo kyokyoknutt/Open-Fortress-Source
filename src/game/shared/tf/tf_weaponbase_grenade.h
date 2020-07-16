@@ -14,7 +14,7 @@
 #include "npcevent.h"
 
 #ifdef CLIENT_DLL
-#define CTFWeaponBaseGrenade C_TFWeaponBaseGrenade
+	#define CTFWeaponBaseGrenade C_TFWeaponBaseGrenade
 #endif
 
 //=============================================================================//

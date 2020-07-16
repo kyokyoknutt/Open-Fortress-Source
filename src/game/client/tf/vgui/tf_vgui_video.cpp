@@ -5,17 +5,11 @@
 //=============================================================================
 
 #include "cbase.h"
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
-#include <KeyValues.h>
-#include "vgui_video.h"
 #include "tf_vgui_video.h"
 #include "engine/IEngineSound.h"
 
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
 
 DECLARE_BUILD_FACTORY( CTFVideoPanel );
 

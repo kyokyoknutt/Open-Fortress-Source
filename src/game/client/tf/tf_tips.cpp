@@ -8,7 +8,6 @@
 #include "tf_tips.h"
 #include "tier3/tier3.h"
 #include <vgui/ILocalize.h>
-#include "cdll_util.h"
 #include "fmtstr.h"
 
 //-----------------------------------------------------------------------------

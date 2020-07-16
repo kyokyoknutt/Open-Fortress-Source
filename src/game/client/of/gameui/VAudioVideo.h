@@ -10,7 +10,8 @@
 #include "basemodui.h"
 #include "VFlyoutMenu.h"
 
-namespace BaseModUI {
+namespace BaseModUI
+{
 
 class DropDownMenu;
 class SliderControl;

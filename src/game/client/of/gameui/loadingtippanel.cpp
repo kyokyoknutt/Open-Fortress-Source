@@ -5,12 +5,7 @@
 //===========================================================================//
 #include "cbase.h"
 #include "loadingtippanel.h"
-#include "filesystem.h"
-#include "KeyValues.h"
 #include "vgui/ISurface.h"
-// #include "EngineInterface.h"
-#include "vstdlib/random.h"
-#include "fmtstr.h"
 #include "tf_tips.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -96,6 +96,7 @@ enum {
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
 	WINREASON_POINTLIMIT,
 	WINREASON_JUGGERNAUGHT_TIMER,
+	//WINREASON_RAGEQUIT,
 #endif
 };
 

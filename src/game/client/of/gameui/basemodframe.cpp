@@ -5,30 +5,14 @@
 //=====================================================================================//
 
 #include "cbase.h"
-
-#include <ctype.h>
-#include "basemodframe.h"
-
-#include "BaseModPanel.h"
-// #include "EngineInterface.h"
-
 #include "VFooterPanel.h"
 #include "VGenericConfirmation.h"
-//#include "VFlyoutMenu.h"
 #include "IGameUIFuncs.h"
-
-// vgui controls
 #include <vgui/IVGui.h>
 #include "vgui/ISurface.h"
 #include "vgui/IInput.h"
-#include "vgui_controls/Tooltip.h"
-#include "vgui_controls/ImagePanel.h"
-#include "vgui/ILocalize.h"
-
 #include "filesystem.h"
-#include "fmtstr.h"
-#include "cdll_util.h"
-#include "materialsystem/itexture.h"
+#include "tier1/fmtstr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

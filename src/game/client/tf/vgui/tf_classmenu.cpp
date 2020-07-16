@@ -7,25 +7,9 @@
 
 #include "cbase.h"
 #include "tf_classmenu.h"
-
-#include <KeyValues.h>
-#include <filesystem.h>
-#include <vgui_controls/Button.h>
-#include <vgui/IVGui.h>
-
-#include "hud.h" // for gEngfuncs
-#include "c_tf_player.h"
-#include "c_tf_team.h"
-#include "c_tf_playerresource.h"
-
-#include "tf_controls.h"
-#include "vguicenterprint.h"
-#include "of_imagemouseoverbutton.h"
-#include "IconPanel.h"
-
 #include "IGameUIFuncs.h" // for key bindings
-
 #include "tf_hud_notification_panel.h"
+#include "c_tf_playerresource.h"
 
 extern IGameUIFuncs *gameuifuncs; // for key binding details
 

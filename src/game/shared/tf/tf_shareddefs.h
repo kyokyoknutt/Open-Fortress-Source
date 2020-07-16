@@ -9,10 +9,7 @@
 #pragma once
 #endif
 
-#include "shareddefs.h"
 #include "mp_shareddefs.h"
-#include "KeyValues.h"
-#include "filesystem.h"
 #include "bone_setup.h"
 
 // Using MAP_DEBUG mode?
@@ -399,6 +396,7 @@ enum TFWeaponIDs
 	TF_WEAPON_INVIS,
 	TF_WEAPON_RAILGUN,
 	TF_WEAPON_SUPERSHOTGUN,
+	TF_WEAPON_ETERNALSHOTGUN,
 	TF_WEAPON_PISTOL_MERCENARY,
 	TF_WEAPON_REVOLVER_MERCENARY,
 	TF_WEAPON_GATLINGGUN,
@@ -420,6 +418,7 @@ enum TFWeaponIDs
 	TF_WEAPON_GIB,
 	TF_WEAPON_CLAWS,
 	TF_WEAPON_JUGGERNAUGHT,
+	TF_WEAPON_COMBATKNIFE,
 	
 	TFC_WEAPON_SHOTGUN_SB,
 	TFC_WEAPON_SHOTGUN_DB,
@@ -699,6 +698,7 @@ enum
 	TF_COND_JAUGGERNAUGHT,	// 134
 	TF_COND_POISON,
 	TF_COND_TRANQ,
+	TF_COND_HOOKED,
 
 	TF_COND_LAST
 };

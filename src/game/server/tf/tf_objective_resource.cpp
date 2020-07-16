@@ -6,8 +6,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include "tf_objective_resource.h"
-#include "shareddefs.h"
-#include <coordsize.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

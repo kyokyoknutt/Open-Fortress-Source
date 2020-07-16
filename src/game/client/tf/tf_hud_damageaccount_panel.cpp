@@ -6,19 +6,13 @@
 //=============================================================================
 
 #include "cbase.h"
-#include "hud.h"
 #include "hudelement.h"
 #include "c_tf_player.h"
 #include "iclientmode.h"
-#include "ienginevgui.h"
-#include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
 #include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ProgressBar.h>
 #include "engine/IEngineSound.h"
 #include <vgui_controls/AnimationController.h>
-#include "iclientmode.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

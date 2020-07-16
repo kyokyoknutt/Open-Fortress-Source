@@ -5,19 +5,13 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-
 #include "tf_obj_sentrygun.h"
-#include "engine/IEngineSound.h"
-#include "tf_player.h"
 #include "bot/tf_bot.h"
 #include "tf_team.h"
-#include "world.h"
-#include "tf_projectile_rocket.h"
 #include "te_effect_dispatch.h"
 #include "tf_gamerules.h"
 #include "ammodef.h"
 #include "ai_basenpc.h"
-#include "tf_bot_manager.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

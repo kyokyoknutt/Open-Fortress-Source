@@ -72,6 +72,8 @@ private:
 	int							m_iImageDominated;
 	int							m_iImageNemesis;
 	
+	int							m_iClassIcon[TF_CLASS_COUNT_ALL];
+	
 	CPanelAnimationVarAliasType( int, m_iStatusWidth, "status_width", "12", "proportional_int" );
 	CPanelAnimationVarAliasType( int, m_iNemesisWidth, "nemesis_width", "20", "proportional_int" );
 };

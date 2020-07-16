@@ -6,9 +6,6 @@
 
 
 #include "cbase.h"
-#include "c_tf_player.h"
-#include "iclientmode.h"
-#include "ienginevgui.h"
 #include "of_imageprogressbar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -6,9 +6,6 @@
 
 #include "cbase.h"
 #include "VFooterPanel.h"
-#include "vgui/IPanel.h"
-#include "vgui_controls/ImagePanel.h"
-#include "vgui_controls/Controls.h"
 #include "vgui/ISurface.h"
 #include "vgui/ILocalize.h"
 

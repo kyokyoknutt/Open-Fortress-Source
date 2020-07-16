@@ -4,7 +4,6 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "baseobject_shared.h"
 #include "tf_obj_baseupgrade_shared.h"
 
 IMPLEMENT_NETWORKCLASS_ALIASED( BaseObjectUpgrade, DT_BaseObjectUpgrade )

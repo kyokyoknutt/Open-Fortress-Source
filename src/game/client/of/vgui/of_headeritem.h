@@ -11,11 +11,9 @@
 #pragma once
 #endif
 
-#include "tf_controls.h"
-#include "basemodel_panel.h"
 #include <vgui_controls/Slider.h>
-
 #include "of_editablebutton.h"
+#include "tf_controls.h"
 
 class CStudioHdr;
 class CCvarToggleCheckButton;

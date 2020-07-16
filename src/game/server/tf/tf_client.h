@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include "baseentity.h"
 
 void respawn( CBaseEntity *pEdict, bool fCopyCorpse );
 

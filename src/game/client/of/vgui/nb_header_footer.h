@@ -4,16 +4,9 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI.h>
 #include <vgui_controls/EditablePanel.h>
-
 #include "video/ivideoservices.h"
-#include "SoundEmitterSystem/isoundemittersystembase.h"
-
-#define GAMEIU_MULTI_MOVIES
-
 #include "avi/ibik.h"
-#include "avi/iavi.h"
 
 class HUDVideoPanel;
 class CNB_Gradient_Bar;

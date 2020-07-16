@@ -11,7 +11,6 @@
 #pragma once
 #endif
 
-#include "tf_controls.h"
 #include "basemodel_panel.h"
 
 class CStudioHdr;

@@ -1,6 +1,5 @@
 #include "cbase.h"
 #include "../../../tf_bot.h"
-#include "team_control_point_master.h"
 #include "tf_gamerules.h"
 #include "nav_mesh/tf_nav_mesh.h"
 #include "tf_bot_defend_point.h"
@@ -8,6 +7,7 @@
 #include "tf_bot_capture_point.h"
 #include "../../tf_bot_seek_and_destroy.h"
 #include "../../demoman/tf_bot_prepare_stickybomb_trap.h"
+#include "team_control_point_master.h"
 
 
 ConVar tf_bot_defense_must_defend_time( "tf_bot_defense_must_defend_time", "300", FCVAR_CHEAT, "If timer is less than this, bots will stay near point and guard" );

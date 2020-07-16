@@ -6,18 +6,12 @@
 
 #include "cbase.h"
 #include "tf_weaponbase_melee.h"
-#include "effect_dispatch_data.h"
 #include "tf_gamerules.h"
 #include "in_buttons.h"
 
-// Server specific.
-#if !defined( CLIENT_DLL )
-#include "tf_player.h"
-#include "tf_gamestats.h"
-#include "ilagcompensationmanager.h"
-// Client specific.
-#else
-#include "c_tf_player.h"
+#ifdef GAME_DLL
+	#include "tf_gamestats.h"
+	#include "ilagcompensationmanager.h"
 #endif
 
 //=============================================================================
@@ -27,7 +21,7 @@
 IMPLEMENT_NETWORKCLASS_ALIASED( TFWeaponBaseMelee, DT_TFWeaponBaseMelee )
 
 BEGIN_NETWORK_TABLE( CTFWeaponBaseMelee, DT_TFWeaponBaseMelee )
-#if !defined( CLIENT_DLL )
+#ifdef GAME_DLL
 	SendPropFloat( SENDINFO(m_flChargeMeter), 0, SPROP_NOSCALE | SPROP_CHANGES_OFTEN ),
 #else
 	RecvPropFloat( RECVINFO(m_flChargeMeter) ),
@@ -43,13 +37,13 @@ END_PREDICTION_DATA()
 LINK_ENTITY_TO_CLASS( tf_weaponbase_melee, CTFWeaponBaseMelee );
 
 // Server specific.
-#if !defined( CLIENT_DLL ) 
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFWeaponBaseMelee )
 DEFINE_FUNCTION( Smack )
 END_DATADESC()
 #endif
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 ConVar tf_meleeattackforcescale( "tf_meleeattackforcescale", "80.0", FCVAR_CHEAT | FCVAR_GAMEDLL );
 #endif
 
@@ -247,7 +241,7 @@ bool CTFWeaponBaseMelee::CanShieldCharge()
 //-----------------------------------------------------------------------------
 void CTFWeaponBaseMelee::Swing( CTFPlayer *pPlayer )
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	pPlayer->m_Shared.RemoveCond( TF_COND_SPAWNPROTECT );
 #endif
 	CalcIsAttackCritical();
@@ -508,7 +502,7 @@ void CTFWeaponBaseMelee::Smack( void )
 		Vector vecSwingStart = pPlayer->Weapon_ShootPosition();
 		Vector vecSwingEnd = vecSwingStart + vecForward * 48;
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 		// Do Damage.
 		int iCustomDamage = TF_DMG_CUSTOM_NONE;
 		float flDamage = GetMeleeDamage( trace.m_pEnt, iCustomDamage );

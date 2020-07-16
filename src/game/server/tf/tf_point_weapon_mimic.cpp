@@ -25,18 +25,9 @@ CBaseEntity - tf_point_weapon_mimic
 */
 
 #include "cbase.h"
-#include "tf_weapon_parse.h"
-#include "tf_weaponbase.h"
-#include "tf_weaponbase_grenade.h"
-#include "tf_weaponbase_grenadeproj.h"
-#include "tf_weaponbase_rocket.h"
 #include "tf_projectile_rocket.h"
 #include "tf_weapon_grenade_pipebomb.h"
-#include "tf_weapon_grenadelauncher.h"
-#include "tf_weapon_pipebomblauncher.h"
-#include "te_particlesystem.h"
 #include "tf_fx.h"
-#include "particle_parse.h"
 #include "tf_point_weapon_mimic.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

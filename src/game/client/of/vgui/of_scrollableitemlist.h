@@ -11,7 +11,6 @@
 #pragma once
 #endif
 
-#include "tf_controls.h"
 #include "of_itemselection.h"
 
 struct ItemListItem_t

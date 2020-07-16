@@ -5,27 +5,13 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "tf_weaponbase_grenadeproj.h"
-#include "tf_gamerules.h"
 #include "tf_projectile_bomblet.h"
-#include "tf_weapon_grenade_pipebomb.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-#include "iefx.h"
-#include "dlight.h"
-#include "tempent.h"
-#include "c_te_legacytempents.h"
-// Server specific.
-#else
-#include "soundent.h"
-#include "te_effect_dispatch.h"
-#include "tf_player.h"
-#include "func_break.h"
-#include "func_nogrenades.h"
-#include "Sprite.h"
-#include "tf_fx.h"
+	#include "c_tf_player.h"
+	#include "iefx.h"
+	#include "dlight.h"
+	#include "c_te_legacytempents.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

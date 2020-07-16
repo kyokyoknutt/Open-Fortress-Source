@@ -6,32 +6,16 @@
 
 #include "cbase.h"
 #include "vcustomcampaigns.h"
-#include "VGenericPanelList.h"
-#include "KeyValues.h"
-#include "VFooterPanel.h"
 #include "vhybridbutton.h"
 #include "filesystem.h"
 #include "fmtstr.h"
 #include "vgui/ISurface.h"
-#include "vgui/IBorder.h"
-#include "vgui_controls/Label.h"
-#include "vgui_controls/Button.h"
-#include "vgui_controls/Divider.h"
-#include "vgui_controls/CheckButton.h"
-#include "vgui_controls/ImagePanel.h"
-#include "vgui_controls/ProgressBar.h"
-#include "vgui_controls/Label.h"
-#include "vgui_controls/TextImage.h"
-#include "utlbuffer.h"
 #include "vgetlegacydata.h"
 
 // use the JPEGLIB_USE_STDIO define so that we can read in jpeg's from outside the game directory tree.  For Spray Import.
 #define JPEGLIB_USE_STDIO
 #include "jpeglib/jpeglib.h"
 #undef JPEGLIB_USE_STDIO
-#include <setjmp.h>
-#include "bitmap/tgawriter.h"
-#include "ivtex.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

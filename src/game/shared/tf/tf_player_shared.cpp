@@ -5,11 +5,6 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_gamerules.h"
-#include "tf_player_shared.h"
-//#include "takedamageinfo.h"
-#include "tf_weaponbase.h"
-//#include "effect_dispatch_data.h"
-//#include "tf_item.h"
 #include "entity_capture_flag.h"
 #include "baseobject_shared.h"
 #include "tf_weapon_medigun.h"
@@ -20,22 +15,13 @@
 #include "tf_weapon_fists.h"
 
 #ifdef CLIENT_DLL
-	#include "c_tf_player.h"
-	//#include "c_te_effect_dispatch.h"
-	//#include "c_tf_fx.h"
-	//#include "soundenvelope.h"
 	#include "c_tf_playerclass.h"
 	#include "iviewrender.h"
 
 	#define CTFPlayerClass C_TFPlayerClass
 #else
-	#include "tf_player.h"
 	#include "te_effect_dispatch.h"
-	//#include "tf_fx.h"
-	//#include "util.h"
-	//#include "tf_team.h"
 	#include "tf_gamestats.h"
-	//#include "tf_playerclass.h"
 	#include "tf_weapon_builder.h"
 #endif
 
@@ -462,7 +448,7 @@ float CTFPlayerShared::GetConditionDuration( int nCond )
 
 void CTFPlayerShared::DebugPrintConditions( void )
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	const char *szDll = "Server";
 #else
 	const char *szDll = "Client";
@@ -1258,7 +1244,7 @@ void CTFPlayerShared::UpdateCritParticle()
 
 void CTFPlayerShared::OnAddCritBoosted( void )
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	CTFPlayer *pTFPlayer = ToTFPlayer( m_pOuter );
 	if ( pTFPlayer )
 		pTFPlayer->SpeakConceptIfAllowed( MP_CONCEPT_PLAYER_POSITIVE );
@@ -1269,7 +1255,7 @@ void CTFPlayerShared::OnAddCritBoosted( void )
 
 void CTFPlayerShared::OnRemoveCritBoosted( void )
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	CTFPlayer *pTFPlayer = ToTFPlayer( m_pOuter );
 	if ( pTFPlayer && pTFPlayer->IsAlive() )
 	{
@@ -1581,7 +1567,7 @@ void CTFPlayerShared::OnRemoveTeleported( void )
 
 void CTFPlayerShared::OnRemoveTaunting( void )
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	m_pOuter->m_iTaunt = -1;
 	m_pOuter->m_iTauntLayer = 0;
 #endif
@@ -1592,7 +1578,7 @@ void CTFPlayerShared::OnRemoveTaunting( void )
 //-----------------------------------------------------------------------------
 void CTFPlayerShared::Burn( CTFPlayer *pAttacker, float flTime )
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	// Don't bother igniting players who have just been killed by the fire damage.
 	if ( !m_pOuter->IsAlive() )
 		return;
@@ -2039,7 +2025,7 @@ float CTFPlayerShared::GetPercentInvisible( void )
 //-----------------------------------------------------------------------------
 void CTFPlayerShared::Disguise( int nTeam, int nClass )
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	int nRealTeam = m_pOuter->GetTeamNumber();
 	int nRealClass = m_pOuter->GetPlayerClass()->GetClassIndex();
 
@@ -2100,7 +2086,7 @@ void CTFPlayerShared::Disguise( int nTeam, int nClass )
 //-----------------------------------------------------------------------------
 // Purpose: Set our target with a player we've found to emulate
 //-----------------------------------------------------------------------------
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 void CTFPlayerShared::FindDisguiseTarget( void )
 {
 	m_hDisguiseTarget = m_pOuter->TeamFortress_GetDisguiseTarget( m_nDisguiseTeam, m_nDisguiseClass );
@@ -2121,7 +2107,7 @@ void CTFPlayerShared::FindDisguiseTarget( void )
 //-----------------------------------------------------------------------------
 void CTFPlayerShared::CompleteDisguise( void )
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	AddCond( TF_COND_DISGUISED );
 
 	m_nDisguiseClass = m_nDesiredDisguiseClass;
@@ -2696,11 +2682,6 @@ void CTFPlayerShared::SetCSlideDuration(float duration)
 	m_flCSlideDuration = duration;
 }
 
-void CTFPlayerShared::SetRampJumpVel(float vel)
-{
-	m_flRampJumpVel = vel;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -2970,7 +2951,7 @@ void CTFPlayer::FireBullet( const FireBulletsInfo_t &info, bool bDoEffects, int 
 		}
 
 		// Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 		// See what material we hit.
 		CTakeDamageInfo dmgInfo( this, info.m_pAttacker, GetActiveWeapon(), info.m_flDamage, nDamageType );
 		dmgInfo.SetDamageCustom( nCustomDamageType );
@@ -3209,7 +3190,7 @@ void CTFPlayer::SetItem( CTFItem *pItem )
 {
 	m_hItem = pItem;
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	if ( pItem && pItem->GetItemID() == TF_ITEM_CAPTURE_FLAG )
 	{
 		RemoveInvisibility();
@@ -3432,7 +3413,7 @@ int CTFPlayer::CanBuild( int iObjectType, int iAltMode )
 	if ( iObjectType == OBJ_TELEPORTER && iAltMode > 1 )
 		return CB_UNKNOWN_OBJECT;
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	CTFPlayerClass *pCls = GetPlayerClass();
 	if ( pCls )
 	{

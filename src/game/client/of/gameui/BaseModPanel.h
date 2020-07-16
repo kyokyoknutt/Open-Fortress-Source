@@ -7,18 +7,7 @@
 #ifndef _BASEMODFACTORYBASEPANEL_H__
 #define _BASEMODFACTORYBASEPANEL_H__
 
-#include "vgui_controls/Panel.h"
-#include "vgui_controls/Frame.h"
-#include "vgui_controls/Button.h"
-#include "vgui_controls/PHandle.h"
-#include "vgui_controls/MenuItem.h"
-#include "vgui_controls/MessageDialog.h"
-#include "tier1/utllinkedlist.h"
-
 #include <GameUI/IBasePanel.h>
-#include "vgui/tf_vgui_video.h"
-
-//#include "avi/ibik.h"
 #include "ixboxsystem.h"
 
 class COptionsDialog;

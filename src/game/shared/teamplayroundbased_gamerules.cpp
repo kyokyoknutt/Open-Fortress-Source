@@ -274,7 +274,7 @@ static ConCommand mp_switchteams( "mp_switchteams", cc_SwitchTeams, "Switch team
 //-----------------------------------------------------------------------------	
 void cc_ScrambleTeams( const CCommand& args )
 {
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	if ( TFGameRules() && ( ( TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ) || ( TFGameRules()->IsInfGamemode() || TFGameRules()->IsCoopEnabled() ) ) )
 		return;
 #endif
@@ -422,7 +422,7 @@ CTeamplayRoundBasedRules::CTeamplayRoundBasedRules( void )
 	State_Transition( GR_STATE_PREGAME );
 
 	m_bResetTeamScores = true;
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	m_bInfectionLastManAlive = false;
 #endif
 	m_bResetPlayerScores = true;
@@ -857,7 +857,7 @@ void CTeamplayRoundBasedRules::GoToIntermission( void )
 //-----------------------------------------------------------------------------
 void CTeamplayRoundBasedRules::SetInWaitingForPlayers( bool bWaitingForPlayers  )
 {
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	if ( mp_disable_waitingforplayers.GetBool() )
 		bWaitingForPlayers = false;
 #endif
@@ -997,6 +997,15 @@ void CTeamplayRoundBasedRules::CheckWaitingForPlayers( void )
 
 	if( m_bInWaitingForPlayers )
 	{
+#ifdef OF_DLL
+		//if dueler leaves during the wait time go back to PREGAME
+		if(TFGameRules()->IsDuelGamemode() && CountActivePlayers() < 2)
+		{
+			SetInWaitingForPlayers( false );
+			State_Transition( GR_STATE_PREGAME );
+			return;
+		}
+#endif
 		if ( IsInTournamentMode() == true )
 			return;
 
@@ -1004,15 +1013,12 @@ void CTeamplayRoundBasedRules::CheckWaitingForPlayers( void )
 		// restart countdown already, and we are not waiting for a ready restart
 		if( gpGlobals->curtime > m_flWaitingForPlayersTimeEnds && m_flRestartRoundTime < 0 && !m_bAwaitingReadyRestart )
 		{
-			m_flRestartRoundTime = gpGlobals->curtime;	// reset asap
+			m_flRestartRoundTime = gpGlobals->curtime; // reset asap
 
 			if ( IsInArenaMode() == true )
 			{
-				if ( gpGlobals->curtime > m_flWaitingForPlayersTimeEnds )
-				{
-					SetInWaitingForPlayers( false );
-					State_Transition( GR_STATE_PREROUND );
-				}
+				SetInWaitingForPlayers( false );
+				State_Transition( GR_STATE_PREROUND );
 
 				return;
 			}
@@ -1481,10 +1487,13 @@ void CTeamplayRoundBasedRules::State_Think_PREGAME( void )
 	// Commentary stays in this mode too
 	if ( IsInCommentaryMode() )
 		return;
-	
+#ifdef OF_DLL
+	if (CountActivePlayers() > 1 || (IsInArenaMode() == true && m_flWaitingForPlayersTimeEnds == 0.0f))
+#else
 	if( CountActivePlayers() > 0 || (IsInArenaMode() == true && m_flWaitingForPlayersTimeEnds == 0.0f) )
+#endif
 	{
-		State_Transition( GR_STATE_STARTGAME );			
+		State_Transition( GR_STATE_STARTGAME );
 	}
 }
 
@@ -1507,7 +1516,7 @@ void CTeamplayRoundBasedRules::State_Think_STARTGAME()
 	{
 		if ( !IsInTraining() && !IsInItemTestingMode() )
 		{
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )		
+#ifdef OF_DLL
 			if ( mp_waitingforplayers_time.GetFloat() > 0 )
 #else
 			ConVarRef tf_bot_offline_practice( "tf_bot_offline_practice" );
@@ -1528,7 +1537,7 @@ void CTeamplayRoundBasedRules::State_Think_STARTGAME()
 //-----------------------------------------------------------------------------
 void CTeamplayRoundBasedRules::State_Enter_PREROUND( void )
 {
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	m_bInfectionLastManAlive = false;
 #endif
 
@@ -1590,8 +1599,8 @@ void CTeamplayRoundBasedRules::State_Enter_PREROUND( void )
 		m_flStateTransitionTime = gpGlobals->curtime + 5 * mp_enableroundwaittime.GetFloat();
 	}
 	
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
-	if ( TFGameRules() && TFGameRules()->IsDMGamemode() && !TFGameRules()->DontCountKills() )
+#ifdef OF_DLL
+	if ( TFGameRules() && TFGameRules()->IsDMGamemode() && !TFGameRules()->DontCountKills() && !TFGameRules()->IsInWaitingForPlayers() )
 		BroadcastSound( TEAM_UNASSIGNED, "DMRoundPrepare" );
 #endif
 
@@ -1608,8 +1617,8 @@ void CTeamplayRoundBasedRules::State_Enter_PREROUND( void )
 //-----------------------------------------------------------------------------
 void CTeamplayRoundBasedRules::State_Leave_PREROUND( void )
 {
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
-	if ( TFGameRules() && TFGameRules()->IsDMGamemode() && !TFGameRules()->DontCountKills() )
+#ifdef OF_DLL
+	if ( TFGameRules() && TFGameRules()->IsDMGamemode() && !TFGameRules()->DontCountKills() && !TFGameRules()->IsInWaitingForPlayers() )
 		BroadcastSound( TEAM_UNASSIGNED, "DMRoundStart" );
 #endif
 
@@ -1869,16 +1878,19 @@ void CTeamplayRoundBasedRules::State_Think_RND_RUNNING( void )
 	CheckReadyRestart();
 
 	// See if we're coming up to the server timelimit, in which case force a stalemate immediately.
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	if ( mp_timelimit.GetInt() > 0 && IsInPreMatch() == false && GetTimeLeft() <= 0 && !TFGameRules()->IsInfGamemode() && !TFGameRules()->IsCoopEnabled() )
 #else
 	if ( mp_timelimit.GetInt() > 0 && IsInPreMatch() == false && GetTimeLeft() <= 0 )
 #endif
 	{
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 		if ( TFGameRules()->IsDMGamemode() )
 		{
-			SetWinningTeam( TF_TEAM_MERCENARY, WINREASON_POINTLIMIT, true, true, false );
+			if(!CanGoToStalemate())
+				SetOvertime( true );
+			else
+				SetWinningTeam( TF_TEAM_MERCENARY, WINREASON_POINTLIMIT, true, true, false );
 		}	
 		else if ( m_bAllowStalemateAtTimelimit || ( mp_match_end_at_timelimit.GetBool() && !IsValveMap() ) )
 #else		
@@ -1929,7 +1941,7 @@ void CTeamplayRoundBasedRules::State_Think_RND_RUNNING( void )
 		}
 	}
 	
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	// If a team is fully killed, the other team has won
 	if ( TFGameRules()->IsInfGamemode() && TFGameRules()->GetInfectionRoundTimer() && !TFGameRules()->GetInfectionRoundTimer()->IsInfectionBeginning() )
 	{
@@ -2055,7 +2067,7 @@ void CTeamplayRoundBasedRules::State_Think_RND_RUNNING( void )
 void CTeamplayRoundBasedRules::State_Enter_TEAM_WIN( void )
 {
 	m_flStateTransitionTime = gpGlobals->curtime + GetBonusRoundTime();
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	m_flStartedWinState = gpGlobals->curtime;
 #endif
 	// if we're forcing the map to reset it must be the end of a "full" round not a mini-round
@@ -2064,7 +2076,7 @@ void CTeamplayRoundBasedRules::State_Enter_TEAM_WIN( void )
 		m_nRoundsPlayed++;
 	}
 	
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL 
 	if ( TFGameRules()->IsInfGamemode() )
 		UTIL_Remove ( gEntList.FindEntityByName( NULL, "InfMusicTemp_BRUH" ) );
 #endif
@@ -2588,7 +2600,7 @@ void CTeamplayRoundBasedRules::SetWinningTeam( int team, int iWinReason, bool bF
 			pPlayer->SpeakConceptIfAllowed( MP_CONCEPT_STALEMATE );
 		}
 	}
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	else
 	{		
 		int numPlayers = 0;
@@ -2810,7 +2822,7 @@ void CC_CH_ForceRespawn( void )
 }
 static ConCommand mp_forcerespawnplayers("mp_forcerespawnplayers", CC_CH_ForceRespawn, "Force all players to respawn.", FCVAR_CHEAT );
 
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 ConVar *host_timescale = NULL;
 
 void CC_CH_TIMESCALE( const CCommand &args )
@@ -2914,17 +2926,16 @@ void CTeamplayRoundBasedRules::RespawnPlayers( bool bForceRespawn, bool bTeam /*
 			continue;
 		}
 		
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
-		// If duel is on, only respawn the current players
-		// Regardless on if its forced or not
-/*		if( TFGameRules()->IsDuelGamemode() )
+#ifdef OF_DLL
+		// If duel is on, only respawn the first two players in the queue
+		if( TFGameRules()->IsDuelGamemode() )
 		{
-			if( TFGameRules()->GetDuelQueuePos( pPlayer ) != 0 )
+			if ( !TFGameRules()->IsDueler( pPlayer ) )
 			{
 				pPlayer->CommitSuicide(true, true);
 				continue;
 			}
-		}*/
+		}
 #endif
 
 		// If we aren't force respawning, don't respawn players that:
@@ -2935,7 +2946,7 @@ void CTeamplayRoundBasedRules::RespawnPlayers( bool bForceRespawn, bool bTeam /*
 			if ( pPlayer->IsAlive() )
 				continue; 
 
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 			if ( m_iRoundState != GR_STATE_PREROUND || ( TFGameRules()->IsDMGamemode() ) )
 #else
 			if ( m_iRoundState != GR_STATE_PREROUND )
@@ -3072,7 +3083,7 @@ void CTeamplayRoundBasedRules::CreateTimeLimitTimer( void )
 	// this is the same check we use in State_Think_RND_RUNNING()
 	// don't show the timelimit timer if we're not going to end the map when it runs out
 	bool bAllowStalemate = ( m_bAllowStalemateAtTimelimit || ( mp_match_end_at_timelimit.GetBool() && !IsValveMap() ) );
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	if ( !bAllowStalemate && !TFGameRules()->IsDMGamemode() )
 #else
 	if ( !bAllowStalemate )
@@ -3170,7 +3181,7 @@ void CTeamplayRoundBasedRules::RoundRespawn( void )
     //  so the below function can use the now freed ones.
 	engine->AllowImmediateEdictReuse();
 	
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 #else
 	RespawnPlayers( true );
 #endif
@@ -3184,14 +3195,14 @@ void CTeamplayRoundBasedRules::RoundRespawn( void )
 		{
 			pPlayer->ResetPerRoundStats();
 			
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )			
+#ifdef OF_DLL		
 			if ( TFGameRules() && TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTDMGamemode() )
 				pPlayer->ResetFragCount();
 #endif
 		}
 	}	
 	
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	RespawnPlayers( true );
 #endif
 }
@@ -3366,7 +3377,7 @@ void CTeamplayRoundBasedRules::CheckRespawnWaves( void )
 //-----------------------------------------------------------------------------
 void CTeamplayRoundBasedRules::BalanceTeams( bool bRequireSwitcheesToBeDead )
 {
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 	if ( TFGameRules() && ( ( TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ) || ( TFGameRules()->IsInfGamemode() || TFGameRules()->IsCoopEnabled() ) ) )
 		return;
 #endif
@@ -3633,7 +3644,7 @@ void CTeamplayRoundBasedRules::PlayWinSong( int team )
 
 		for ( int i = FIRST_GAME_TEAM; i < GetNumberOfTeams(); i++ )
 		{
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 			if ( TFGameRules() && TFGameRules()->IsInfGamemode() )
 			{
 				if ( team == TF_TEAM_RED )
@@ -3698,7 +3709,7 @@ void CTeamplayRoundBasedRules::PlayStalemateSong( void )
 	}
 }
 
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 const char* CTeamplayRoundBasedRules::WinSongName( int nTeam )
 { 
 	if ( TFGameRules() && TFGameRules()->IsInfGamemode() )
@@ -3727,7 +3738,8 @@ bool CTeamplayRoundBasedRules::PlayThrottledAlert( int iTeam, const char *sound,
 	return false;
 }
 
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
+
 #else
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -6,10 +6,7 @@
 
 #include "cbase.h"
 #include "c_tf_projectile_rocket.h"
-#include "tf_weaponbase.h"
-#include "particles_new.h"
 #include "tf_gamerules.h"
-#include "tempent.h"
 #include "iefx.h"
 #include "dlight.h"
 #include "c_te_legacytempents.h"

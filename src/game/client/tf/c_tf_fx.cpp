@@ -5,31 +5,9 @@
 //=============================================================================
 
 #include "cbase.h"
+#include "c_tf_fx.h"
 #include "tf_fx_shared.h"
-#include "c_basetempentity.h"
 #include "tier0/vprof.h"
-#include <cliententitylist.h>
-
-class C_TEFireBullets : public C_BaseTempEntity
-{
-public:
-
-	DECLARE_CLASS( C_TEFireBullets, C_BaseTempEntity );
-	DECLARE_CLIENTCLASS();
-
-	virtual void	PostDataUpdate( DataUpdateType_t updateType );
-
-public:
-
-	int		m_iPlayer;
-	Vector	m_vecOrigin;
-	QAngle	m_vecAngles;
-	int		m_iWeaponID;
-	int		m_iMode;
-	int		m_iSeed;
-	float	m_flSpread;
-	int		m_bCritical;
-};
 
 IMPLEMENT_CLIENTCLASS_EVENT( C_TEFireBullets, DT_TEFireBullets, CTEFireBullets );
 

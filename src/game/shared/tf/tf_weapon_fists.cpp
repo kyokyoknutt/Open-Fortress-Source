@@ -6,16 +6,13 @@
 
 #include "cbase.h"
 #include "tf_weapon_fists.h"
-#include "decals.h"
 #include "in_buttons.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-// Server specific.
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
-#include "tf_gamestats.h"
+	#include "tf_player.h"
+	#include "tf_gamestats.h"
 #endif
 
 //=============================================================================

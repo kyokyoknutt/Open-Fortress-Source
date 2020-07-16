@@ -17,12 +17,9 @@
 //=============================================================================
 
 #include "cbase.h"
-#include "player.h"
-#include "tf_player.h"
 #include "tf_gamerules.h"
 #include "in_buttons.h"
 #include "movehelper_server.h"
-#include "tf_playerclass_shared.h"
 #include "datacache/imdlcache.h"
 
 void ClientPutInServer( edict_t *pEdict, const char *playername );

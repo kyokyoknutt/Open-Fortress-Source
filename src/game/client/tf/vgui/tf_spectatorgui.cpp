@@ -6,22 +6,14 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hud.h"
-#include "c_team.h"
 #include "tf_spectatorgui.h"
-#include "tf_shareddefs.h"
 #include "tf_gamerules.h"
 #include "tf_hud_objectivestatus.h"
-#include "tf_hud_statpanel.h"
 #include "iclientmode.h"
-#include "c_playerresource.h"
 #include "tf_hud_building_status.h"
-#include "tf_hud_winpanel.h"
 #include "tf_tips.h"
-#include "tf_mapinfomenu.h"
-
 #include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "gamevars_shared.h"
 
 using namespace vgui;
 

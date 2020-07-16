@@ -5,22 +5,10 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hud.h"
-#include "hudelement.h"
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
 #include "iclientmode.h"
-#include <vgui_controls/Label.h>
-
-#include "hud_controlpointicons.h"
-#include "KeyValues.h"
 #include "filesystem.h"
-#include "tf_controls.h"
 #include "c_tf_player.h"
-#include "c_tf_playerresource.h"
 #include "of_hud_powerups.h"
-
-using namespace vgui;
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

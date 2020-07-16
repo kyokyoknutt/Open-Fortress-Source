@@ -11,12 +11,6 @@
 #pragma once
 #endif
 
-#include "gameui/basemodui.h"
-
-#include "tf_controls.h"
-#include "basemodel_panel.h"
-#include <vgui_controls/Slider.h>
-
 #include "of_modelpanel.h"
 
 namespace vgui

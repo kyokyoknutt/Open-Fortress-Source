@@ -5,11 +5,7 @@
 //=====================================================================================//
 
 #include "cbase.h"
-#include <tier0/platform.h>
 #include "vgetlegacydata.h"
-#include "VGenericConfirmation.h"
-#include "vgui_controls/Label.h"
-#include "vgui/ISurface.h"
 
 #undef IS_WINDOWS_PC
 

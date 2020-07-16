@@ -4,15 +4,6 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_weapon_tranq.h"
-#include "tf_fx_shared.h"
-
-// Client specific.
-#ifdef CLIENT_DLL
-#include "c_tf_player.h"
-// Server specific.
-#else
-#include "tf_player.h"
-#endif
 
 //=============================================================================
 //
@@ -30,7 +21,7 @@ LINK_ENTITY_TO_CLASS( tfc_weapon_tranq, CTFCTranq );
 //PRECACHE_WEAPON_REGISTER( tfc_weapon_tranq );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFCTranq )
 END_DATADESC()
 #endif
@@ -44,7 +35,7 @@ void CTFCTranq::Precache()
 {
 	BaseClass::Precache();
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	PrecacheParticleSystem( "nailtrails_medic_blue_crit" );
 	PrecacheParticleSystem( "nailtrails_medic_blue" );
 	PrecacheParticleSystem( "nailtrails_medic_red_crit" );

@@ -6,18 +6,6 @@
 
 #include "cbase.h"
 #include "UI_Shared.h"
-#include "VFooterPanel.h"
-#include "vhybridbutton.h"
-#include "VFlyoutMenu.h"
-#include "VGenericConfirmation.h"
-// #include "VGuiSystemModuleLoader.h"
-#include "filesystem.h"
-
-#include "ienginevgui.h"
-#include "BaseModPanel.h"
-#include "vgui/ISurface.h"
-#include "tier0/icommandline.h"
-#include "fmtstr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

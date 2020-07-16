@@ -11,11 +11,7 @@
 #endif
 
 #include "hud.h"
-#include "hudelement.h"
-#include <vgui_controls/EditablePanel.h>
-#include "tf_imagepanel.h"
 #include "tf_spectatorgui.h"
-#include "c_tf_player.h"
 
 #define PLAYER_HINT_DISTANCE	150
 #define PLAYER_HINT_DISTANCE_SQ	(PLAYER_HINT_DISTANCE*PLAYER_HINT_DISTANCE)

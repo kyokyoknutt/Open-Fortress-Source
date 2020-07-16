@@ -11,22 +11,18 @@
 #pragma once
 #endif
 
-#include "gameui/basemodui.h"
-
-#include "tf_controls.h"
-#include "basemodel_panel.h"
-#include <vgui_controls/Slider.h>
-
 #include "of_loadoutheader.h"
 #include "of_dmmodelpanel.h"
 #include "of_scrollablepanellist.h"
 #include "of_selectionpanel.h"
+#include "basemodframe.h"
 
 class CStudioHdr;
 class CCvarToggleCheckButton;
 class CModelPanel;
 
-namespace BaseModUI {
+namespace BaseModUI
+{
 
 	class DMLoadout : public CBaseModFrame
 	{

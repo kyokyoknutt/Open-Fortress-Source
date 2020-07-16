@@ -6,7 +6,6 @@
 
 #include "cbase.h"
 #include "gamemodes.h"
-#include "fmtstr.h"
 #include "vgui/ISurface.h"
 #include "vgui/ILocalize.h"
 #include "vgui/IInput.h"

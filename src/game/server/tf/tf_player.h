@@ -5,19 +5,13 @@
 #define TF_PLAYER_H
 #pragma once
 
-#include "basemultiplayerplayer.h"
-#include "server_class.h"
-#include "tf_playeranimstate.h"
-#include "tf_shareddefs.h"
 #include "tf_player_shared.h"
-#include "tf_weaponbase.h"
 #include "tf_weaponbase_gun.h"
 #include "tf_playerclass.h"
 #include "entity_tfstart.h"
 #include "trigger_area_capture.h"
 #include "nav_mesh/tf_nav_area.h"
 #include "Path/NextBotPathFollow.h"
-#include "NextBotUtil.h"
 #include "tf_powerup.h"
 
 class CTFPlayer;

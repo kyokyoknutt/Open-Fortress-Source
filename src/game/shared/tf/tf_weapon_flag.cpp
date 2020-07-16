@@ -6,33 +6,15 @@
 
 #include "cbase.h"
 #include "tf_weapon_flag.h"
-#include "decals.h"
-#include "tf_fx_shared.h"
-#include "effect_dispatch_data.h"
-#include "takedamageinfo.h"
-#include "tf_projectile_nail.h"
 #include "in_buttons.h"
-#include "debugoverlay_shared.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
 	#include "c_tf_player.h"
-	#include "c_te_effect_dispatch.h"
-// Server specific.
 #else
-#include "tf_player.h"
-#include "tf_team.h"
-#include "func_bomb_target.h"
-#include "tf_gamestats.h"
-#include "tf_player.h"
-#include "tf_fx.h"
-#include "te_effect_dispatch.h"
-
-#include "tf_projectile_rocket.h"
-#include "tf_weapon_grenade_pipebomb.h"
-#include "te.h"
-#include "of_projectile_tripmine.h"
+	#include "tf_player.h"
+	#include "tf_team.h"
+	#include "func_bomb_target.h"
+	#include "tf_gamestats.h"
 #endif
 
 //=============================================================================
@@ -167,7 +149,7 @@ void CTFFlag::PrimaryAttack( void )
 	if ( m_bPlanting = false || gpGlobals->curtime < m_flPlantStart + 3.0f )
 		return;
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 
 	pPlayer->SpeakWeaponFire();
 

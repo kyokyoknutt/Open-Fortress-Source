@@ -7,41 +7,22 @@
 #include "cbase.h"
 #include "tf_gamerules.h"
 #include "ammodef.h"
-#include "KeyValues.h"
-#include "tf_weaponbase.h"
 #include "time.h"
-#include "tf_shareddefs.h"
-#include <vgui/IScheme.h>
 #include <vgui/ILocalize.h>
 #include "tier3/tier3.h"
 #include "tf_weapon_grenade_pipebomb.h"
-#include "gameeventdefs.h"
-	
+
 #ifdef CLIENT_DLL
-	#include <game/client/iviewport.h>
-	#include "c_tf_player.h"
 	#include "c_tf_objective_resource.h"
 	#include "dt_utlvector_recv.h"
 #else
-	#include "basemultiplayerplayer.h"
 	#include "voice_gamemgr.h"
-	#include "items.h"
-	#include "team.h"
-	#include "tf_bot_temp.h"
-	#include "tf_player.h"
 	#include "tf_team.h"
 	#include "player_resource.h"
-	#include "entity_tfstart.h"
-	#include "filesystem.h"
-	#include "tf_obj.h"
 	#include "tf_objective_resource.h"
 	#include "tf_player_resource.h"
 	#include "team_control_point_master.h"
-	#include "entity_roundwin.h"
 	#include "playerclass_info_parse.h"
-	#include "team_train_watcher.h"
-	#include "entity_roundwin.h"
-	#include "coordsize.h"
 	#include "entity_healthkit.h"
 	#include "entity_ammopack.h"
 	#include "func_respawnroom.h"
@@ -50,29 +31,17 @@
 	#include "entity_capture_flag.h"
 	#include "entity_weapon_spawner.h"
 	#include "entity_condpowerup.h"
-	#include "tf_player_resource.h"
 	#include "tf_obj_sentrygun.h"
-	#include "tier0/icommandline.h"
 	#include "activitylist.h"
-	#include "AI_ResponseSystem.h"
 	#include "hl2orange.spa.h"
 	#include "hltvdirector.h"
-	#include "globalstate.h"
-    #include "igameevents.h"
-	#include "trains.h"
-	#include "pathtrack.h"
 	#include "entitylist.h"
-	#include "trigger_area_capture.h"
-	#include "ai_basenpc.h"
-	#include "ai_dynamiclink.h"
-	#include "vote_controller.h"
-	#include "tf_weaponbase_grenadeproj.h"
 	#include "tf_voteissues.h"
 	#include "nav_mesh.h"
 	#include "bot/tf_bot_manager.h"
 	#include <../shared/gamemovement.h>
-	
 	#include "dt_utlvector_send.h"
+	#include "team_train_watcher.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -137,6 +106,7 @@ ConVar of_threewave					( "of_threewave", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, 
 ConVar of_juggernaught				( "of_juggernaught", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Toggles Juggernaught mode." );
 ConVar of_coop						( "of_coop", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Toggles Coop mode. (Pacifism)" );
 ConVar of_duel						( "of_duel", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Toggles Duel mode." );
+ConVar of_duel_winlimit				( "of_duel_winlimit", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Set the maximum amount of wins before a player\nis sent to the bottom of the queue." );
 
 ConVar of_allow_allclass_pickups 	( "of_allow_allclass_pickups", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Non-Mercenary Classes can pickup dropped weapons.");
 ConVar of_allow_allclass_spawners 	( "of_allow_allclass_spawners", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Non-Mercenary Classes can pickup weapons from spawners.");
@@ -340,9 +310,6 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFGameRules, DT_TFGameRules )
 	RecvPropEHandle( RECVINFO( m_hInfectionTimer ) ),
 	RecvPropInt( RECVINFO( m_halloweenScenario ) ),
 	RecvPropInt( RECVINFO( m_iMaxLevel ) ),
-	
-	RecvPropUtlVector( RECVINFO_UTLVECTOR( m_hDuelQueueR ), 32, RecvPropInt(NULL, 0, sizeof(int)) ),
-	RecvPropUtlVector( RECVINFO_UTLVECTOR( m_hDuelQueueL ), 32, RecvPropInt(NULL, 0, sizeof(int)) ),
 #else
 
 	SendPropInt( SENDINFO( m_nGameType ), TF_GAMETYPE_LAST, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN ),
@@ -376,9 +343,6 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFGameRules, DT_TFGameRules )
 	SendPropEHandle( SENDINFO( m_itHandle ) ),
 	SendPropInt( SENDINFO( m_halloweenScenario ) ),
 	SendPropInt( SENDINFO( m_iMaxLevel ) ),
-	
-	SendPropUtlVector( SENDINFO_UTLVECTOR( m_hDuelQueueR ), 32, SendPropInt( NULL, 0, sizeof(int) ) ),
-	SendPropUtlVector( SENDINFO_UTLVECTOR( m_hDuelQueueL ), 32, SendPropInt( NULL, 0, sizeof(int) ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -1480,60 +1444,147 @@ void CTFGameRules::SetRetroMode( int nRetroMode)
 }
 #endif
 
+//-----------------------------------------------------------------------------
+// Purpose: Duel stuff
+//-----------------------------------------------------------------------------
+#ifdef GAME_DLL
+
+//The goal of this is keeping track of the duel queue throughtout the matches
+class CDuelQueue : CAutoGameSystem
+{
+public:
+
+	CDuelQueue() : CAutoGameSystem("CDuelQueue") {}
+
+	virtual bool Init();
+
+	int		GetDuelQueuePos(CBaseEntity *pPlayer);
+	CTFPlayer *GetDueler(int index);
+	void 	PlaceIntoDuelQueue(CBaseEntity *pPlayer);
+	void	RemoveFromDuelQueue(CBaseEntity *pPlayer);
+
+	void	IncreaseDuelerWins(CBaseEntity *pPlayer);
+	void	ResetDuelerWins(CBaseEntity *pPlayer);
+	int		GetDuelerWins(CBaseEntity *pPlayer);
+
+private:
+
+	CUtlVector<int> m_hDuelQueue;
+	int m_iDuelerWins[32];
+};
+
+bool CDuelQueue::Init()
+{
+	for (int i = 0; i < 32; i++)
+		m_iDuelerWins[i] = 0;
+
+	return true;
+}
+
+int CDuelQueue::GetDuelQueuePos(CBaseEntity *pPlayer)
+{
+	return m_hDuelQueue.Find(pPlayer->entindex());
+}
+
+CTFPlayer *CDuelQueue::GetDueler(int index)
+{
+	return ToTFPlayer( UTIL_PlayerByIndex (m_hDuelQueue[index] ) );
+}
+
+void CDuelQueue::PlaceIntoDuelQueue(CBaseEntity *pPlayer)
+{
+	m_hDuelQueue.AddToTail(pPlayer->entindex());
+	//Msg("player with index %d was placed in queue position %d\n", pPlayer->entindex(), GetDuelQueuePos(pPlayer));
+}
+
+void CDuelQueue::RemoveFromDuelQueue(CBaseEntity *pPlayer)
+{
+	if (m_hDuelQueue.HasElement(pPlayer->entindex()))
+	{
+		//Msg("player with index %d was removed from the queue\n", pPlayer->entindex());
+		m_hDuelQueue.FindAndRemove(pPlayer->entindex());
+		ResetDuelerWins(pPlayer);
+	}
+}
+
+void CDuelQueue::IncreaseDuelerWins(CBaseEntity *pPlayer)
+{
+	m_iDuelerWins[pPlayer->entindex()]++;
+}
+
+int CDuelQueue::GetDuelerWins(CBaseEntity *pPlayer)
+{
+	return m_iDuelerWins[pPlayer->entindex()];
+}
+
+void CDuelQueue::ResetDuelerWins(CBaseEntity *pPlayer)
+{
+	m_iDuelerWins[pPlayer->entindex()] = 0;
+}
+
+CDuelQueue g_pDuelQueue;
+
+//**************************************************************
+//**************************************************************
+
 int CTFGameRules::GetDuelQueuePos( CBasePlayer *pPlayer )
 {
-	if( m_hDuelQueueR.HasElement( pPlayer->entindex() ) )
-		return m_hDuelQueueR.Find(pPlayer->entindex());
-	else
-		return m_hDuelQueueL.Find( pPlayer->entindex() );
+	return g_pDuelQueue.GetDuelQueuePos( pPlayer );
+}
 
+bool CTFGameRules::CheckDuelOvertime()
+{
+	return g_pDuelQueue.GetDueler(0)->FragCount() == g_pDuelQueue.GetDueler(1)->FragCount();
+}
+
+bool CTFGameRules::IsDueler( CBasePlayer *pPlayer )
+{
+	return GetDuelQueuePos( pPlayer ) < 2;
 }
 
 void CTFGameRules::PlaceIntoDuelQueue( CBasePlayer *pPlayer )
 {
-	if( m_hDuelQueueR.Count() > m_hDuelQueueL.Count() )
-		m_hDuelQueueL.AddToTail( pPlayer->entindex() );
-	else
-		m_hDuelQueueR.AddToTail( pPlayer->entindex() );
+	g_pDuelQueue.PlaceIntoDuelQueue( pPlayer );
 }
 
-void CTFGameRules::RemoveFromDuelQueue( CBasePlayer *pPlayer )
+void CTFGameRules::RemoveFromDuelQueue(CBasePlayer *pPlayer)
 {
-	CUtlVector<int> *m_hMyQueue;
-	CUtlVector<int> *m_hOtherQueue;
-	if( m_hDuelQueueR.HasElement( pPlayer->entindex() ) )
-	{
-		m_hMyQueue = &m_hDuelQueueR;
-		m_hOtherQueue = &m_hDuelQueueL;
-	}
-	else
-	{
-		m_hMyQueue = &m_hDuelQueueL;
-		m_hOtherQueue = &m_hDuelQueueR;
-	}
-	m_hMyQueue->FindAndRemove( pPlayer->entindex() );
-	
-	if( m_hOtherQueue->Count() - m_hMyQueue->Count() >= 2 )
-	{
-		m_hMyQueue->AddToTail( m_hOtherQueue->Tail() );
-		m_hOtherQueue->Remove( m_hOtherQueue->Count() - 1 );
-	}
+	g_pDuelQueue.RemoveFromDuelQueue( pPlayer );
 }
 
-void CTFGameRules::ProgressDuelQueues()
+void CTFGameRules::DuelRageQuit( CTFPlayer *pRager )
 {
-	int iFirst = m_hDuelQueueR[0];
-	int iSecond = m_hDuelQueueL[0];
-
-	// We do it this way round so that we dont accidentally
-	// remove the only person on one team
-	
-	m_hDuelQueueL.Remove(0);
-	m_hDuelQueueR.Remove(0);
-	
-	m_hDuelQueueL.AddToTail( iFirst  );
-	m_hDuelQueueR.AddToTail( iSecond );
+	//reset frag count of the rager to make sure player who hasn't left wins even if it has a lower frag count
+	pRager->ResetFragCount();
+	//conclude match
+	TFGameRules()->SetWinningTeam(TF_TEAM_MERCENARY, WINREASON_POINTLIMIT, true, true, false);
+	//find the winner, it is the player at index 1 or 0 of the duel queue
+	int iRagerIndex = GetDuelQueuePos(pRager);
+	//update queue
+	ProgressDuelQueues(g_pDuelQueue.GetDueler(iRagerIndex == 1 ? 0 : 1), pRager, true);
 }
+
+void CTFGameRules::ProgressDuelQueues(CTFPlayer *pWinner, CTFPlayer *pLoser, bool rageQuit)
+{
+	//Loser gets thrown to the bottom of the queue
+	g_pDuelQueue.RemoveFromDuelQueue(pLoser);
+	if (!rageQuit)
+		g_pDuelQueue.PlaceIntoDuelQueue(pLoser);
+
+	//winner gets thrown to the bottom of the queue if server
+	//is using a wins limit, to ensure a player with a much
+	//higher skill set does not suck the fun out of everybody
+	g_pDuelQueue.IncreaseDuelerWins(pWinner);
+	int iWinLimit = of_duel_winlimit.GetInt();
+	if (iWinLimit && g_pDuelQueue.GetDuelerWins(pWinner) >= iWinLimit)
+	{
+		g_pDuelQueue.RemoveFromDuelQueue(pWinner);
+		g_pDuelQueue.PlaceIntoDuelQueue(pWinner);
+	}
+
+	//Msg("queue has progressed, winner now has positon %d with %d wins and loser position %d\n", GetDuelQueuePos(pWinner), g_pDuelQueue.GetDuelerWins(pWinner), GetDuelQueuePos(pLoser));
+}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1580,6 +1631,9 @@ bool CTFGameRules::CanChangelevelBecauseOfTimeLimit( void )
 //-----------------------------------------------------------------------------
 bool CTFGameRules::CanGoToStalemate( void )
 {
+	if(IsDuelGamemode() && CheckDuelOvertime())
+		return false;
+
 	// In CTF, don't go to stalemate if one of the flags isn't at home
 	if ( m_nGameType == TF_GAMETYPE_CTF )
 	{
@@ -4813,17 +4867,14 @@ void CTFGameRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &in
 
 					if ( pTFPlayerScorer->FragCount() >= iFragLimit )
 					{
-/*						if( IsDuelGamemode() )
-						{
-							SetWinningTeam( TF_TEAM_MERCENARY, WINREASON_POINTLIMIT, false, false, true);
-							ProgressDuelQueues();
-						}
-						else*/
-							SetWinningTeam( TF_TEAM_MERCENARY, WINREASON_POINTLIMIT, true, true, false);
+						if( IsDuelGamemode() )
+							ProgressDuelQueues(pTFPlayerScorer, pTFPlayerVictim);
+
+						SetWinningTeam( TF_TEAM_MERCENARY, WINREASON_POINTLIMIT, true, true, false);
 					}
 
 					// one of our players is at 80% of the fragcount, start voting for next map
-					if ( !m_bStartedVote && ( pTFPlayerScorer->FragCount() >= ( (float)iFragLimit * 0.8 ) ) && !TFGameRules()->IsInWaitingForPlayers() )
+					if ( !m_bStartedVote && ( pTFPlayerScorer->FragCount() >= ( (float)iFragLimit * 0.8 ) ) && !IsInWaitingForPlayers() )
 					{
 						DevMsg( "VoteController: Player fraglimit is 80%%, begin nextlevel voting... \n" );
 						m_bStartedVote = true;
@@ -4933,7 +4984,7 @@ void CTFGameRules::CreateStandardEntities()
 //-----------------------------------------------------------------------------
 // Purpose: determine the class name of the weapon that got a kill
 //-----------------------------------------------------------------------------
-const char *CTFGameRules::GetKillingWeaponName( const CTakeDamageInfo &info, CTFPlayer *pVictim )
+const char *CTFGameRules::GetKillingWeaponName( const CTakeDamageInfo &info, CTFPlayer *pVictim, int *weaponType )
 {
 	CBaseEntity *pInflictor = info.GetInflictor();
 	CBaseEntity *pKiller = info.GetAttacker();
@@ -4958,15 +5009,23 @@ const char *CTFGameRules::GetKillingWeaponName( const CTakeDamageInfo &info, CTF
 	}
 	else if ( pScorer && pInflictor && ( pInflictor == pScorer ) )
 	{
+		CTFWeaponBase *pWeapon = ToTFPlayer(pScorer)->GetActiveTFWeapon();
+		
 		// If the inflictor is the killer,  then it must be their current weapon doing the damage
-		if ( pScorer->GetActiveWeapon() )
+		if (pWeapon)
 		{
-			killer_weapon_name = pScorer->GetActiveWeapon()->GetClassname(); 
+			killer_weapon_name = pWeapon->GetClassname();
+
+			if (weaponType != NULL && WeaponID_IsMeleeWeapon(pWeapon->GetWeaponID()))
+				*weaponType = 1;
 		}
 	}
 	else if ( pInflictor )
 	{
 		killer_weapon_name = STRING( pInflictor->m_iClassname );
+
+		if (weaponType != NULL && IsExplosiveProjectile(killer_weapon_name))
+			*weaponType = 2; //explosive projectile
 	}
 	
 	static char temp[128];
@@ -5124,7 +5183,8 @@ void CTFGameRules::DeathNotice(CBasePlayer *pVictim, const CTakeDamageInfo &info
 	CTFPlayer *pAssister = ToTFPlayer(GetAssister(pVictim, pScorer, pInflictor));
 
 	// Work out what killed the player, and send a message to all clients about it
-	const char *killer_weapon_name = GetKillingWeaponName(info, pTFPlayerVictim);
+	int weaponType = 0;
+	const char *killer_weapon_name = GetKillingWeaponName(info, pTFPlayerVictim, &weaponType);
 
 	IGameEvent *event = gameeventmanager->CreateEvent("player_death");
 
@@ -5150,10 +5210,8 @@ void CTFGameRules::DeathNotice(CBasePlayer *pVictim, const CTakeDamageInfo &info
 			event->SetInt("attacker", pScorer->GetUserID());
 
 		//medals, only activate after warmup
-		if(!IsInWaitingForPlayers())
+		if (!IsInWaitingForPlayers() && State_Get() > GR_STATE_PREGAME)
 		{
-			int weaponType = 0;
-
 			if(pScorer)
 			{
 				//streaks
@@ -5161,7 +5219,6 @@ void CTFGameRules::DeathNotice(CBasePlayer *pVictim, const CTakeDamageInfo &info
 				event->SetInt("killer_pupkills", pTFPlayerScorer->m_iPowerupKills);
 				event->SetInt("killer_kspree", pTFPlayerScorer->m_iSpreeKills);
 				event->SetInt("ex_streak", pTFPlayerScorer->m_iEXKills);
-				weaponType = GetKillingWeaponType(pInflictor, pScorer);
 			}
 
 			//more streaks
@@ -5230,30 +5287,6 @@ void CTFGameRules::DeathNotice(CBasePlayer *pVictim, const CTakeDamageInfo &info
 void CTFGameRules::ResetDeathInflictor(int index)
 {
 	m_InflictorsArray[index] = NULL;
-}
-
-int CTFGameRules::GetKillingWeaponType(CBaseEntity *pInflictor, CBasePlayer *pScorer)
-{
-	if (pScorer && pInflictor && (pInflictor == pScorer))
-	{
-		CTFWeaponBase *pWeapon = ToTFPlayer(pScorer)->GetActiveTFWeapon();
-		int weaponID = 0;
-
-		if (pWeapon)
-			weaponID = pWeapon->GetWeaponID();
-		else
-			return weaponID;
-
-		if(WeaponID_IsMeleeWeapon(weaponID))
-			return 1; //meleee
-	}
-	else if (pInflictor)
-	{
-		if(IsExplosiveProjectile(STRING(pInflictor->m_iClassname)))
-			return 2; //explosive projectile
-	}
-
-	return 0; //no special weapon
 }
 
 void CTFGameRules::ClientDisconnected( edict_t *pClient )
@@ -5346,12 +5379,8 @@ void CTFGameRules::SendWinPanelInfo( void )
 		winEvent->SetInt( "panel_style", WINPANEL_BASIC );
 		winEvent->SetInt( "winning_team", m_iWinningTeam );
 		winEvent->SetInt( "winreason", m_iWinReason );
-		winEvent->SetString( "cappers",  ( m_iWinReason == WINREASON_ALL_POINTS_CAPTURED || m_iWinReason == WINREASON_FLAG_CAPTURE_LIMIT ) ?
-			m_szMostRecentCappers : "" );
-		if ( TFGameRules()->IsDMGamemode() )
-			winEvent->SetInt( "flagcaplimit", of_mctf_flag_caps_per_round.GetInt() );
-		else
-			winEvent->SetInt( "flagcaplimit", tf_flag_caps_per_round.GetInt() );
+		winEvent->SetString( "cappers",  ( m_iWinReason == WINREASON_ALL_POINTS_CAPTURED || m_iWinReason == WINREASON_FLAG_CAPTURE_LIMIT ) ? m_szMostRecentCappers : "" );
+		winEvent->SetInt( "flagcaplimit",TFGameRules()->IsDMGamemode() ? of_mctf_flag_caps_per_round.GetInt() : tf_flag_caps_per_round.GetInt() );
 		winEvent->SetInt( "blue_score", iBlueScore );
 		winEvent->SetInt( "red_score", iRedScore );
 		winEvent->SetInt( "blue_score_prev", iBlueScorePrev );
@@ -5372,6 +5401,7 @@ void CTFGameRules::SendWinPanelInfo( void )
 			CTFPlayer *pTFPlayer = ToTFPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
 			if ( !pTFPlayer || !pTFPlayer->IsConnected() )
 				continue;
+
 			// filter out spectators and, if not stalemate, all players not on winning team
 			int iPlayerTeam = pTFPlayer->GetTeamNumber();
 			if ( ( iPlayerTeam < FIRST_GAME_TEAM ) || ( m_iWinningTeam != TEAM_UNASSIGNED && ( m_iWinningTeam != iPlayerTeam ) ) )
@@ -5382,7 +5412,9 @@ void CTFGameRules::SendWinPanelInfo( void )
 			if ( pStats )
 			{
 				if ( TFGameRules()->IsDMGamemode() && !TFGameRules()->DontCountKills() )
+				{
 					iRoundScore = iTotalScore = pTFPlayer->FragCount();
+				}
 				else
 				{
 					iRoundScore = CalcPlayerScore( &pStats->statsCurrentRound );

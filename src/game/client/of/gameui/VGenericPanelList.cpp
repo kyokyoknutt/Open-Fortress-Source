@@ -6,17 +6,8 @@
 
 #include "cbase.h"
 #include "VGenericPanelList.h"
-
-#include "vgui_controls/Label.h"
-#include "vgui_controls/Panel.h"
 #include "vgui_controls/ScrollBar.h"
-#include "vgui/IInput.h"
-#include "vgui/ISurface.h"
-#include "vgui/IImage.h"
 #include "vgui/ILocalize.h"
-#include "vgui_controls/ImagePanel.h"
-#include "KeyValues.h"
-//#include "VFlyoutMenu.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

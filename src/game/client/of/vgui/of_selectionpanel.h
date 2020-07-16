@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include "tf_controls.h"
 #include "of_editablebutton.h"
+#include "tf_imagepanel.h"
 
 class CTFSelectionPanel;
 

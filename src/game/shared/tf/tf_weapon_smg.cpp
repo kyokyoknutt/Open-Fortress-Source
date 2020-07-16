@@ -4,16 +4,11 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_weapon_smg.h"
-#include "tf_weaponbase.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-
-// Server specific.
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
-#include "util.h"
+	#include "tf_player.h"
 #endif
 
 //=============================================================================
@@ -103,7 +98,7 @@ LINK_ENTITY_TO_CLASS( tfc_weapon_assault_rifle, CTFCAssaultRifle);
 //PRECACHE_WEAPON_REGISTER( tfc_weapon_assault_rifle );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFSMG )
 END_DATADESC()
 #endif

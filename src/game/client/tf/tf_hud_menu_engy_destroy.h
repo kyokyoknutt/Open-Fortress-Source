@@ -12,7 +12,6 @@
 #endif
 
 #include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
 
 using namespace vgui;
 

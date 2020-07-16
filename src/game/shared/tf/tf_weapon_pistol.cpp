@@ -4,15 +4,12 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_weapon_pistol.h"
-#include "tf_fx_shared.h"
 #include "in_buttons.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-// Server specific.
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
+	#include "tf_player.h"
 #endif
 
 //=============================================================================
@@ -22,7 +19,7 @@
 IMPLEMENT_NETWORKCLASS_ALIASED( TFPistol, DT_WeaponPistol )
 
 BEGIN_NETWORK_TABLE_NOBASE( CTFPistol, DT_PistolLocalData )
-#if !defined( CLIENT_DLL )
+#ifdef GAME_DLL
 	SendPropTime( SENDINFO( m_flSoonestPrimaryAttack ) ),
 #else
 	RecvPropTime( RECVINFO( m_flSoonestPrimaryAttack ) ),
@@ -30,7 +27,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFPistol, DT_PistolLocalData )
 END_NETWORK_TABLE()
 
 BEGIN_NETWORK_TABLE( CTFPistol, DT_WeaponPistol )
-#if !defined( CLIENT_DLL )
+#ifdef GAME_DLL
 	SendPropDataTable( "PistolLocalData", 0, &REFERENCE_SEND_TABLE( DT_PistolLocalData ), SendProxy_SendLocalWeaponDataTable ),
 #else
 	RecvPropDataTable( "PistolLocalData", 0, 0, &REFERENCE_RECV_TABLE( DT_PistolLocalData ) ),
@@ -47,7 +44,7 @@ LINK_ENTITY_TO_CLASS( tf_weapon_pistol, CTFPistol );
 //PRECACHE_WEAPON_REGISTER( tf_weapon_pistol );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFPistol )
 END_DATADESC()
 #endif

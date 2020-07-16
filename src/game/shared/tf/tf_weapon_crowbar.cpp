@@ -6,14 +6,11 @@
 
 #include "cbase.h"
 #include "tf_weapon_crowbar.h"
-#include "decals.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-// Server specific.
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
+	#include "tf_player.h"
 #endif
 
 //=============================================================================

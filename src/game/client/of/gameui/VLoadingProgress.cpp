@@ -5,22 +5,11 @@
 //=====================================================================================//
 #include "cbase.h"
 #include "VLoadingProgress.h"
-// #include "EngineInterface.h"
-#include "vgui_controls/Label.h"
 #include "vgui_controls/ProgressBar.h"
 #include "vgui/ISurface.h"
 #include "vgui/ILocalize.h"
-#include "vgui_controls/Image.h"
-#include "vgui_controls/ImagePanel.h"
-#include "gameui_util.h"
-#include "KeyValues.h"
 #include "fmtstr.h"
 #include "filesystem.h"
-// #include "GameUI_Interface.h"
-#include "loadingtippanel.h"
-#include "tf_tips.h"
-
-#include <vgui/IInput.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

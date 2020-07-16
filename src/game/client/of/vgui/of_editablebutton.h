@@ -11,8 +11,7 @@
 #pragma once
 #endif
 
-#include "tf_controls.h"
-#include "basemodel_panel.h"
+#include <vgui_controls/EditablePanel.h>
 
 enum
 {

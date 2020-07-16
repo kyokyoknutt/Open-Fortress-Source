@@ -4,12 +4,11 @@
 //=============================================================================//
 #include "cbase.h"
 #include "tf_item.h"
-#include "tf_shareddefs.h"
 
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
+	#include "tf_player.h"
 #endif
 
 IMPLEMENT_NETWORKCLASS_ALIASED( TFItem, DT_TFItem )

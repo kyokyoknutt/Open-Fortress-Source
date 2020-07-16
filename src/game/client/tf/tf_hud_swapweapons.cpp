@@ -6,19 +6,11 @@
 //=============================================================================
 
 #include "cbase.h"
-#include "hud.h"
 #include "hudelement.h"
 #include "c_tf_player.h"
 #include "iclientmode.h"
-#include "ienginevgui.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
 #include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ProgressBar.h>
-#include "tf_weapon_medigun.h"
-#include "of_weapon_lightning.h"
-#include <vgui_controls/AnimationController.h>
 #include <vgui_controls/ImagePanel.h>
 
 // memdbgon must be the last include file in a .cpp file!!!

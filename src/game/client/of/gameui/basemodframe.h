@@ -7,14 +7,10 @@
 #ifndef __BASEMODFRAME_H__
 #define __BASEMODFRAME_H__
 
-#include "materialsystem/imaterial.h"
-#include "materialsystem/MaterialSystemUtil.h"
-#include "vgui_controls/Panel.h"
-#include "vgui_controls/Frame.h"
-#include "tier1/utllinkedlist.h"
 #include "BaseModPanel.h"
 
-namespace BaseModUI {
+namespace BaseModUI
+{
 
 	struct DialogMetrics_t
 	{
