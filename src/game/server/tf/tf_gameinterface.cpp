@@ -6,7 +6,6 @@
 
 #include "cbase.h"
 #include "gameinterface.h"
-#include "mapentities.h"
 
 
 // -------------------------------------------------------------------------------------------- //

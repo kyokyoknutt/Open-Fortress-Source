@@ -771,6 +771,12 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	{
 		DeathNotice( pVictim, info );
 
+#ifdef OF_DLL
+		//if game is over no more kills awarded
+		if (TFGameRules()->State_Get() == GR_STATE_TEAM_WIN)
+			return;
+#endif
+
 		// Find the killer & the scorer
 		CBaseEntity *pInflictor = info.GetInflictor();
 		CBaseEntity *pKiller = info.GetAttacker();
@@ -783,7 +789,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		// g_EventQueue.AddEvent( "game_playerdie", "Use", value, 0, pVictim, pVictim );
 		FireTargets( "game_playerdie", pVictim, pVictim, USE_TOGGLE, 0 );
 
-#if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#ifdef OF_DLL
 		CTFPlayer *pPlayer = ToTFPlayer( pVictim );
 
 		if ( TFGameRules() && TFGameRules()->IsESCGamemode() && pPlayer && pPlayer->IsPlayerClass( TF_CLASS_CIVILIAN ) )

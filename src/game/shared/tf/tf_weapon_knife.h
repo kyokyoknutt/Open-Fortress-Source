@@ -14,6 +14,7 @@
 #ifdef CLIENT_DLL
 #define CTFKnife C_TFKnife
 #define CTFCKnife C_TFCKnife
+#define CTFCombatKnife C_TFCombatKnife
 #endif
 
 //=============================================================================
@@ -68,4 +69,13 @@ public:
 	virtual int			GetWeaponID( void ) const			{ return TFC_WEAPON_KNIFE; }
 };
 
+class CTFCombatKnife : public CTFKnife
+{
+public:
+
+	DECLARE_CLASS(CTFCombatKnife, CTFKnife);
+	DECLARE_NETWORKCLASS();
+	DECLARE_PREDICTABLE();
+	virtual int			GetWeaponID(void) const			{ return TF_WEAPON_COMBATKNIFE; }
+};
 #endif // TF_WEAPON_KNIFE_H

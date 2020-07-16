@@ -73,84 +73,62 @@ $Project "GameUI"
 	$Folder	"Source Files"
 	{
 		$File	"$SRCDIR\public\igameevents.h"
-		$File	"BonusMapsDatabase.cpp"
-		$File	"BonusMapsDatabase.h"
-		$File	"BonusMapsDialog.cpp"
-		$File	"BonusMapsDialog.h"
-		$File	"CommentaryExplanationDialog.cpp"
-		$File	"CommentaryExplanationDialog.h"
-		$File	"ControllerDialog.cpp"
-		$File	"ControllerDialog.h"
-		$File	"LoadGameDialog.cpp"
-		$File	"LoadGameDialog.h"
-		$File	"NewGameDialog.cpp"
-		$File	"NewGameDialog.h"
-		$File	"SaveGameBrowserDialog.cpp"
-		$File	"SaveGameBrowserDialog.h"
-		$File	"SaveGameDialog.cpp"
-		$File	"SaveGameDialog.h"
-		$File	"TGAImagePanel.cpp"
-		$File	"TGAImagePanel.h"
 	
 		$File	"$SRCDIR\game\client\vgui_video_player.h"
 		$File	"$SRCDIR\game\client\vgui_video_player.cpp"
 
 		$File	"cbase.h"
 
-		$File	"optionsmousedialog.h"
-	
+		$File	"BackgroundMenuButton.cpp"
+		$File	"BaseSaveGameDialog.cpp"
+		$File	"BitmapImagePanel.cpp"
+		$File	"CommandCheckButton.cpp"
+		$File	"ContentControlDialog.cpp"
+		$File	"CreateMultiplayerGameBotPage.cpp"
+		$File	"CreateMultiplayerGameDialog.cpp"
+		$File	"CreateMultiplayerGameGameplayPage.cpp"
+		$File	"CreateMultiplayerGameServerPage.cpp"
+		$File	"CustomTabExplanationDialog.cpp"
+		$File	"CvarNegateCheckButton.cpp"
+		$File	"cvarslider.cpp"
+		$File	"CvarTextEntry.cpp"
+		$File	"CvarToggleCheckButton.cpp"
+		$File	"GameConsole.cpp"
+		$File	"GameConsoleDialog.cpp"
+		$File	"GameUI_Interface.cpp"
+		$File	"gameui_util.cpp"
+		$File	"KeyToggleCheckButton.cpp"
+		$File	"LabeledCommandComboBox.cpp"
+		$File	"LoadingDialog.cpp"
+		$File	"logofile.cpp"
+		$File	"ModInfo.cpp"
+		$File	"MouseMessageForwardingPanel.cpp"
+		$File	"MultiplayerAdvancedDialog.cpp"
+		$File	"OptionsDialog.cpp"
+		$File	"OptionsSubAudio.cpp"
+		$File	"OptionsSubDifficulty.cpp"
+		$File	"OptionsSubGame.cpp"
+		$File	"OptionsSubKeyboard.cpp"
+		$File	"OptionsSubMouse.cpp"
+		$File	"OptionsSubMultiplayer.cpp"
+		$File	"OptionsSubPortal.cpp"
+		$File	"OptionsSubVideo.cpp"
+		$File	"OptionsSubVoice.cpp"
+		$File	"PanelListPanel.cpp"
+		$File	"PlayerListDialog.cpp"
+		$File	"rungameengine.cpp"
+		$File	"ScriptObject.cpp"
+		$File	"sys_utils.cpp" [$WIN32]
+		$File	"textentrybox.cpp"
+		$File	"URLButton.cpp"
+		$File	"VControlsListPanel.cpp"
+		$File	"VGuiSystemModuleLoader.cpp"
 
-		$File	"BackgroundMenuButton.cpp" \
-				"BaseSaveGameDialog.cpp" \
-				"BitmapImagePanel.cpp" \
-				"CommandCheckButton.cpp" \
-				"ContentControlDialog.cpp" \
-				"CreateMultiplayerGameBotPage.cpp" \
-				"CreateMultiplayerGameDialog.cpp" \
-				"CreateMultiplayerGameGameplayPage.cpp" \
-				"CreateMultiplayerGameServerPage.cpp" \
-				"CustomTabExplanationDialog.cpp" \
-				"CvarNegateCheckButton.cpp" \
-				"cvarslider.cpp" \
-				"CvarTextEntry.cpp" \
-				"CvarToggleCheckButton.cpp" \
-				"GameConsole.cpp" \
-				"GameConsoleDialog.cpp" \
-				"GameUI_Interface.cpp" \
-				"gameui_util.cpp" \
-				"KeyToggleCheckButton.cpp" \
-				"LabeledCommandComboBox.cpp" \
-				"LoadingDialog.cpp" \
-				"logofile.cpp" \
-				"ModInfo.cpp" \
-				"MouseMessageForwardingPanel.cpp" \
-				"MultiplayerAdvancedDialog.cpp" \
-				"OptionsDialog.cpp" \
-				"optionsmousedialog.cpp" \
-				"OptionsSubAudio.cpp" \
-				"OptionsSubDifficulty.cpp" \
-				"OptionsSubGame.cpp" \
-				"OptionsSubKeyboard.cpp" \
-				"OptionsSubMouse.cpp" \
-				"OptionsSubMultiplayer.cpp" \
-				"OptionsSubPortal.cpp" \
-				"OptionsSubVideo.cpp" \
-				"OptionsSubVoice.cpp" \					
-				"PanelListPanel.cpp" \
-				"PlayerListDialog.cpp" \
-				"rungameengine.cpp" \
-				"ScriptObject.cpp" \
-				"sys_utils.cpp" [$WIN32] \
-				"textentrybox.cpp" \
-				"URLButton.cpp" \
-				"VControlsListPanel.cpp" \
-				"VGuiSystemModuleLoader.cpp" \
-				"$SRCDIR\common\language.cpp" \
-				"$SRCDIR\public\crtmemdebug.cpp" \
-				"$SRCDIR\public\filesystem_helpers.cpp" \
-				"$SRCDIR\common\randoverride.cpp" \
-				"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
-		$File	"OptionsSubHL2CE.cpp"
+		$File	"$SRCDIR\common\language.cpp"
+		$File	"$SRCDIR\public\crtmemdebug.cpp"
+		$File	"$SRCDIR\public\filesystem_helpers.cpp"
+		$File	"$SRCDIR\common\randoverride.cpp"
+		$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
 	}
 
 	$Folder	"Public Header Files"

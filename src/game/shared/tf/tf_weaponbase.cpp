@@ -4,59 +4,39 @@
 //
 //=============================================================================
 #include "cbase.h"
-#include "in_buttons.h"
-#include "takedamageinfo.h"
 #include "tf_weaponbase.h"
+#include "in_buttons.h"
 #include "ammodef.h"
 #include "tf_gamerules.h"
 #include "eventlist.h"
 
-// Server specific.
-#if !defined( CLIENT_DLL )
-#include "tf_player.h"
-#include "tf_weapon_builder.h"
-// Client specific.
+#ifdef CLIENT_DLL
+	#include "tf_viewmodel.h"
+	#include "clientmode_tf.h"
+	#include "toolframework_client.h"
+	// for spy material proxy
+	#include "proxyentity.h"
+	#include "materialsystem/imaterialvar.h"
+
+	extern CTFWeaponInfo *GetTFWeaponInfo( int iWeapon );
 #else
-#include "vgui/ISurface.h"
-#include "vgui_controls/Controls.h"
-#include "c_tf_player.h"
-#include "tf_viewmodel.h"
-#include "hud_crosshair.h"
-#include "c_tf_playerresource.h"
-#include "clientmode_tf.h"
-#include "r_efx.h"
-#include "dlight.h"
-#include "effect_dispatch_data.h"
-#include "c_te_effect_dispatch.h"
-#include "toolframework_client.h"
-
-// for spy material proxy
-#include "proxyentity.h"
-#include "materialsystem/imaterial.h"
-#include "materialsystem/imaterialvar.h"
-
-extern CTFWeaponInfo *GetTFWeaponInfo( int iWeapon );
+	#include "tf_weapon_builder.h"
 #endif
 
 #ifdef CLIENT_DLL
-extern ConVar of_muzzlelight;
-extern ConVar of_beta_muzzleflash;
-extern ConVar fov_softzoom;
-extern ConVar fov_desired;
-#endif
+	extern ConVar of_muzzlelight;
+	extern ConVar of_beta_muzzleflash;
+	extern ConVar fov_softzoom;
+	extern ConVar fov_desired;
 
-/*const float SOFTZOOMINTIME_DEFAULT = 0.25f;
-const float SOFTZOOMOUTTIME_DEFAULT = 0.1f;*/
-void QuickzoomConVarChanged(IConVar *var, const char *pOldValue, float flOldValue); // Callback - should be overriden down below
-
-#if defined (CLIENT_DLL)
-ConVar of_autoreload( "of_autoreload", "1", FCVAR_CLIENTDLL | FCVAR_ARCHIVE | FCVAR_USERINFO, "Automatically reload when not firing." );
-ConVar of_autoswitchweapons("of_autoswitchweapons", "1", FCVAR_CLIENTDLL | FCVAR_ARCHIVE | FCVAR_USERINFO , "Toggles autoswitching when picking up new weapons.");
+	ConVar of_autoreload( "of_autoreload", "1", FCVAR_CLIENTDLL | FCVAR_ARCHIVE | FCVAR_USERINFO, "Automatically reload when not firing." );
+	ConVar of_autoswitchweapons("of_autoswitchweapons", "1", FCVAR_CLIENTDLL | FCVAR_ARCHIVE | FCVAR_USERINFO , "Toggles autoswitching when picking up new weapons.");
 #endif
 
 // This was in the CLIENT_DLL section, but then I was unable to set it on a listen server so moved it out here to Shared space.
 // To allow players to change their zoom speeds on most weapons (With callbacks & caching for performance)
 // Currently DOES AFFECT the re-zooming time, but is does still use m_flNextZoomTime as a minimum (m_flNextZoomTime + zoom in/out time).
+void QuickzoomConVarChanged(IConVar *var, const char *pOldValue, float flOldValue); // Callback - should be overriden down below
 ConVar cl_quickzoom_in_time("cl_quickzoom_in_time", "0.25", FCVAR_ARCHIVE | FCVAR_USERINFO, "The time it takes to zoom in with 'soft zoom' (secondary attack on most weapons)", true, 0.0f, true, 3.0f, QuickzoomConVarChanged);
 ConVar cl_quickzoom_out_time("cl_quickzoom_out_time", "0.1", FCVAR_ARCHIVE | FCVAR_USERINFO, "The time it takes to zoom out with 'soft zoom' (secondary attack on most weapons)", true, 0.0f, true, 3.0f, QuickzoomConVarChanged);
 float fConVarQuickZoomInTime = cl_quickzoom_in_time.GetFloat();
@@ -162,6 +142,7 @@ BEGIN_NETWORK_TABLE( CTFWeaponBase, DT_TFWeaponBase )
 	RecvPropInt( RECVINFO( m_iDamageIncrease ) ),
 	RecvPropInt( RECVINFO( m_iSlotOverride ) ),
 	RecvPropInt( RECVINFO( m_iPositionOverride ) ),
+	RecvPropInt( RECVINFO( m_iTeamNum ) ),
 	RecvPropFloat( RECVINFO( m_flBlastRadiusIncrease ) ),
 // Server specific.
 #else
@@ -176,6 +157,7 @@ BEGIN_NETWORK_TABLE( CTFWeaponBase, DT_TFWeaponBase )
 	SendPropInt( SENDINFO( m_iDamageIncrease ) ),
 	SendPropInt( SENDINFO( m_iSlotOverride ) ),
 	SendPropInt( SENDINFO( m_iPositionOverride ) ),
+	SendPropInt( SENDINFO( m_iTeamNum ) ),
 	SendPropFloat( SENDINFO( m_flBlastRadiusIncrease ) ),
 	// World models have no animations so don't send these.
 	SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
@@ -276,11 +258,13 @@ CTFWeaponBase::CTFWeaponBase()
 	
 	m_iSlotOverride = -1;
 	m_iPositionOverride = -1;
+	
+	m_iTeamNum = TEAM_UNASSIGNED;
 }
 
 CTFWeaponBase::~CTFWeaponBase()
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	CTFPlayer *pTFOwner = ToTFPlayer( GetOwner() );
 	if ( !pTFOwner )
 		return;
@@ -770,7 +754,7 @@ int CTFWeaponBase::GetDefaultClip1( void ) const
 //-----------------------------------------------------------------------------
 void CTFWeaponBase::Drop( const Vector &vecVelocity )
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	if ( m_iAltFireHint )
 	{
 		CBasePlayer *pPlayer = GetPlayerOwner();
@@ -782,6 +766,21 @@ void CTFWeaponBase::Drop( const Vector &vecVelocity )
 #endif
 
 	BaseClass::Drop( vecVelocity );
+}
+
+void CTFWeaponBase::Detach()
+{
+#ifdef GAME_DLL
+	CTFPlayer *pTFOwner = ToTFPlayer( GetOwner() );
+	if ( !pTFOwner )
+		return;
+	WeaponHandle hHandle;
+	hHandle = this;	
+	if ( pTFOwner->m_hWeaponInSlot && pTFOwner->m_hWeaponInSlot[GetSlot()][GetPosition()] == hHandle )
+		pTFOwner->m_hWeaponInSlot[GetSlot()][GetPosition()] = NULL;
+	
+	pTFOwner->m_hSuperWeapons.FindAndRemove(hHandle);
+#endif
 }
 
 void CTFWeaponBase::PlayWeaponShootSound(void)
@@ -823,7 +822,7 @@ bool CTFWeaponBase::Holster( CBaseCombatWeapon *pSwitchingTo )
 		return false;
 	CTFPlayer *pOwner = ToTFPlayer( GetOwner() );
 	
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	if ( m_iAltFireHint )
 	{
 		if ( pOwner )
@@ -892,7 +891,7 @@ bool CTFWeaponBase::CanHolster( void ) const
 bool CTFWeaponBase::Deploy( void )
 {
 	CTFPlayer *pPlayer = ToTFPlayer( GetOwner() );
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	if ( m_iAltFireHint )
 	{
 		if ( pPlayer )
@@ -1277,7 +1276,7 @@ bool CTFWeaponBase::ReloadSingly( void )
 				UpdateReloadTimers( false );
 			}
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 			if (m_bQuakeRLHack)
 				WeaponSound( RELOAD_NPC );
 			else
@@ -1400,7 +1399,7 @@ bool CTFWeaponBase::DefaultReload( int iClipSize1, int iClipSize2, int iActivity
 	if ( !( bReloadPrimary || bReloadSecondary )  )
 		return false;
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 		WeaponSound( RELOAD );
 #endif
 

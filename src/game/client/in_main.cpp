@@ -64,22 +64,28 @@ ConVar cl_yawspeed( "cl_yawspeed", "210", FCVAR_NONE, "Client yaw speed.", true,
 ConVar cl_pitchspeed( "cl_pitchspeed", "225", FCVAR_NONE, "Client pitch speed.", true, -100000, true, 100000 );
 ConVar cl_pitchdown( "cl_pitchdown", "89", FCVAR_CHEAT );
 ConVar cl_pitchup( "cl_pitchup", "89", FCVAR_CHEAT );
+
 #if defined( CSTRIKE_DLL )
-ConVar cl_sidespeed( "cl_sidespeed", "400", FCVAR_CHEAT );
-ConVar cl_upspeed( "cl_upspeed", "320", FCVAR_ARCHIVE|FCVAR_CHEAT );
-ConVar cl_forwardspeed( "cl_forwardspeed", "400", FCVAR_ARCHIVE|FCVAR_CHEAT );
-ConVar cl_backspeed( "cl_backspeed", "400", FCVAR_ARCHIVE|FCVAR_CHEAT );
+	ConVar cl_sidespeed( "cl_sidespeed", "400", FCVAR_CHEAT );
+	ConVar cl_upspeed( "cl_upspeed", "320", FCVAR_ARCHIVE|FCVAR_CHEAT );
+	ConVar cl_forwardspeed( "cl_forwardspeed", "400", FCVAR_ARCHIVE|FCVAR_CHEAT );
+	ConVar cl_backspeed( "cl_backspeed", "400", FCVAR_ARCHIVE|FCVAR_CHEAT );
 #elif defined( OF_CLIENT_DLL )
-ConVar cl_sidespeed( "cl_sidespeed", "720", FCVAR_REPLICATED | FCVAR_CHEAT );
-ConVar cl_upspeed( "cl_upspeed", "720", FCVAR_REPLICATED | FCVAR_CHEAT );
-ConVar cl_forwardspeed( "cl_forwardspeed", "720", FCVAR_REPLICATED | FCVAR_CHEAT );
-ConVar cl_backspeed( "cl_backspeed", "720", FCVAR_REPLICATED | FCVAR_CHEAT );
+	ConVar cl_sidespeed( "cl_sidespeed", "720", FCVAR_REPLICATED | FCVAR_CHEAT );
+	ConVar cl_upspeed( "cl_upspeed", "720", FCVAR_REPLICATED | FCVAR_CHEAT );
+	ConVar cl_forwardspeed( "cl_forwardspeed", "720", FCVAR_REPLICATED | FCVAR_CHEAT );
+	ConVar cl_backspeed( "cl_backspeed", "720", FCVAR_REPLICATED | FCVAR_CHEAT );
+
+	ConVar of_nullmovescript("of_nullmovescript", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE, "Prevents two opposite movement inputs from cancelling each other out. Last pressed key takes priority.");
+	int curside = 1;
+	int curfwd = 1;
 #else
-ConVar cl_sidespeed( "cl_sidespeed", "450", FCVAR_REPLICATED | FCVAR_CHEAT );
-ConVar cl_upspeed( "cl_upspeed", "320", FCVAR_REPLICATED | FCVAR_CHEAT );
-ConVar cl_forwardspeed( "cl_forwardspeed", "450", FCVAR_REPLICATED | FCVAR_CHEAT );
-ConVar cl_backspeed( "cl_backspeed", "450", FCVAR_REPLICATED | FCVAR_CHEAT );
+	ConVar cl_sidespeed( "cl_sidespeed", "450", FCVAR_REPLICATED | FCVAR_CHEAT );
+	ConVar cl_upspeed( "cl_upspeed", "320", FCVAR_REPLICATED | FCVAR_CHEAT );
+	ConVar cl_forwardspeed( "cl_forwardspeed", "450", FCVAR_REPLICATED | FCVAR_CHEAT );
+	ConVar cl_backspeed( "cl_backspeed", "450", FCVAR_REPLICATED | FCVAR_CHEAT );
 #endif // CSTRIKE_DLL
+
 ConVar lookspring( "lookspring", "0", FCVAR_ARCHIVE );
 ConVar lookstrafe( "lookstrafe", "0", FCVAR_ARCHIVE );
 ConVar in_joystick( "joystick","0", FCVAR_ARCHIVE );
@@ -835,9 +841,53 @@ void CInput::ComputeSideMove( CUserCmd *cmd )
 		cmd->sidemove -= cl_sidespeed.GetFloat() * KeyState (&in_left);
 	}
 
+#ifdef OF_CLIENT_DLL
+	float moveright = KeyState(&in_moveright);
+	float moveleft = KeyState(&in_moveleft);
+
+	/*
+	I want to put a lot of documentation for this so I can see where I'm going wrong...
+	so let's review:
+	KeyState tells us what the key was doing during the current frame:
+	0 = not held at all or let go of in that frame
+	0.25 = pressed then let go in same frame
+	0.5 = just pressed during, then held for the rest of the frame
+	1 = held down throughout the frame
+
+	In order to do null movement script, we need to figure out:
+	1. if both keys are being held down at the same time, and
+	2. which key was pressed soonest
+	the key that was pressed soonest gets priority; the other key gets its input nullified.
+	*/
+
+	if (of_nullmovescript.GetBool())
+	{
+		if (moveright == 1.f && moveleft == 1.f)
+		{
+			if (curside == 1.f)
+				moveleft = 0.f; 
+			else if (curside == -1.f)
+				moveright = 0.f;
+		}
+		else if (moveright == 1.f && moveleft == 0.5f)
+		{
+			curside = -1.f;
+			moveright = 0.f;
+		}
+		else if (moveleft == 1.f && moveright == 0.5f)
+		{
+			curside = 1.f;
+			moveleft = 0.f;
+		}
+	}
+
 	// Otherwise, check strafe keys
-	cmd->sidemove += cl_sidespeed.GetFloat() * KeyState (&in_moveright);
-	cmd->sidemove -= cl_sidespeed.GetFloat() * KeyState (&in_moveleft);
+	cmd->sidemove += cl_sidespeed.GetFloat() * moveright;
+	cmd->sidemove -= cl_sidespeed.GetFloat() * moveleft;
+#else
+	cmd->sidemove += cl_sidespeed.GetFloat() * KeyState(&in_moveright);
+	cmd->sidemove -= cl_sidespeed.GetFloat() * KeyState(&in_moveleft);
+#endif
 }
 
 /*
@@ -893,8 +943,38 @@ void CInput::ComputeForwardMove( CUserCmd *cmd )
 
 	if ( !(in_klook.state & 1 ) )
 	{	
-		cmd->forwardmove += cl_forwardspeed.GetFloat() * KeyState (&in_forward);
-		cmd->forwardmove -= cl_backspeed.GetFloat() * KeyState (&in_back);
+#ifdef OF_CLIENT_DLL
+		//I already explained how this works above so no comments this time
+		float forward = KeyState(&in_forward);
+		float back = KeyState(&in_back);
+
+		if (of_nullmovescript.GetBool())
+		{
+			if (forward == 1.f && back == 1.f)
+			{
+				if (curfwd == 1.f) 
+					back = 0.f; 
+				else if (curfwd == -1.f) 
+					forward = 0.f;
+			}
+			else if (forward == 1.f && back == 0.5f)
+			{
+				curfwd = -1.f; 
+				forward = 0.f;
+			}
+			else if (back == 1.f && forward == 0.5f)
+			{
+				curfwd = 1.f; 
+				back = 0.f;
+			}
+		}
+
+		cmd->forwardmove += cl_forwardspeed.GetFloat() * forward;
+		cmd->forwardmove -= cl_backspeed.GetFloat() * back;
+#else
+		cmd->forwardmove += cl_forwardspeed.GetFloat() * KeyState(&in_forward);
+		cmd->forwardmove -= cl_backspeed.GetFloat() * KeyState(&in_back);
+#endif
 	}	
 }
 

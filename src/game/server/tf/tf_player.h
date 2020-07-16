@@ -5,19 +5,13 @@
 #define TF_PLAYER_H
 #pragma once
 
-#include "basemultiplayerplayer.h"
-#include "server_class.h"
-#include "tf_playeranimstate.h"
-#include "tf_shareddefs.h"
 #include "tf_player_shared.h"
-#include "tf_weaponbase.h"
 #include "tf_weaponbase_gun.h"
 #include "tf_playerclass.h"
 #include "entity_tfstart.h"
 #include "trigger_area_capture.h"
 #include "nav_mesh/tf_nav_area.h"
 #include "Path/NextBotPathFollow.h"
-#include "NextBotUtil.h"
 #include "tf_powerup.h"
 
 class CTFPlayer;
@@ -544,12 +538,12 @@ public:
 
 	//medals
 	bool				m_bHadPowerup;
+	float				m_fEXTime;
+	float				m_fAirStartTime;
 	int					m_iPowerupKills;
 	int					m_iEXKills;
-	float				m_fEXTime;
 	int					m_iSpreeKills;
 	int					m_iImpressiveCount;
-	CBaseEntity			*m_SuicideEntity;
 
 private:
 
@@ -721,6 +715,8 @@ public:
 	void				InputSpeakResponseConcept( inputdata_t &inputdata );
 	void				InputIgnitePlayer( inputdata_t &inputdata );
 	void				InputExtinguishPlayer( inputdata_t &inputdata );
+	void				InputPoisonPlayer( inputdata_t &inputdata );
+	void				InputDePoisonPlayer( inputdata_t &inputdata );
 	void				InputSetZombie( inputdata_t &inputdata );
 	void				InputSetTeamNoKill( inputdata_t &inputdata );
 	bool				m_bNotAlreadyPlayingMusic;

@@ -6,10 +6,8 @@
 #include "cbase.h"
 #include "items.h"
 #include "tf_gamerules.h"
-#include "tf_shareddefs.h"
-#include "tf_player.h"
+//#include "tf_shareddefs.h"
 #include "tf_team.h"
-#include "engine/IEngineSound.h"
 #include "entity_healthkit.h"
 
 ConVar  of_item_debug("of_item_debug", "0", FCVAR_CHEAT, "Visualize Item bounding boxes." );
@@ -132,9 +130,12 @@ bool CHealthKit::MyTouch( CBasePlayer *pPlayer )
 
 		Assert( pTFPlayer );
 
-		// Healthkits also contain a fire blanket.
-		if ( pTFPlayer->m_Shared.InCond( TF_COND_BURNING ) )
-				pTFPlayer->m_Shared.RemoveCond( TF_COND_BURNING );		
+		// Healthkits cures burning...
+		if (pTFPlayer->m_Shared.InCond(TF_COND_BURNING))
+			pTFPlayer->m_Shared.RemoveCond( TF_COND_BURNING );
+		//...and poison
+		if (pTFPlayer->m_Shared.InCond(TF_COND_POISON))
+			pTFPlayer->m_Shared.RemoveCond(TF_COND_POISON);
 		AddEffects( EF_NODRAW );
 	}
 

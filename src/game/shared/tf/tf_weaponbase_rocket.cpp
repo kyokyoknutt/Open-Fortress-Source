@@ -7,17 +7,14 @@
 #include "tf_weaponbase_rocket.h"
 #include "tf_weapon_rocketlauncher.h"
 #include "tf_gamerules.h"
-#include "tf_weaponbase.h"
 
-// Server specific.
 #ifdef GAME_DLL
-#include "soundent.h"
-#include "te_effect_dispatch.h"
-#include "tf_fx.h"
-#include "iscorer.h"
-#include "tf_projectile_bomblet.h"
-extern void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
-extern void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
+	#include "soundent.h"
+	#include "tf_fx.h"
+	#include "tf_projectile_bomblet.h"
+
+	extern void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
+	extern void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
 #endif
 
 //=============================================================================
@@ -28,29 +25,25 @@ extern void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const 
 IMPLEMENT_NETWORKCLASS_ALIASED( TFBaseRocket, DT_TFBaseRocket )
 
 BEGIN_NETWORK_TABLE( CTFBaseRocket, DT_TFBaseRocket )
-// Client specific.
 #ifdef CLIENT_DLL
-RecvPropVector( RECVINFO( m_vInitialVelocity ) ),
-
-RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
-RecvPropQAngles( RECVINFO_NAME( m_angNetworkAngles, m_angRotation ) ),
-// Server specific.
+	RecvPropVector( RECVINFO( m_vInitialVelocity ) ),
+	RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+	RecvPropQAngles( RECVINFO_NAME( m_angNetworkAngles, m_angRotation ) ),
 #else
-SendPropVector( SENDINFO( m_vInitialVelocity ), 12 /*nbits*/, 0 /*flags*/, -3000 /*low value*/, 3000 /*high value*/	),
-
-SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
-SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
-
-SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_COORD_MP_INTEGRAL|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
-SendPropQAngles	(SENDINFO(m_angRotation), 6, SPROP_CHANGES_OFTEN, SendProxy_Angles ),
+	SendPropVector( SENDINFO( m_vInitialVelocity ), 12 /*nbits*/, 0 /*flags*/, -3000 /*low value*/, 3000 /*high value*/	),
+	SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
+	SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
+	SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_COORD_MP_INTEGRAL|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	SendPropQAngles	(SENDINFO(m_angRotation), 6, SPROP_CHANGES_OFTEN, SendProxy_Angles ),
 #endif
 END_NETWORK_TABLE()
+
 // Server specific.
 #ifdef GAME_DLL
-BEGIN_DATADESC( CTFBaseRocket )
-DEFINE_ENTITYFUNC( RocketTouch ),
-DEFINE_THINKFUNC( FlyThink ),
-END_DATADESC()
+	BEGIN_DATADESC( CTFBaseRocket )
+	DEFINE_ENTITYFUNC( RocketTouch ),
+	DEFINE_THINKFUNC( FlyThink ),
+	END_DATADESC()
 #endif
 
 ConVar tf_rocket_show_radius( "tf_rocket_show_radius", "0", FCVAR_REPLICATED | FCVAR_CHEAT , "Render rocket radius." );

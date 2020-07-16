@@ -10,13 +10,11 @@
 #include "tf_shareddefs.h"
 #include "tf_gamerules.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "fx_impact.h"
-// Server specific.
+	#include "fx_impact.h"
 #else
-#include "tf_fx.h"
-#include "ilagcompensationmanager.h"
+	#include "tf_fx.h"
+	#include "ilagcompensationmanager.h"
 #endif
 
 ConVar tf_use_fixed_weaponspreads( "tf_use_fixed_weaponspreads", "1", FCVAR_NOTIFY|FCVAR_REPLICATED, "If set to 1, weapons that fire multiple pellets per shot will use a non-random pellet distribution." );
@@ -152,7 +150,7 @@ void FX_FireBullets( int iPlayer, const Vector &vecOrigin, const QAngle &vecAngl
 
 	// The minigun has custom sound & animation code to deal with its windup/down.
 	if ( pPlayer->ShouldDrawThisPlayer() 
-		&& ( iWeapon != TF_WEAPON_MINIGUN && iWeapon != TF_WEAPON_GATLINGGUN && iWeapon != TFC_WEAPON_ASSAULTCANNON ) )
+		&& ( iWeapon != TF_WEAPON_MINIGUN && iWeapon != TF_WEAPON_GATLINGGUN && iWeapon != TFC_WEAPON_ASSAULTCANNON && iWeapon != TF_WEAPON_LIGHTNING_GUN ) )
 	{
 		// Fire the animation event.
 		if ( !pPlayer->IsDormant() )

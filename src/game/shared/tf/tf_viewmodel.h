@@ -12,14 +12,10 @@
 #endif
 
 #include "predictable_entity.h"
-#include "utlvector.h"
-#include "baseplayer_shared.h"
-#include "shared_classnames.h"
-#include "tf_weaponbase.h"
 
-#if defined( CLIENT_DLL )
-#define CTFViewModel C_TFViewModel
-#define CTFHandModel C_TFHandModel
+#ifdef CLIENT_DLL
+	#define CTFViewModel C_TFViewModel
+	#define CTFHandModel C_TFHandModel
 #endif
 
 class CTFViewModel : public CBaseViewModel

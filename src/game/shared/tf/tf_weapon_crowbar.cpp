@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2005, Valve Corporation, All rights reserved. =======
+//====== Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -6,16 +6,13 @@
 
 #include "cbase.h"
 #include "tf_weapon_crowbar.h"
-#include "decals.h"
 #include "tf_gamerules.h"
 #include "in_buttons.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-// Server specific.
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
+	#include "tf_player.h"
 #endif
 
 ConVar of_crowbarfastbuff("of_crowbarfastbuff", "0", FCVAR_ARCHIVE | FCVAR_REPLICATED, "The faster you're moving, the harder you smack 'em.");

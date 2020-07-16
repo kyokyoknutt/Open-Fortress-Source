@@ -8,11 +8,9 @@
 #include "tf_hud_target_id.h"
 #include "c_tf_playerresource.h"
 #include "iclientmode.h"
-#include "vgui/ILocalize.h"
 #include "c_baseobject.h"
-#include "c_team.h"
 #include "tf_gamerules.h"
-#include "tf_hud_statpanel.h"
+#include <vgui/ILocalize.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

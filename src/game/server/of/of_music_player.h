@@ -63,6 +63,7 @@ class CTFDMMusicManager : public CBaseEntity
 public:
 	DECLARE_CLASS(CTFDMMusicManager, CBaseEntity);
 	DECLARE_DATADESC();
+	DECLARE_SERVERCLASS();
 
 	CTFDMMusicManager();
 	~CTFDMMusicManager();
@@ -73,17 +74,17 @@ public:
 		return SetTransmitState( FL_EDICT_ALWAYS );
 	}	
 	// Input handlers
-	int m_iIndex;
+	CNetworkVar( int, m_iIndex );
 	bool m_bDisableThink;
 
-	CTFMusicPlayer *pWaitingMusicPlayer;
-	CTFMusicPlayer *pRoundMusicPlayer;
+	CNetworkHandle( CTFMusicPlayer, pWaitingMusicPlayer );
+	CNetworkHandle( CTFMusicPlayer, pRoundMusicPlayer );
 	
-	string_t szWaitingForPlayerMusic;
-	string_t szRoundMusic;
+	CNetworkVar(string_t, szWaitingForPlayerMusic);
+	CNetworkVar(string_t, szRoundMusic);
 	
-	string_t szWaitingMusicPlayer;
-	string_t szRoundMusicPlayer;
+	CNetworkVar(string_t, szWaitingMusicPlayer);
+	CNetworkVar(string_t, szRoundMusicPlayer);	
 };
 
 extern CTFDMMusicManager* DMMusicManager();

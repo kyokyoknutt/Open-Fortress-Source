@@ -4,10 +4,7 @@
 //
 //=============================================================================
 #include "cbase.h"
-#include <KeyValues.h>
 #include "tf_weapon_parse.h"
-#include "tf_shareddefs.h"
-#include "tf_playerclass_shared.h"
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -47,6 +44,8 @@ CTFWeaponInfo::CTFWeaponInfo()
 	m_bNoSniperCharge = false;
 	m_bAlwaysDrop = false;
 	m_bCanSoftZoom = true;
+	
+	m_flDespawnTime = 30.0f;
 	
 	szScoutViewModel[0] = 0;
 	szSoldierViewModel[0] = 0;
@@ -336,6 +335,8 @@ void CTFWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
 	m_bAlwaysDrop = ( pKeyValuesData->GetInt( "AlwaysDrop", 0 ) != 0 );
 	m_bCanSoftZoom = ( pKeyValuesData->GetInt( "CanSoftZoom", 1 ) != 0 );
 	
+	m_flDespawnTime	= pKeyValuesData->GetFloat( "DespawnTime", 30.0f );
+
 	m_bCanShieldCharge = ( pKeyValuesData->GetInt( "CanShieldCharge", 0 ) != 0 );
 	
 	m_flChargeDuration = pKeyValuesData->GetFloat( "ChargeDuration", 0.0f );

@@ -6,30 +6,11 @@
 //=============================================================================
 
 #include "cbase.h"
-
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/RichText.h>
-#include <vgui_controls/Frame.h>
-#include <vgui/IScheme.h>
-#include <game/client/iviewport.h>
-#include <vgui/IVGui.h>
-#include <KeyValues.h>
-#include <filesystem.h>
-
-#include "vguicenterprint.h"
-#include "tf_controls.h"
-#include "basemodelpanel.h"
 #include "tf_teammenu.h"
-#include <convar.h>
 #include "IGameUIFuncs.h" // for key bindings
-#include "hud.h" // for gEngfuncs
-#include "c_tf_player.h"
 #include "tf_gamerules.h"
 #include "c_team.h"
 #include "tf_hud_notification_panel.h"
-#include "teamplayroundbased_gamerules.h"
 
 using namespace vgui;
 

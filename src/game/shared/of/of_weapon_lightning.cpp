@@ -247,7 +247,7 @@ void CTFLightningGun::PrimaryAttack()
 
 			SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 
-			m_flStartFiringTime = gpGlobals->curtime + 0.16;	// 5 frames at 30 fps
+			m_flStartFiringTime = gpGlobals->curtime;	// 5 frames at 30 fps
 
 			m_iWeaponState = FT_STATE_STARTFIRING;
 		}
@@ -308,23 +308,9 @@ void CTFLightningGun::PrimaryAttack()
 #endif
 
 #if !defined (CLIENT_DLL)
-	// Let the player remember the usercmd he fired a weapon on. Assists in making decisions about lag compensation.
-	pOwner->NoteWeaponFired();
-
 	pOwner->SpeakWeaponFire();
 	CTF_GameStats.Event_PlayerFiredWeapon( pOwner, m_bCritFire );
-
-	// Move other players back to history positions based on local player's lag
-	// lagcompensation->StartLagCompensation( pOwner, pOwner->GetCurrentCommand() );
 #endif
-
-	// Find eligible entities in a cone in front of us.
-	Vector vOrigin = pOwner->Weapon_ShootPosition();
-	Vector vForward, vRight, vUp;
-	QAngle vAngles = pOwner->EyeAngles() + pOwner->GetPunchAngle();
-	AngleVectors( vAngles, &vForward, &vRight, &vUp );
-
-	#define NUM_TEST_VECTORS	30
 
 #ifdef CLIENT_DLL
 		bool bWasCritical = m_bCritFire;
@@ -359,9 +345,6 @@ void CTFLightningGun::PrimaryAttack()
 	m_flNextPrimaryAttack = gpGlobals->curtime + flFiringInterval;
 	m_flTimeWeaponIdle = gpGlobals->curtime + flFiringInterval;
 
-#if !defined (CLIENT_DLL)
-	// lagcompensation->FinishLagCompensation( pOwner );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -694,3 +677,36 @@ void CTFLightningGun::StopLightning( bool bAbrupt /* = false */ )
 }
 
 #endif
+
+acttable_t CTFLightningGun::m_acttableLightningGun[] =
+{
+	{ ACT_MP_STAND_IDLE, ACT_MERC_STAND_LIGHTNING_GUN, false },
+	{ ACT_MP_CROUCH_IDLE, ACT_MERC_CROUCH_LIGHTNING_GUN, false },
+	{ ACT_MP_RUN, ACT_MERC_RUN_LIGHTNING_GUN, false },
+	{ ACT_MP_WALK, ACT_MERC_WALK_LIGHTNING_GUN, false },
+	{ ACT_MP_AIRWALK, ACT_MERC_AIRWALK_LIGHTNING_GUN, false },
+	{ ACT_MP_CROUCHWALK, ACT_MERC_CROUCHWALK_LIGHTNING_GUN, false },
+	{ ACT_MP_JUMP, ACT_MERC_JUMP_LIGHTNING_GUN, false },
+	{ ACT_MP_JUMP_START, ACT_MERC_JUMP_START_LIGHTNING_GUN, false },
+	{ ACT_MP_JUMP_FLOAT, ACT_MERC_JUMP_FLOAT_LIGHTNING_GUN, false },
+	{ ACT_MP_JUMP_LAND, ACT_MERC_JUMP_LAND_LIGHTNING_GUN, false },
+	{ ACT_MP_SWIM, ACT_MERC_SWIM_LIGHTNING_GUN, false },
+
+	{ ACT_MP_ATTACK_STAND_PRIMARYFIRE, ACT_MERC_ATTACK_STAND_LIGHTNING_GUN, false },
+	{ ACT_MP_ATTACK_CROUCH_PRIMARYFIRE, ACT_MERC_ATTACK_CROUCH_LIGHTNING_GUN, false },
+	{ ACT_MP_ATTACK_SWIM_PRIMARYFIRE, ACT_MERC_ATTACK_SWIM_LIGHTNING_GUN, false },
+};
+
+//Act table remapping for Merc
+acttable_t *CTFLightningGun::ActivityList(int &iActivityCount)
+{
+	if (GetTFPlayerOwner()->GetPlayerClass()->GetClassIndex() == TF_CLASS_MERCENARY)
+	{
+		iActivityCount = ARRAYSIZE(m_acttableLightningGun);
+		return m_acttableLightningGun;
+	}
+	else
+	{
+		return BaseClass::ActivityList(iActivityCount);
+	}
+}

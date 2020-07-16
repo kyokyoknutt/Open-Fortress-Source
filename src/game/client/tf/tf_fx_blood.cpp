@@ -5,20 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "clienteffectprecachesystem.h"
-#include "fx_sparks.h"
-#include "iefx.h"
-#include "c_te_effect_dispatch.h"
-#include "particles_ez.h"
-#include "decals.h"
-#include "engine/IEngineSound.h"
-#include "fx_quad.h"
-#include "engine/ivdebugoverlay.h"
-#include "shareddefs.h"
-#include "fx_blood.h"
 #include "view.h"
-#include "c_tf_player.h"
-#include "debugoverlay_shared.h"
 #include "tf_gamerules.h"
 #include "c_basetempentity.h"
 #include "tier0/vprof.h"
@@ -157,6 +144,3 @@ IMPLEMENT_CLIENTCLASS_EVENT_DT(C_TETFBlood, DT_TETFBlood, CTETFBlood)
 	RecvPropVector( RECVINFO(m_vecNormal)),
 	RecvPropInt( "entindex", 0, SIZEOF_IGNORE, 0, RecvProxy_BloodEntIndex ),
 END_RECV_TABLE()
-
-
-

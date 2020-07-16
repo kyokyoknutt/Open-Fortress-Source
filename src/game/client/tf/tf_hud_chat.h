@@ -13,7 +13,6 @@
 
 #include <hud_basechat.h>
 
-
 class CHudChatLine : public CBaseHudChatLine
 {
 	DECLARE_CLASS_SIMPLE( CHudChatLine, CBaseHudChatLine );

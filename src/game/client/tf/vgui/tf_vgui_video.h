@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2007, Valve Corporation, All rights reserved. =======
+ï»¿//====== Copyright ï¿½ 1996-2007, Valve Corporation, All rights reserved. =======
 //
 // Purpose: VGUI panel which can play back video, in-engine
 //
@@ -21,14 +21,17 @@ public:
 	~CTFVideoPanel();
 
 	virtual void OnClose();
-	virtual void OnKeyCodePressed( vgui::KeyCode code ){}
+	virtual void OnKeyCodePressed( vgui::KeyCode code ) {}
+	virtual void RequestFocus( int direction = 0 ) {}
 	virtual void ApplySettings( KeyValues *inResourceData );
-	
+
 	virtual void GetPanelPos( int &xpos, int &ypos );
 	virtual void Shutdown();
 
-	float GetStartDelay(){ return m_flStartAnimDelay; }
-	float GetEndDelay(){ return m_flEndAnimDelay; }
+	float GetStartDelay() { return m_flStartAnimDelay; }
+	float GetEndDelay() { return m_flEndAnimDelay; }
+
+	bool BeginPlaybackNoAudio( const char *pFilename );
 
 protected:
 	virtual void ReleaseVideo();

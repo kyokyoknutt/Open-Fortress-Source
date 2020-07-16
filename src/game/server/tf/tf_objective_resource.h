@@ -11,7 +11,6 @@
 #pragma once
 #endif
 
-#include "tf_shareddefs.h"
 #include "team_objectiveresource.h"
 
 class CTFObjectiveResource : public CBaseTeamObjectiveResource

@@ -7,17 +7,9 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "hud.h"
-#include "in_buttons.h"
-#include "clientmode_tf.h"
-#include "engine/IEngineSound.h"
 #include "c_tf_weapon_builder.h"
 #include "c_weapon__stubs.h"
-#include "iinput.h"
-#include <vgui/IVGui.h>
 #include "c_tf_player.h"
-#include "c_vguiscreen.h"
-#include "ienginevgui.h"
 
 STUB_WEAPON_CLASS_IMPLEMENT( tf_weapon_builder, C_TFWeaponBuilder );
 

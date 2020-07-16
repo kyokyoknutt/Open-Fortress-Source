@@ -1865,7 +1865,7 @@ int C_BaseFlex::FlexControllerLocalToGlobal( const flexsettinghdr_t *pSettinghdr
 		}
 	}
 
-	FS_LocalToGlobal_t& result = m_LocalToGlobal[ idx ];
+	const FS_LocalToGlobal_t &result = m_LocalToGlobal[ idx ];
 	// Validate lookup
 	Assert( result.m_nCount != 0 && key < result.m_nCount );
 	int index = result.m_Mapping[ key ];

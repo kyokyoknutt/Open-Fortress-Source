@@ -30,7 +30,12 @@ class CVGuiScreen;
 #define CBaseCombatWeapon C_BaseCombatWeapon
 #endif
 
+#if defined ( OF_DLL ) || defined ( OF_CLIENT_DLL )
+#define VIEWMODEL_INDEX_BITS 2 // allows 4 hands. see shareddef's MAX_VIEWMODELS
+// (also unfortunately makes a net struct 49 bits)
+#else
 #define VIEWMODEL_INDEX_BITS 1
+#endif
 
 class CBaseViewModel : public CBaseAnimating, public IHasOwner
 {

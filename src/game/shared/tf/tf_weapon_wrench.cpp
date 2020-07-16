@@ -6,18 +6,7 @@
 
 #include "cbase.h"
 #include "tf_weapon_wrench.h"
-#include "decals.h"
 #include "baseobject_shared.h"
-
-// Client specific.
-#ifdef CLIENT_DLL
-	#include "c_tf_player.h"
-// Server specific.
-#else
-	#include "tf_player.h"
-	#include "variant_t.h"
-#endif
-
 #include "tf_gamerules.h"
 
 //=============================================================================

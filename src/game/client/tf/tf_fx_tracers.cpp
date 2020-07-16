@@ -4,17 +4,12 @@
 //
 //=============================================================================
 #include "cbase.h"
-#include "fx.h"
-#include "c_te_effect_dispatch.h"
-#include "tier0/vprof.h"
 #include "clientsideeffects.h"
 #include "clienteffectprecachesystem.h"
 #include "view.h"
 #include "collisionutils.h"
-#include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "engine/IEngineSound.h"
 #include "c_tf_player.h"
-#include "tf_gamerules.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

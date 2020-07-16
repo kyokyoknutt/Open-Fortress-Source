@@ -1,17 +1,6 @@
 
 #include "cbase.h"
-
-#include "nav_mesh.h"
-#include "nav_colors.h"
-#include "fmtstr.h"
-#include "props_shared.h"
-
-#include "functorutils.h"
-#include "team.h"
-#include "nav_entities.h"
-
 #include "tf_nav_area.h"
-
 #include "tf_bot.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

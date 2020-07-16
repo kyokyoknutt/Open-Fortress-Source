@@ -5,11 +5,7 @@
 // $NoKeywords: $
 //=============================================================================
 #include "cbase.h"
-#include "engine/IEngineSound.h"
-#include "hud.h"
-#include "recvproxy.h"
 #include "c_tf_team.h"
-#include "tf_shareddefs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

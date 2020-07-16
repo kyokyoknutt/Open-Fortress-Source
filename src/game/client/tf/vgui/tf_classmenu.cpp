@@ -7,25 +7,9 @@
 
 #include "cbase.h"
 #include "tf_classmenu.h"
-
-#include <KeyValues.h>
-#include <filesystem.h>
-#include <vgui_controls/Button.h>
-#include <vgui/IVGui.h>
-
-#include "hud.h" // for gEngfuncs
-#include "c_tf_player.h"
-#include "c_tf_team.h"
-#include "c_tf_playerresource.h"
-
-#include "tf_controls.h"
-#include "vguicenterprint.h"
-#include "of_imagemouseoverbutton.h"
-#include "IconPanel.h"
-
 #include "IGameUIFuncs.h" // for key bindings
-
 #include "tf_hud_notification_panel.h"
+#include "c_tf_playerresource.h"
 
 extern IGameUIFuncs *gameuifuncs; // for key binding details
 
@@ -148,7 +132,7 @@ void CTFClassMenu::ApplySchemeSettings( IScheme *pScheme )
 		if ( button )
 		{
 			button->SetPreserveArmedButtons( true );
-			button->SetUpdateDefaultButtons( true );
+			GetFocusNavGroup().SetDefaultButton(button);
 		}
 	}
 }
@@ -181,6 +165,7 @@ CTFImageMouseOverButton<CTFClassInfoPanel> *CTFClassMenu::GetCurrentClassButton(
 	}
 
 	m_iCurrentClassIndex = GetIndexForClass( iClass );
+	
 	return m_pClassButtons[iClass];
 }
 
@@ -231,6 +216,13 @@ void CTFClassMenu::ShowPanel( bool bShow )
 			{
 				if ( button == pInitialButton )
 				{
+					button->ShowPage();
+					button->SetArmed( true );
+					button->SetAsDefaultButton( 1 );
+					GetFocusNavGroup().SetDefaultButton(button);
+
+					g_lastButton = button;
+
 					CModelPanel *pModelPanel = dynamic_cast<CModelPanel *>(button->FindChildByName( "classModel" ) );
 					if ( pModelPanel )
 					{
@@ -257,11 +249,6 @@ void CTFClassMenu::ShowPanel( bool bShow )
 						iVisibleTeam = GetTeamNumber() < TF_TEAM_RED ? TF_TEAM_MERCENARY : GetTeamNumber();
 						pModelPanel->SetAttachmentsSkin( iVisibleTeam - 2 );
 					}
-					button->ShowPage();
-					button->SetArmed( true );
-					button->SetAsDefaultButton( 1 );
-
-					g_lastButton = button;
 				}
 				else
 				{

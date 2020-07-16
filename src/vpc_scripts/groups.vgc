@@ -15,6 +15,13 @@ $Group "gamedlls"
 	"gameui"
 }
 
+$Group "UserInterface"
+{
+	"vgui_controls"
+	"client"
+	"gameui"
+}
+
 $Group "game"
 {
 	"client"

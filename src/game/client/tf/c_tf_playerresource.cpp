@@ -6,9 +6,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include "c_tf_playerresource.h"
-#include <shareddefs.h>
-#include <tf_shareddefs.h>
-#include "hud.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

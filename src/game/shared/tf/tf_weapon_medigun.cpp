@@ -8,28 +8,18 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
+#include "tf_weapon_medigun.h"
 #include "in_buttons.h"
-#include "engine/IEngineSound.h"
 #include "tf_gamerules.h"
 
-#if defined( CLIENT_DLL )
-#include <vgui_controls/Panel.h>
-#include <vgui/ISurface.h>
-#include "particles_simple.h"
-#include "c_tf_player.h"
-#include "soundenvelope.h"
-#include "iefx.h"
-#include "dlight.h"
-#include "tempent.h"
+#ifdef CLIENT_DLL
+	#include "soundenvelope.h"
+	#include "iefx.h"
+	#include "dlight.h"
 #else
-#include "ndebugoverlay.h"
-#include "tf_player.h"
-#include "tf_team.h"
-#include "tf_gamestats.h"
-#include "ilagcompensationmanager.h"
+	#include "tf_gamestats.h"
+	#include "ilagcompensationmanager.h"
 #endif
-
-#include "tf_weapon_medigun.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -796,7 +786,7 @@ void CWeaponMedigun::RemoveHealingTarget( bool bStopHealingSelf )
 		pOwner->DoAnimationEvent( PLAYERANIMEVENT_ATTACK_POST );
 	}
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	m_DamageModifier.RemoveModifier();
 #endif
 	m_bHealing = false;

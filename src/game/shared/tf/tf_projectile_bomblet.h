@@ -10,12 +10,9 @@
 #endif
 
 #include "tf_weapon_grenade_pipebomb.h"
-#include "KeyValues.h"
-#include "networkvar.h"
-#include "tf_shareddefs.h"
 
 #ifdef CLIENT_DLL
-#define CTFGrenadeMirvBomb C_TFGrenadeMirvBomb
+	#define CTFGrenadeMirvBomb C_TFGrenadeMirvBomb
 #endif
 
 class CTFGrenadeMirvBomb : public CTFGrenadePipebombProjectile

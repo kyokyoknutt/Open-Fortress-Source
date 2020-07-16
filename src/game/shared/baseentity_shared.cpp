@@ -1170,7 +1170,21 @@ void CBaseEntity::VPhysicsUpdate( IPhysicsObject *pPhysics )
 			{
 				if ( CheckEmitReasonablePhysicsSpew() )
 				{
+#if defined ( OF_DLL ) || defined ( OF_CLIENT_DLL )
+					// This can crash vphysics, so move it inbounds and kill it immediately
+					Warning( "Killing entity %s with unreasonable position (%f,%f,%f) from vphysics!\n", GetDebugName(), origin.x, origin.y, origin.z );
+					SetMoveType( MOVETYPE_NONE );
+					Vector vecOrigin;
+					SetAbsOrigin( vecOrigin );
+					VPhysicsDestroyObject();
+#ifdef OF_DLL					
+					UTIL_Remove( this );
+#else
+					Remove();
+#endif
+#else
 					Warning( "Ignoring unreasonable position (%f,%f,%f) from vphysics! (entity %s)\n", origin.x, origin.y, origin.z, GetDebugName() );
+#endif
 				}
 			}
 

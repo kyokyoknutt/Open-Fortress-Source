@@ -96,6 +96,7 @@ enum {
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
 	WINREASON_POINTLIMIT,
 	WINREASON_JUGGERNAUGHT_TIMER,
+	//WINREASON_RAGEQUIT,
 #endif
 };
 
@@ -278,7 +279,7 @@ public: // IGameEventListener Interface
 	virtual void FireGameEvent( IGameEvent * event );
 	
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
-	void BroadcastSound( int iTeam, const char *sound, bool bAnnouncer = true, int iExcludePlayers = -1 );
+	void BroadcastSound( int iTeam, const char *sound, bool bAnnouncer = true, int iAdditionalSoundFlags = 0, int iExcludePlayers = -1 );
 	void BroadcastSoundFFA( int iPlayer, const char *sound, const char *sound_rest = NULL, bool bAnnouncer = true );
 #endif
 

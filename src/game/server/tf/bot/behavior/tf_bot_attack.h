@@ -4,10 +4,7 @@
 #pragma once
 #endif
 
-
-#include "NextBotBehavior.h"
 #include "Path/NextBotChasePath.h"
-#include "NextBotUtil.h"
 
 class CTFBotAttack : public Action<CTFBot>
 {

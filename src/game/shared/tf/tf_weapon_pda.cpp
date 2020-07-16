@@ -6,16 +6,12 @@
 
 #include "cbase.h"
 #include "tf_weapon_pda.h"
-#include "in_buttons.h"
 
-// Server specific.
-#if !defined( CLIENT_DLL )
-#include "tf_player.h"
-#include "vguiscreen.h"
-// Client specific.
+#ifdef CLIENT_DLL
+	#include "c_tf_player.h"
 #else
-#include "c_tf_player.h"
-#include <igameevents.h>
+	#include "tf_player.h"
+	#include "vguiscreen.h"
 #endif
 
 //=============================================================================

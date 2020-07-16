@@ -4,6 +4,9 @@
 #pragma once
 #endif
 
+#include <vgui_controls/EditablePanel.h>
+#include <vgui_controls/ImagePanel.h>
+
 using namespace vgui;
 
 #define TF_MAX_FILENAME_LENGTH	128
@@ -26,7 +29,7 @@ public:
 
 	CTFHudMedals(const char *pElementName);
 
-	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
+	virtual void ApplySchemeSettings(IScheme *pScheme);
 	virtual void FireGameEvent(IGameEvent *event);
 	virtual void Reset();
 	virtual bool ShouldDraw(void);

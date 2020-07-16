@@ -7,22 +7,16 @@
 
 #include "cbase.h"
 
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/RichText.h>
 #include <game/client/iviewport.h>
 #include <vgui/ILocalize.h>
-#include <KeyValues.h>
-#include <filesystem.h>
-#include "IGameUIFuncs.h" // for key bindings
-
-#ifdef _WIN32
-#include "winerror.h"
-#endif
-#include "ixboxsystem.h"
 #include "tf_gamerules.h"
 #include "tf_controls.h"
-#include "tf_shareddefs.h"
 #include "tf_mapinfomenu.h"
+#include "filesystem.h"
+
+#ifdef _WIN32
+	#include "winerror.h"
+#endif
 
 using namespace vgui;
 

@@ -6,17 +6,8 @@
 //=============================================================================
 
 #include "cbase.h"
-#include "hud.h"
 #include "hud_macros.h"
-#include "c_tf_player.h"
 #include "iclientmode.h"
-#include "ienginevgui.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
-#include "tf_shareddefs.h"
 #include "tf_hud_notification_panel.h"
 #include "tf_hud_freezepanel.h"
 

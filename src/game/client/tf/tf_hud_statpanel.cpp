@@ -7,32 +7,22 @@
 //=============================================================================//
 
 #include "cbase.h"
-#ifdef _WIN32
-#include "winerror.h"
-#endif
-#include "tf_hud_statpanel.h"
-#include "tf_hud_winpanel.h"
-#include <vgui/IVGui.h>
-#include "vgui_controls/AnimationController.h"
+
 #include "iclientmode.h"
-#include "c_tf_playerresource.h"
-#include <vgui_controls/Label.h>
 #include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include "tf/c_tf_player.h"
-#include "tf/c_tf_team.h"
 #include "tf/tf_steamstats.h"
-#include "filesystem.h"
-#include "dmxloader/dmxloader.h"
 #include "fmtstr.h"
 #include "tf_statsummary.h"
-#include "usermessages.h"
 #include "hud_macros.h"
 #include "ixboxsystem.h"
 #include "achievementmgr.h"
 #include "tf_hud_freezepanel.h"
-#include "tf_gamestats_shared.h"
 #include "tf_gamerules.h"
+#include "filesystem.h"
+
+#ifdef _WIN32
+	#include "winerror.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

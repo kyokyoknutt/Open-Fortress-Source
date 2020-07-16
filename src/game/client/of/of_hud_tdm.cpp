@@ -5,39 +5,13 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hud.h"
-#include "hudelement.h"
-#include "hud_macros.h"
-#include "hud_numericdisplay.h"
-#include <KeyValues.h>
-#include <vgui/IScheme.h>
 #include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui_controls/AnimationController.h>
 #include "iclientmode.h"
-#include "tf_shareddefs.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui/ISurface.h>
-#include <vgui/IImage.h>
-#include <vgui_controls/Label.h>
-
-#include "tf_controls.h"
-#include "in_buttons.h"
-#include "tf_imagepanel.h"
 #include "c_team.h"
-#include "c_tf_player.h"
 #include "ihudlcd.h"
 #include "of_hud_tdm.h"
 #include "tf_gamerules.h"
 #include "c_tf_playerresource.h"
-#include "multiplay_gamerules.h"
-#include "of_imageprogressbar.h"
-
-#include <vgui/VGUI.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/ProgressBar.h>
 
 using namespace vgui;
 
@@ -199,18 +173,3 @@ void CTFHudTDM::OnThink()
 		m_flNextThink = gpGlobals->curtime + 0.1f;
 	}
 }
-
-ConVar uv1_1_x( "uv1_1_x", "1", FCVAR_CHEAT );
-ConVar uv2_1_x( "uv2_1_x", "1", FCVAR_CHEAT );
-ConVar uv2_2_x( "uv2_2_x", "1", FCVAR_CHEAT );
-ConVar uv1_2_x( "uv1_2_x", "1", FCVAR_CHEAT );
-
-ConVar uv1_1_y( "uv1_1_y", "1", FCVAR_CHEAT );
-ConVar uv2_1_y( "uv2_1_y", "1", FCVAR_CHEAT );
-ConVar uv2_2_y( "uv2_2_y", "1", FCVAR_CHEAT );
-ConVar uv1_2_y( "uv1_2_y", "1", FCVAR_CHEAT );
-
-ConVar vert0_x( "vert0_x", "1", FCVAR_CHEAT );
-ConVar vert1_x( "vert1_x", "1", FCVAR_CHEAT );
-ConVar vert2_x( "vert2_x", "1", FCVAR_CHEAT );
-ConVar vert3_x( "vert3_x", "1", FCVAR_CHEAT );

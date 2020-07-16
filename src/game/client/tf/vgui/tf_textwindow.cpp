@@ -7,33 +7,11 @@
 
 #include "cbase.h"
 #include "tf_textwindow.h"
-#include <cdll_client_int.h>
-
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <filesystem.h>
-#include <KeyValues.h>
-#include <convar.h>
-#include <vgui_controls/ImageList.h>
-
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/BuildGroup.h>
-#include <vgui_controls/ImagePanel.h>
-
-#include "tf_controls.h"
-#include "tf_shareddefs.h"
-
-#include "IGameUIFuncs.h" // for key bindings
-#include <igameresources.h>
-extern IGameUIFuncs *gameuifuncs; // for key binding details
-
-#include <game/client/iviewport.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+extern IGameUIFuncs *gameuifuncs; // for key binding details
 
 using namespace vgui;
 

@@ -4,25 +4,19 @@
 //
 //=============================================================================//
 #include "cbase.h" 
-#include "tf_fx_shared.h"
 #include "tf_weapon_sniperrifle.h"
+#include "tf_fx_shared.h"
 #include "in_buttons.h"
 
 // Client specific.
 #ifdef CLIENT_DLL
-#include "view.h"
-#include "beamdraw.h"
-#include "vgui/ISurface.h"
-#include <vgui/ILocalize.h>
-#include "vgui_controls/Controls.h"
-#include "hud_crosshair.h"
-#include "functionproxy.h"
-#include "materialsystem/imaterialvar.h"
-#include "toolframework_client.h"
-#include "input.h"
+	#include "view.h"
+	#include "beamdraw.h"
+	#include "functionproxy.h"
+	#include "toolframework_client.h"
 
-// forward declarations
-void ToolFramework_RecordMaterialParams( IMaterial *pMaterial );
+	// forward declarations
+	//void ToolFramework_RecordMaterialParams( IMaterial *pMaterial );
 #endif
 
 #define TF_WEAPON_SNIPERRIFLE_UNCHARGE_PER_SEC	75.0
@@ -33,8 +27,8 @@ void ToolFramework_RecordMaterialParams( IMaterial *pMaterial );
 #define SNIPER_DOT_SPRITE_RED		"effects/sniperdot_red.vmt"
 #define SNIPER_DOT_SPRITE_BLUE		"effects/sniperdot_blue.vmt"
 
-#if defined (CLIENT_DLL)
-ConVar of_holdtozoom( "of_holdtozoom", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE | FCVAR_USERINFO, "Hold Mouse2 to zoom instead of Toggling it." );
+#ifdef CLIENT_DLL
+	ConVar of_holdtozoom( "of_holdtozoom", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE | FCVAR_USERINFO, "Hold Mouse2 to zoom instead of Toggling it." );
 #endif
 
 ConVar of_headshots	( "of_headshots", "0", FCVAR_REPLICATED | FCVAR_NOTIFY , "Makes all hitscan weapons headshot when set. 2 will force headshots only damage." );

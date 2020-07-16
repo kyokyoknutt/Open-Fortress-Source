@@ -9,14 +9,12 @@
 #endif
 
 #ifdef CLIENT_DLL
-#include "c_props.h"
-#else
-#include "props.h"
-#endif
+	#include "c_props.h"
 
-#ifdef CLIENT_DLL
-#define CTFPlayer C_TFPlayer
-#define CTFItem C_TFItem
+	#define CTFPlayer C_TFPlayer
+	#define CTFItem C_TFItem
+#else
+	#include "props.h"
 #endif
 
 class CTFPlayer;

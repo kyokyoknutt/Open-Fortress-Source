@@ -7,10 +7,6 @@
 
 #include "cbase.h"
 #include "cvartogglecheckbutton.h"
-#include <vgui/IVGui.h>
-#include "tier1/KeyValues.h"
-#include "tier1/convar.h"
-#include "IGameUIFuncs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

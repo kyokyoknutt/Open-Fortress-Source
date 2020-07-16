@@ -9,22 +9,13 @@
 #pragma once
 #endif
 
-#include "cbase.h"
-#include "tf_shareddefs.h"
-
-// Client specific.
 #ifdef CLIENT_DLL
-	#include "c_baseanimating.h"
 	#include "tempent.h"
-// Server specific.
-#else
-	#include "baseanimating.h"
-	#include "iscorer.h"
-#endif
 
-#ifdef CLIENT_DLL
-#define CTFBaseProjectile C_TFBaseProjectile
-C_LocalTempEntity *ClientsideProjectileCallback( const CEffectData &data, float flGravityBase, const char *pszParticleName = NULL );
+	#define CTFBaseProjectile C_TFBaseProjectile
+	C_LocalTempEntity *ClientsideProjectileCallback( const CEffectData &data, float flGravityBase, const char *pszParticleName = NULL );
+#else
+	#include "iscorer.h"
 #endif
 
 /* 

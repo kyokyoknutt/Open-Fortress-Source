@@ -1,4 +1,3 @@
-
 #include "cbase.h"
 #include "c_of_trigger_jump.h"
 

@@ -8,19 +8,14 @@
 //=============================================================================
 
 #include "cbase.h"
-#include "hud.h"
 #include "hudelement.h"
 #include "c_tf_player.h"
-#include "tf_weaponbase_melee.h"
 #include "iclientmode.h"
-#include "ienginevgui.h"
-#include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
 #include <vgui_controls/EditablePanel.h>
 #include <vgui_controls/ProgressBar.h>
 #include <vgui_controls/Label.h>
-#include "view.h"
 #include <../shared/gamemovement.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -28,8 +23,9 @@
 
 using namespace vgui;
 
-#define SHADOW_OFFSET 2
 #define V_LENGTH 200
+#define LINE_THICKNESS 20
+#define MIN_LINE_WIDTH 4
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -100,12 +96,11 @@ ConVar hud_speedometer("hud_speedometer", "0", FCVAR_ARCHIVE, "0: Off. 1: Shows 
 ConVar hud_speedometer_opacity("hud_speedometer_opacity", "150", FCVAR_ARCHIVE, "Sets the opacity of the speedometer overlay.", true, 0.0f, true, 255.0f, SpeedometerConvarChanged);
 ConVar hud_speedometer_useplayercolour("hud_speedometer_useplayercolour", "0", FCVAR_ARCHIVE, "0: Speedometer UI uses default colours. 1: Speedometer UI uses the player's colour. 2: Uses complimentary colour.", SpeedometerConvarChanged);
 
-
-ConVar hud_speedometer_vectors("hud_speedometer_vectors", "1", FCVAR_ARCHIVE, "Enables velocity and input vectors on the speedometer UI.", SpeedometerConvarChanged);
+ConVar hud_speedometer_vectors("hud_speedometer_vectors", "0", FCVAR_ARCHIVE, "Enables velocity and input vectors on the speedometer UI.", SpeedometerConvarChanged);
 ConVar hud_speedometer_vectors_useplayercolour("hud_speedometer_vectors_useplayercolour", "0", FCVAR_ARCHIVE, "0: Speedometer vectors use default colours. 1: Speedometer vectors use the player's colour and complimentary colour.", SpeedometerConvarChanged);
 
 //ConVar hud_speedometer_keeplevel("hud_speedometer_keeplevel", "1", FCVAR_ARCHIVE, "0: Speedometer is centred on screen. 1: Speedometer shifts up and down to keep level with the horizon.", SpeedometerConvarChanged);
-//ConVar hud_speedometer_optimalangle("hud_speedometer_optimalangle", "0", FCVAR_ARCHIVE, "Enables the optimal angle indicator for airstrafing.", SpeedometerConvarChanged);
+ConVar hud_speedometer_optimalangle("hud_speedometer_optimalangle", "0", FCVAR_ARCHIVE, "Enables the optimal angle indicator for airstrafing.", SpeedometerConvarChanged);
 
 
 // Cached versions of the ConVars that get used every frame/draw update (More efficient).
@@ -113,6 +108,7 @@ ConVar hud_speedometer_vectors_useplayercolour("hud_speedometer_vectors_useplaye
 int iSpeedometer = hud_speedometer.GetInt();
 bool bDelta = hud_speedometer.GetInt() > 1;
 bool bVectors = hud_speedometer_vectors.GetBool();
+bool bOptimalAngle = false;
 const float flSpeedometermax = 1000.0f;
 //float flMaxspeed = -1.0f;
 
@@ -125,7 +121,12 @@ extern ConVar of_color_g;
 extern ConVar of_color_b;
 
 extern CMoveData *g_pMoveData;
+extern ConVar of_movementmode;
+extern ConVar of_q3airaccelerate;
+extern ConVar of_cslideaccelerate;
+extern ConVar of_cslidestopspeed;
 extern ConVar mp_maxairspeed;
+extern ConVar sv_accelerate;
 extern ConVar sv_airaccelerate;
 
 void SpeedometerConvarChanged(IConVar *var, const char *pOldValue, float flOldValue)
@@ -138,6 +139,8 @@ void SpeedometerConvarChanged(IConVar *var, const char *pOldValue, float flOldVa
 	
 	// Attempt to automatically reload the HUD and scheme each time
 	engine->ExecuteClientCmd("hud_reloadscheme");
+
+	bOptimalAngle = hud_speedometer_optimalangle.GetBool();
 }
 
 //-----------------------------------------------------------------------------
@@ -218,7 +221,6 @@ void CHudSpeedometer::ApplySchemeSettings(IScheme *pScheme)
 
 void CHudSpeedometer::UpdateColours()
 {
-
 	// Grab the colours
 	playerColourBase = Color(of_color_r.GetFloat(), of_color_g.GetFloat(), of_color_b.GetFloat(), hud_speedometer_opacity.GetFloat());
 	playerColourComplementary = GetComplimentaryColour(playerColourBase);
@@ -230,7 +232,6 @@ void CHudSpeedometer::UpdateColours()
 	playerColour = &colourDefault;
 	// By default, it's just a black shadow
 	playerColourShadow = &playerColourShadowbase;
-
 
 	if (hud_speedometer_useplayercolour.GetInt() >= 1)
 	{
@@ -401,8 +402,7 @@ void CHudSpeedometer::OnTick(void)
 				// Set the sign (More clarity, keeps width nice and consistent :)
 				// If negative, continue as usual, but otherwise prepend a + or ~ if we're >0 or ==0
 				char s[8];
-				char sign = (difference > 0 ? '+' : (difference == 0 ? '~' : '-'));
-				Q_snprintf(s, sizeof(s), "%c%i", sign, difference);
+				Q_snprintf(s, sizeof(s), "%+d", difference);
 
 				SetDialogVariable("speeddelta", s);
 
@@ -420,10 +420,8 @@ void CHudSpeedometer::Paint(void)
 {
 	BaseClass::Paint();
 
-	// Omitted currently due to optimal angle display being incorrect
-	/*if (bOptimalAngle) {
+	if (bOptimalAngle)
 		QStrafeJumpHelp();
-	}*/
 
 	if (bVectors)
 	{
@@ -467,50 +465,68 @@ void CHudSpeedometer::Paint(void)
 	}
 }
 
-// Working in Radians, outputting in degrees
-// DeltaAngle is implemented above.
-// VectorAngle is just atan2 according to https://zdoom.org/wiki/VectorAngle, hence atan2 has been used (radians) whereby VectorAngle(x,y) = atan2(y,x)
-// TICRATE -> integer representing the number of TICKS per second?
-void CHudSpeedometer::QStrafeJumpHelp() {
-
-	C_BasePlayer *pPlayerBase = C_TFPlayer::GetLocalPlayer();
-	if (!pPlayerBase)
+void CHudSpeedometer::QStrafeJumpHelp()
+{
+	C_TFPlayer *pPlayerBase = C_TFPlayer::GetLocalTFPlayer();
+	if (!pPlayerBase || pPlayerBase->GetWaterLevel() > 2 || pPlayerBase->m_Shared.GetHook() || pPlayerBase->GetMoveType() == MOVETYPE_LADDER)
 		return;
-	//===============================================
-	//Gather info
-	// Unit directional input - LOCAL, angle from atan2 is 0 at East, so use (forwardmove,-sidemove)
-
-	Vector vel = g_pMoveData->m_vecVelocity;
-	vel = Vector(vel.x, vel.y, 0);
-
-	float speed = vel.Length();
 
 	float forwardMove = g_pMoveData->m_flForwardMove;
 	float sideMove = g_pMoveData->m_flSideMove;
 
-	// Don't try if the player is holding W.
-	/*if (forwardMove) {
+	//No movement keys pressed
+	if ((!g_pMoveData->m_flForwardMove && !g_pMoveData->m_flSideMove) || pPlayerBase->GetWaterLevel() > WL_Feet)
 		return;
-	}*/
 
+	Vector vel = Vector(g_pMoveData->m_vecVelocity.x, g_pMoveData->m_vecVelocity.y, 0);
+	float speed = vel.Length();
+
+	//no speed
+	if (speed < 1.f)
+		return;
+
+	//===============================================
+	//Gather info
 	Vector wishDir = Vector(forwardMove, -sideMove, 0);
-	float wishSpeed = VectorNormalize(wishDir);
 	float PAngle = DEG2RAD(g_pMoveData->m_vecViewAngles.y) + atan2(wishDir.y, wishDir.x);
 	float velAngle = atan2(vel.y, vel.x);
+	float wishSpeed = VectorNormalize(wishDir);
 
-	if (!g_pMoveData->m_flForwardMove && !g_pMoveData->m_flSideMove) { return; }
+	float maxCurSpeed, maxAccel;
+	if (pPlayerBase->IsCSliding()) //csliding
+	{
+		wishSpeed = min(speed, of_cslidestopspeed.GetFloat());
+		maxAccel = min(of_cslideaccelerate.GetFloat() * wishSpeed * gpGlobals->interval_per_tick, wishSpeed);
+	}
+	else
+	{
+		wishSpeed = min(wishSpeed, g_pMoveData->m_flMaxSpeed);
 
-	// CTFGameMovement::AirMove does this clamp so we do it too (But without the pointless "wishvel" line)
-	if (wishSpeed != 0 && (wishSpeed > g_pMoveData->m_flMaxSpeed))
-		wishSpeed = g_pMoveData->m_flMaxSpeed;
-	
-	if (wishSpeed > mp_maxairspeed.GetFloat())
-		wishSpeed = mp_maxairspeed.GetFloat();
+		if (pPlayerBase->GetGroundEntity() && !(g_pMoveData->m_nButtons & (1 << 1))) //On the ground and not jumping
+		{
+			if (speed <= g_pMoveData->m_flMaxSpeed + 0.1f) return;
+			maxAccel = min(sv_accelerate.GetFloat() * wishSpeed * gpGlobals->interval_per_tick * pPlayerBase->GetSurfaceFriction(), wishSpeed);
+		}
+		else
+		{
+			int moveMode = of_movementmode.GetInt();
 
+			if (!moveMode || (moveMode == 2 && !forwardMove && sideMove)) //all Q1 acceleration scenarios
+			{
+				wishSpeed = min(wishSpeed, mp_maxairspeed.GetFloat());
+				maxAccel = min(sv_airaccelerate.GetFloat() * wishSpeed * gpGlobals->interval_per_tick, wishSpeed);
+			}
+			else //Q3
+			{
+				if (speed <= g_pMoveData->m_flMaxSpeed + 0.1f) return;
+				maxAccel = min(of_q3airaccelerate.GetFloat() * wishSpeed * gpGlobals->interval_per_tick, wishSpeed);
+			}
+		}
+	}
+	maxCurSpeed = wishSpeed - maxAccel;
 
-	float maxAccel = min(sv_airaccelerate.GetFloat() * wishSpeed * gpGlobals->interval_per_tick, wishSpeed); //often 30
-	float maxCurSpeed = wishSpeed - maxAccel; // often 0
-
+	//===============================================
+	//Calculate angles
 	float minAngle = acosf(wishSpeed / speed);
 	float optimalAngle = acosf(maxCurSpeed / speed);
 
@@ -521,57 +537,28 @@ void CHudSpeedometer::QStrafeJumpHelp() {
 	}
 
 	minAngle = RAD2DEG(DeltaAngleRad(PAngle, minAngle + velAngle)) * FOVScale;
-
 	optimalAngle = RAD2DEG(DeltaAngleRad(PAngle, optimalAngle + velAngle))  * FOVScale;
 
-	/*if (bOptimalAngleExponential) {
-		float maxAngleOnScreen = flOptimalAngleMax * FOVScale;
-		float clampedAngle = min(maxAngleOnScreen, optimalAngle);
-
-		//float exponentialAngle = 1 / (clampedAngle / maxAngleOnScreen);
-		//exponentialAngle = min(exponentialAngle, 50);//hardlimit @ 50
-
-		float scaledAngle = (ScreenWidth() * flOptimalAngleScreenwidth / 2.0f) * (clampedAngle / maxAngleOnScreen);
-
-		optimalAngle = scaledAngle;
-	}*/
-
-	const float thickness = 20;
-	int xOpt = iCentreScreenX - (optimalAngle);
-	int xMin = iCentreScreenX - (minAngle);
-
+	//===============================================
+	//Draw angle indicators
+	int xMin = iCentreScreenX - minAngle;
+	int xOpt = iCentreScreenX - optimalAngle;
 
 	int yHorizon = iCentreScreenY;
-
-	// Tries to keep the UI level with the horizon
-	/*if (bKeepLevel) {
-		int iX, iY;
-		Vector vecTarget = MainViewOrigin() + Vector(MainViewForward().x, MainViewForward().y, 0.0f);
-		GetVectorInScreenSpace(vecTarget, iX, iY);
-		yHorizon = iY;
-	}*/
-
 	int yTop = yHorizon;
-	int yBottom = yHorizon + thickness;
-	yTop = clamp(yTop, 0, ScreenHeight() - thickness);
-	yBottom = clamp(yBottom, 0 + thickness, ScreenHeight());
+	int yBottom = yHorizon + LINE_THICKNESS;
+	yTop = clamp(yTop, 0, ScreenHeight() - LINE_THICKNESS);
+	yBottom = clamp(yBottom, LINE_THICKNESS, ScreenHeight());
 
 	// Gotta do it top left to bottom right
 	if (xMin >= xOpt)
 	{
-		surface()->DrawSetColor(playerColourComplementary);
-		surface()->DrawFilledRect(xOpt + SHADOW_OFFSET, yTop + SHADOW_OFFSET, xMin + SHADOW_OFFSET, yBottom + SHADOW_OFFSET);
-		surface()->DrawSetColor(*playerColour);
-		surface()->DrawFilledRect(xOpt, yTop, xMin, yBottom);
-	}
-	else
-	{
-		surface()->DrawSetColor(playerColourComplementary);
-		surface()->DrawFilledRect(xMin + SHADOW_OFFSET, yTop + SHADOW_OFFSET, xOpt + SHADOW_OFFSET, yBottom + SHADOW_OFFSET);
-		surface()->DrawSetColor(*playerColour);
-		surface()->DrawFilledRect(xMin, yTop, xOpt, yBottom);
+		int temp = xOpt;
+		xOpt = xMin;
+		xMin = temp;
 	}
 
-	//DrawTextFromNumber("MIN: ", minAngle / FOVScale, Color(200, 255, 200, 25), 150, -20);
-	//DrawTextFromNumber("OPTIMAL: ", optimalAngle / FOVScale, Color(255, 200, 200, 25), 150, -10);
+	xMin = min(xMin, xOpt - MIN_LINE_WIDTH);
+	surface()->DrawSetColor(*playerColour);
+	surface()->DrawFilledRect(xMin, yTop, xOpt, yBottom);
 }

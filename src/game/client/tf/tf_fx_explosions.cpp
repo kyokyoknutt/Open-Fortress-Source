@@ -4,14 +4,8 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "c_te_effect_dispatch.h"
-#include "tempent.h"
-#include "c_te_legacytempents.h"
-#include "tf_shareddefs.h"
 #include "engine/IEngineSound.h"
-#include "tf_weapon_parse.h"
 #include "ragdollexplosionenumerator.h"
-#include "tf_weapon_rocketlauncher.h"
 #include "c_tf_player.h"
 #include "c_basetempentity.h"
 #include "tier0/vprof.h"

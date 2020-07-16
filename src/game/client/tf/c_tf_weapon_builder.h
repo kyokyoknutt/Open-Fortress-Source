@@ -11,9 +11,6 @@
 #pragma once
 #endif
 
-//#include "c_tf_basecombatweapon.h"
-//#include "weapon_combat_usedwithshieldbase.h"
-
 #include "tf_weaponbase.h"
 #include "c_baseobject.h"
 

@@ -9,7 +9,6 @@
 #include "tier3/tier3.h"
 #include "EngineInterface.h"
 #include <vgui/ILocalize.h>
-#include "cdll_util.h"
 #include "fmtstr.h"
 
 //-----------------------------------------------------------------------------

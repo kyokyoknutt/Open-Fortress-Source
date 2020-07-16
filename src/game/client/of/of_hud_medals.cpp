@@ -3,26 +3,14 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hud.h"
 #include "hudelement.h"
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
 #include "iclientmode.h"
-#include <vgui_controls/Label.h>
-
-#include "hud_controlpointicons.h"
 #include "tf_gamerules.h"
 #include "c_tf_player.h"
-#include "c_tf_playerresource.h"
-#include "engine/IEngineSound.h"
 #include "of_hud_medals.h"
-
-using namespace vgui;
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-//DECLARE_HUDELEMENT(CTFHudMedals);
 
 #define MEDAL_TIME 2.5f
 #define MEDAL_SIZE 128
@@ -113,10 +101,9 @@ void CTFHudMedals::OnThink(void)
 	//Initialize the time frame medal should be drawn
 	if (!drawTime)
 	{
-		char szFullSound[32];
-		Q_snprintf(szFullSound, sizeof(szFullSound), "%s.%s", "Benja", medalsQueue[0].medal_sound);
-		CLocalPlayerFilter filter;
-		C_TFPlayer::GetLocalTFPlayer()->EmitSound(filter, SOUND_FROM_LOCAL_PLAYER, szFullSound);
+		// if things crash here, uncomment the line below
+		// if( TFGameRules() )
+		TFGameRules()->BroadcastSound( TEAM_UNASSIGNED, medalsQueue[0].medal_sound );
 
 		m_pMedalImage->SetImage(medalsQueue[0].medal_name);
 		m_pMedalImage->SetVisible(true);
@@ -171,16 +158,13 @@ void CTFHudMedals::FireGameEvent(IGameEvent *event)
 	}
 	else if (!Q_strcmp("player_death", eventname))
 	{
-		if (event->GetInt("userid") == pIndex) //you dead, funny
+		//you killed
+		if (event->GetInt("attacker") == pIndex)
 		{
 			//Kamikaze
 			if (event->GetBool("kamikaze"))
 				AddMedal(KAMIKAZE);
-
-			died = true;
-		}
-		else if (event->GetInt("attacker") == pIndex) //you killed
-		{
+			
 			//Midair
 			if (event->GetBool("midair"))
 				AddMedal(MIDAIR);
@@ -242,6 +226,10 @@ void CTFHudMedals::FireGameEvent(IGameEvent *event)
 			else
 				AddMedal(DENIED);
 		}
+
+		//you were killed
+		if (event->GetInt("userid") == pIndex)
+			died = true;
 	}
 }
 

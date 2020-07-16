@@ -82,7 +82,8 @@ void ParseSoundManifest( void )
 				{
 					if( pSound )
 					{
-						DevMsg( "Parsed: %s\n", pSound->GetString( "wave" ) );
+						// +developer 5 to start seeing this noise
+						DevMsg(  5, "Parsed: %s\n", pSound->GetString( "wave" ) );
 					}
 				}
 			}
@@ -136,7 +137,8 @@ void ParseLevelSoundManifest( void )
 		{
 			if( pSound )
 			{
-				DevMsg( "Parsed: %s\n", pSound->GetString( "wave" ) );
+				// +developer 5 to start seeing this noise
+				DevMsg( 5, "Parsed: %s\n", pSound->GetString( "wave" ) );
 			}
 		}
 	}

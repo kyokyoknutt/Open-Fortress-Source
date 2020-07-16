@@ -9,13 +9,8 @@
 #endif
 
 #include "tf_weaponbase_gun.h"
-#include "tf_weaponbase_rocket.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-	#include "particlemgr.h"
-	#include "particle_util.h"
-	#include "particles_simple.h"
 	#include "c_tf_projectile_rocket.h"
 
 	#define CTFFlameThrower C_TFFlameThrower
@@ -23,7 +18,6 @@
 	#define CTFCFlameThrower C_TFCFlameThrower
 #else
 	#include "tf_projectile_rocket.h"
-	#include "baseentity.h"
 #endif
 
 enum FlameThrowerState_t
@@ -73,7 +67,8 @@ public:
 
 	Vector GetVisualMuzzlePos();
 	Vector GetFlameOriginPos();
-#if defined( CLIENT_DLL )
+
+#ifdef CLIENT_DLL
 	virtual bool	Deploy( void );
 
 	virtual void	OnDataChanged(DataUpdateType_t updateType);

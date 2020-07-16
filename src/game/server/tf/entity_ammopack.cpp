@@ -4,12 +4,7 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "items.h"
 #include "tf_gamerules.h"
-#include "tf_shareddefs.h"
-#include "tf_player.h"
-#include "tf_team.h"
-#include "engine/IEngineSound.h"
 #include "entity_ammopack.h"
 
 //=============================================================================

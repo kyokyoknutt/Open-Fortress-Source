@@ -4,10 +4,6 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "c_baseanimating.h"
-#include "engine/ivdebugoverlay.h"
-#include "c_tf_player.h"
-#include "engine/IEngineSound.h"
 #include "soundenvelope.h"
 #include "tf_gamerules.h"
 

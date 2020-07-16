@@ -7,13 +7,9 @@
 //=============================================================================//
 #include "cbase.h"
 #include "../EventLog.h"
-#include "team.h"
-#include "teamplayroundbased_gamerules.h"
 #include "tf_gamerules.h"
 #include "team_control_point_master.h"
-#include "team_control_point_round.h"
 #include "tf_team.h"
-#include "KeyValues.h"
 
 extern ConVar tf_flag_caps_per_round;
 

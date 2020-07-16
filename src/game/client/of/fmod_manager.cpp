@@ -1,10 +1,6 @@
 #include "cbase.h"
 #include "fmod_manager.h"
 #include "filesystem.h"
-#include "c_tf_player.h"
-#include "teamplayroundbased_gamerules.h"
-#include "KeyValues.h"
-#include "tf_gamerules.h"
 
 using namespace FMOD;
 

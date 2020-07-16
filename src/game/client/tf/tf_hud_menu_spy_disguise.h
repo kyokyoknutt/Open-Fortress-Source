@@ -12,7 +12,7 @@
 #endif
 
 #include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
+#include "hudelement.h"
 
 using namespace vgui;
 

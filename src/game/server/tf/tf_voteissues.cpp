@@ -5,18 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "shareddefs.h"
-#include "eiface.h"
-#include "team.h"
-#include "gameinterface.h"
-#include "fmtstr.h"
-
-#include "tf_shareddefs.h"
 #include "tf_voteissues.h"
 #include "tf_gamerules.h"
-#include "tf_player.h"
-
-#include "tf_gamestats.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

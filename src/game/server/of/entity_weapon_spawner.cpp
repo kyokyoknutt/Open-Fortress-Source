@@ -75,7 +75,6 @@ CWeaponSpawner::CWeaponSpawner()
 	m_iszWeaponModel[0] = 0;
 	m_iszWeaponModelOLD[0] = 0;
 	szPickupSound = MAKE_STRING( "Player.PickupWeapon" );
-	ResetSequence( LookupSequence("spin") );
 	UTIL_SetSize( this, -Vector(8,8,8), Vector(8,8,8) );
 	pWeaponInfo = NULL;
 	bWarningTriggered = false;

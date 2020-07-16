@@ -7,23 +7,16 @@
 
 #include "cbase.h"
 
-#include <KeyValues.h>
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
-#include <filesystem.h>
 #include <vgui_controls/AnimationController.h>
-#include "iclientmode.h"
 #include "clientmode_shared.h"
-#include "shareddefs.h"
-#include "tf_shareddefs.h"
 #include "tf_controls.h"
 #include "tf_gamerules.h"
-#ifdef _WIN32
-#include "winerror.h"
-#endif
-#include "ixboxsystem.h"
 #include "intromenu.h"
 #include "tf_intromenu.h"
+
+#ifdef _WIN32
+	#include "winerror.h"
+#endif
 
 // used to determine the action the intro menu should take when OnTick handles a think for us
 enum

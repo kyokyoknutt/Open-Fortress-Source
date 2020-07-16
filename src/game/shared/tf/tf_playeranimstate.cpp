@@ -6,20 +6,13 @@
 
 #include "cbase.h"
 #include "tier0/vprof.h"
-#include "animation.h"
-#include "studio.h"
-#include "apparent_velocity_helper.h"
-#include "utldict.h"
-#include "tf_playeranimstate.h"
 #include "base_playeranimstate.h"
 #include "datacache/imdlcache.h"
 
-//#include "tf_weapon_grapple.h"
-
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
+	#include "tf_player.h"
 #endif
 
 #define TF_RUN_SPEED			320.0f
@@ -540,7 +533,7 @@ bool CTFPlayerAnimState::HandleMoving( Activity &idealActivity )
 	}
 
 	// grappling state
-	if ( m_pTFPlayer->m_Shared.IsGrappling() )
+	if ( m_pTFPlayer->m_Shared.GetHook() )
 	{
 		idealActivity = ACT_GRAPPLE_PULL_IDLE;
 		return true;

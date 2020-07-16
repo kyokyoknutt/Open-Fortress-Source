@@ -6,11 +6,8 @@
 //=============================================================================
 #include "cbase.h"
 #include "prediction.h"
-#include "c_baseplayer.h"
 #include "igamemovement.h"
 #include "c_tf_player.h"
-#include "tf_weapon_minigun.h"
-
 
 static CMoveData g_MoveData;
 CMoveData *g_pMoveData = &g_MoveData;

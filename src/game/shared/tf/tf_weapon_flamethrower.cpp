@@ -5,24 +5,14 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_weapon_flamethrower.h"
-#include "tf_fx_shared.h"
 #include "in_buttons.h"
-#include "ammodef.h"
-#include "tf_weapon_grenade_pipebomb.h"
 
-#if defined( CLIENT_DLL )
-
+#ifdef CLIENT_DLL 
 	#include "c_tf_player.h"
-	#include "vstdlib/random.h"
-	#include "engine/IEngineSound.h"
 	#include "soundenvelope.h"
     #include "dlight.h"
     #include "iefx.h"
-
 #else
-
-	#include "explode.h"
-	#include "tf_player.h"
 	#include "tf_gamerules.h"
 	#include "tf_gamestats.h"
 	#include "ilagcompensationmanager.h"

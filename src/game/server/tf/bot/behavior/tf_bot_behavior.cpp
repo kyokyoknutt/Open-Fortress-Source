@@ -10,10 +10,6 @@
 #include "team.h"
 #include "tf_gamerules.h"
 #include "tf_obj_sentrygun.h"
-#include "tf_weapon_minigun.h"
-#include "tf_weapon_flamethrower.h"
-//#include "tf_weapon_compound_bow.h"
-#include "nav_mesh/tf_nav_area.h"
 #include "tf_bot_behavior.h"
 #include "tf_bot_dead.h"
 #include "tf_bot_tactical_monitor.h"
@@ -490,12 +486,17 @@ void CTFBotMainAction::Dodge( CTFBot *actor )
 		}
 	}
 	else
-	{*/
+	*/
+	{
 		if ( !actor->IsLineOfFireClear( threat->GetLastKnownPosition() ) )
 		{
 			return;
 		}
-	//}
+	}
+
+	float flDistance = actor->GetRangeTo( threat->GetLastKnownPosition() );
+	if ( flDistance < 128.0f )
+		return;
 
 	Vector vecFwd;
 	actor->EyeVectors( &vecFwd );

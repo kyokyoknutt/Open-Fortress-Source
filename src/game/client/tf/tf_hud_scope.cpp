@@ -5,28 +5,12 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hud.h"
 #include "hudelement.h"
-#include "hud_macros.h"
 #include "hud_numericdisplay.h"
 #include "iclientmode.h"
 #include "c_tf_player.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
-#include "materialsystem/imaterial.h"
-#include "materialsystem/imesh.h"
-#include "materialsystem/imaterialvar.h"
-
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <KeyValues.h>
-#include <vgui_controls/AnimationController.h>
-
-//for screenfade
-#include "ivieweffects.h"
-#include "shake.h"
 #include "view_scene.h"
-
-// #include "tf_weapon_sniperrifle.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -6,21 +6,13 @@
 
 #include "cbase.h"
 #include "tf_weapon_pipebomblauncher.h"
-#include "tf_fx_shared.h"
-#include "tf_weapon_grenade_pipebomb.h"
-#include "in_buttons.h"
-#include "datacache/imdlcache.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-#include <vgui_controls/Panel.h>
-#include <vgui/ISurface.h>
-#include "prediction.h"
-// Server specific.
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
-#include "tf_gamestats.h"
+	#include "tf_player.h"
+	#include "tf_gamestats.h"
+	#include "in_buttons.h"
 #endif
 
 // Delete me and put in script
@@ -64,7 +56,7 @@ LINK_ENTITY_TO_CLASS( tf_weapon_pipebomblauncher, CTFPipebombLauncher );
 //PRECACHE_WEAPON_REGISTER( tf_weapon_pipebomblauncher );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFPipebombLauncher )
 END_DATADESC()
 #endif
@@ -150,7 +142,7 @@ void CTFPipebombLauncher::WeaponReset( void )
 {
 	BaseClass::WeaponReset();
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	DetonateRemotePipebombs( true );
 #endif
 

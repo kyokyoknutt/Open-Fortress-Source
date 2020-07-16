@@ -11,6 +11,7 @@
 #include "tf_bot_payload_guard.h"
 #include "tf_bot_payload_block.h"
 #include "behavior/demoman/tf_bot_prepare_stickybomb_trap.h"
+#include "NextBotUtil.h"
 
 ConVar tf_bot_payload_guard_range( "tf_bot_payload_guard_range", "1000", FCVAR_CHEAT );
 ConVar tf_bot_debug_payload_guard_vantage_points( "tf_bot_debug_payload_guard_vantage_points", "0", FCVAR_CHEAT );

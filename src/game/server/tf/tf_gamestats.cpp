@@ -1007,6 +1007,10 @@ bool CTFGameStats::ShouldSendToClient( TFStatType_t statType )
 //-----------------------------------------------------------------------------
 void CTFGameStats::TrackKillStats( CBasePlayer *pAttacker, CBasePlayer *pVictim )
 {
+	//kills obtained during the waiting-for-players part of the match do not count 
+	if (TFGameRules()->IsInWaitingForPlayers())
+		return;
+
 	int iPlayerIndexAttacker = pAttacker->entindex();
 	int iPlayerIndexVictim = pVictim->entindex();
 

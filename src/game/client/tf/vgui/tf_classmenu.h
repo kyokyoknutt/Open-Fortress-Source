@@ -12,19 +12,11 @@
 #endif
 
 #include <classmenu.h>
-#include <vgui_controls/EditablePanel.h>
 #include "vgui_controls/KeyRepeat.h"
-#include <filesystem.h>
-#include <tf_shareddefs.h>
-#include "cbase.h"
 #include "tf_controls.h"
 #include "tf_gamerules.h"
 #include "basemodelpanel.h"
 #include "of_imagemouseoverbutton.h"
-#include "IconPanel.h"
-#include <vgui_controls/CheckButton.h>
-#include "GameEventListener.h"
-#include "c_tf_playerresource.h"
 
 using namespace vgui;
 

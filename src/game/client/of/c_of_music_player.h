@@ -58,4 +58,27 @@ private:
 	ChannelGroup *pChannel;
 };
 
+class C_TFDMMusicManager : public C_BaseEntity
+{
+public:
+	DECLARE_CLASS(C_TFDMMusicManager, C_BaseEntity);
+	DECLARE_CLIENTCLASS();
+
+	C_TFDMMusicManager();
+	~C_TFDMMusicManager();
+
+	// Input handlers
+	int m_iIndex;
+	CNetworkHandle( C_TFMusicPlayer, pWaitingMusicPlayer );
+	CNetworkHandle( C_TFMusicPlayer, pRoundMusicPlayer );
+	
+	char szWaitingForPlayerMusic[64];
+	char szRoundMusic[64];
+	
+	char szWaitingMusicPlayer[64];
+	char szRoundMusicPlayer[64];
+};
+
+extern C_TFDMMusicManager* DMMusicManager();
+
 #endif //OF_MUSIC_PLAYER_H

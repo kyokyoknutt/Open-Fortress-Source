@@ -4,34 +4,17 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include "tf_weaponbase.h"
 #include "tf_gamerules.h"
-#include "npcevent.h"
-#include "engine/IEngineSound.h"
-#include "tf_weapon_grenade_pipebomb.h"
 #include "tf_weapon_pipebomblauncher.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-// for spy material proxy
-#include "proxyentity.h"
-#include "materialsystem/imaterial.h"
-#include "materialsystem/imaterialvar.h"
-#include "prediction.h"
-#include "iefx.h"
-#include "dlight.h"
-#include "tempent.h"
-#include "c_te_legacytempents.h"
+	#include "iefx.h"
+	#include "dlight.h"
+	#include "c_te_legacytempents.h"
 #else
-#include "tf_player.h"
-#include "items.h"
-#include "tf_weaponbase_grenadeproj.h"
-#include "soundent.h"
-#include "KeyValues.h"
-#include "IEffects.h"
-#include "props.h"
-#include "func_respawnroom.h"
-
+	#include "IEffects.h"
+	#include "props.h"
+	#include "func_respawnroom.h"
 #endif
 
 #define TF_WEAPON_PIPEBOMB_TIMER		3.0f //Seconds
@@ -52,7 +35,7 @@ extern ConVar of_muzzlelight;
 ConVar of_stabilize_grenades("of_stabilize_grenades", "0", FCVAR_REPLICATED, "Testing convar, only used to reduce crashes if they happen.");
 #endif
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 ConVar tf_grenadelauncher_min_contact_speed( "tf_grenadelauncher_min_contact_speed", "100" );
 #endif
 

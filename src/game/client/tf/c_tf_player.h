@@ -10,15 +10,9 @@
 #pragma once
 #endif
 
-#include "tf_playeranimstate.h"
-#include "c_baseplayer.h"
-#include "tf_shareddefs.h"
-#include "baseparticleentity.h"
 #include "tf_player_shared.h"
 #include "c_tf_playerclass.h"
 #include "tf_item.h"
-#include "props_shared.h"
-#include "hintsystem.h"
 #include "c_playerattachedmodel.h"
 #include "iinput.h"
 #include "physpropclientside.h"
@@ -241,6 +235,8 @@ public:
 
 	int		GetMaxAmmo( int iAmmoIndex, int iClassNumber = -1 );
 
+	float	GetSurfaceFriction() { return m_surfaceFriction; }
+
 public:
 	// Ragdolls.
 	virtual C_BaseAnimating *BecomeRagdollOnClient();
@@ -399,6 +395,11 @@ public:
 	CNewParticleEffect	*m_pBurningEffect;
 	float				m_flBurnEffectStartTime;
 	float				m_flBurnEffectEndTime;
+
+	// Poison
+	CNewParticleEffect	*m_pPoisonEffect;
+	float				m_flPoisonEffectStartTime;
+	float				m_flPoisonEffectEndTime;
 
 	CNewParticleEffect	*m_pDisguisingEffect;
 	float m_flDisguiseEffectStartTime;

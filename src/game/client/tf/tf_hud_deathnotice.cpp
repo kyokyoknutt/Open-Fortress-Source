@@ -1,27 +1,13 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Draws CSPort's death notices
 //
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "hudelement.h"
-#include "hud_macros.h"
-#include "c_playerresource.h"
-#include "iclientmode.h"
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Panel.h>
-#include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
-#include <KeyValues.h>
-#include "c_baseplayer.h"
-#include "c_team.h"
-
 #include "tf_gamerules.h"
-#include "teamplayroundbased_gamerules.h"
-#include "tf_shareddefs.h"
 #include "clientmode_tf.h"
-#include "c_tf_player.h"
 #include "c_tf_playerresource.h"
 #include "tf_hud_freezepanel.h"
 #include "engine/IEngineSound.h"
@@ -39,11 +25,13 @@ struct DeathNoticePlayer
 		iTeam = TEAM_UNASSIGNED;
 
 		iPlayerID = 0;
+		iColor = Color(255, 255, 255, 255);
 	}
 	char		szName[MAX_PLAYER_NAME_LENGTH * 2];	// big enough for player name and additional information
 	int			iTeam;								// team #	
 
 	int			iPlayerID;
+	Color		iColor;
 };
 
 // Contents of each entry in our list of death notices
@@ -151,6 +139,9 @@ static ConVar hud_deathnotice_time( "hud_deathnotice_time", "6", 0 );
 
 ConVar of_dm_soundcues( "of_dm_soundcues", "1", FCVAR_ARCHIVE, "Whether or not Dominations, Nemesiss and Revenges use the DM specific ones in Deathmatch" );
 
+ConVar of_killfeed_color_threshold( "of_killfeed_color_threshold", "1.5", FCVAR_ARCHIVE, "Minimum contrast ratio before applying an effect to increase visibility" );
+ConVar of_killfeed_color_contrast( "of_killfeed_color_contrast", "1", FCVAR_ARCHIVE, "0: Off, 1: If a color does not contrast well with the killfeed background, modify its color to increase its visibility" );
+
 DECLARE_HUDELEMENT( CTFHudDeathNotice );
 
 //-----------------------------------------------------------------------------
@@ -207,6 +198,97 @@ bool CTFHudDeathNotice::IsVisible( void )
 bool CTFHudDeathNotice::ShouldDraw( void )
 {
 	return ( CHudElement::ShouldDraw() && ( m_DeathNotices.Count() ) );
+}
+
+double Luminance(Color col) 
+{
+    double r, g, b;
+    r = col.r(); g = col.g(); b = col.b();
+    double Rg = r <= 10 ? r / 3294 : pow(r / 269 + 0.0513, 2.4);
+    double Gg = g <= 10 ? g / 3294 : pow(g / 269 + 0.0513, 2.4);
+    double Bg = b <= 10 ? b / 3294 : pow(b / 269 + 0.0513, 2.4);
+    return 0.2126 * Rg + 0.7152 * Gg + 0.0722 * Bg;
+}
+
+float LuminanceContrast(double a, double b) 
+{
+    if (a > b) {
+        return (a + 0.05) / (b + 0.05);
+    }
+    else {
+        return (b + 0.05) / (a + 0.05);
+    }
+}
+
+// THIS DOES NOT WORK, DO NOT USE THIS
+Color FindAcceptableContrast(Color fg, Color bg, float minimum) 
+{
+	float bg_l = Luminance(bg);
+	float fg_l = Luminance(bg);
+	float contrast;
+
+	bool dark = 0;
+	if(fg_l >= bg_l) 
+	{
+		contrast = fg_l / bg_l;
+		dark = 1;
+	} 
+	else 
+	{
+		contrast = bg_l / fg_l;
+	}
+
+	Vector fg_HSV;
+	RGBtoHSV( Vector(fg.r(), fg.g(), fg.b()), fg_HSV);
+	Vector new_col;
+
+	while( contrast < minimum ) 
+	{
+		if(dark) 
+		{
+			if( new_col.x > 254.0f && new_col.y > 254.0f && new_col.z > 254.0f ) 
+			{
+				if( fg_HSV.z < 255.0f ) 
+				{
+					fg_HSV.z += 0.1f;
+				}	
+			}
+			else
+			{
+				if( fg_HSV.z > 0.0f ) 
+				{
+					fg_HSV.z -= 0.1f;
+				}		
+			}
+		}
+		else
+		{
+			if( new_col.x < 1.0f && new_col.y < 1.0f && new_col.z < 1.0f ) 
+			{
+				if( fg_HSV.z > 0.0f ) 
+				{
+					fg_HSV.z -= 0.1f;
+				}		
+			}
+			else
+			{
+				if( fg_HSV.z < 255.0f ) 
+				{
+					fg_HSV.z += 0.1f;
+				}	
+			}
+
+		}
+		
+		// printf("fg_HSV: %f %f %f\n", fg_HSV.x, fg_HSV.y, fg_HSV.z);
+
+		HSVtoRGB(fg_HSV, new_col);
+		fg_l = Luminance( Color( new_col.x, new_col.y, new_col.z, 255 ) );
+		contrast = LuminanceContrast(fg_l, bg_l);
+	}
+
+	// Msg("Old color: (%i, %i, %i) New color: (%i, %i, %i)\n", fg.r(), fg.g(), fg.b(), (int)ceil( new_col.x ), (int)ceil( new_col.y ), (int)ceil( new_col.z) );
+	return Color( new_col.x, new_col.y, new_col.z, 255 );
 }
 
 //-----------------------------------------------------------------------------
@@ -285,20 +367,21 @@ void CTFHudDeathNotice::Paint()
 
 		x += xMargin;
 
-		C_TF_PlayerResource *tf_PR = dynamic_cast<C_TF_PlayerResource *>(g_PR);
+		//C_TF_PlayerResource *tf_PR = dynamic_cast<C_TF_PlayerResource *>(g_PR);
 
 		if ( killer[0] )
 		{
-			Color clr = TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ? tf_PR->GetPlayerColor(msg.Killer.iPlayerID) : GetTeamColor( msg.Killer.iTeam );
+			Color clr = TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ? msg.Killer.iColor : GetTeamColor( msg.Killer.iTeam );
 
 			DrawText( x, yText, m_hTextFont, clr, killer );
+
 			x += iKillerTextWide;
 		}
 
 		if ( assister[0] )
 		{
 			// Draw a + between the names
-			Color clr = TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ? tf_PR->GetPlayerColor(msg.Assister.iPlayerID) : GetTeamColor( msg.Assister.iTeam );
+			Color clr = TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ? msg.Assister.iColor : GetTeamColor( msg.Assister.iTeam );
 
 			DrawText(x, yText, m_hTextFont, GetInfoTextColor( i, msg.bLocalPlayerInvolved ), L" + ");
 			x += 24;
@@ -335,7 +418,7 @@ void CTFHudDeathNotice::Paint()
 		}
 
 		// Draw victims name
-		Color clr = TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ? tf_PR->GetPlayerColor( msg.Victim.iPlayerID ) : GetTeamColor( msg.Victim.iTeam );
+		Color clr = TFGameRules()->IsDMGamemode() && !TFGameRules()->IsTeamplay() ? msg.Victim.iColor : GetTeamColor( msg.Victim.iTeam );
 
 		DrawText( x + iVictimTextOffset, yText, m_hTextFont, clr, victim );
 		x += iVictimTextWide;
@@ -687,6 +770,7 @@ void CTFHudDeathNotice::OnGameEvent( IGameEvent *event, int iDeathNoticeMsg )
 {
 	const char *pszEventName = event->GetName();
 	DeathNoticeItem &msg = m_DeathNotices[iDeathNoticeMsg];
+	C_TF_PlayerResource *tf_PR = dynamic_cast<C_TF_PlayerResource *>(g_PR);
 
 	if ( FStrEq( pszEventName, "player_death" ) || FStrEq( pszEventName, "object_destroyed" ) )
 	{
@@ -721,6 +805,27 @@ void CTFHudDeathNotice::OnGameEvent( IGameEvent *event, int iDeathNoticeMsg )
 			// mentioning that
 			int iKillerID = engine->GetPlayerForUserID(event->GetInt("attacker"));
 			int iVictimID = engine->GetPlayerForUserID(event->GetInt("userid"));
+
+			double backGroundColorLuminance = Luminance(msg.bLocalPlayerInvolved ? m_clrLocalBGColor : m_clrBaseBGColor);
+
+			// msg.Killer.iColor = FindAcceptableContrast(tf_PR->GetPlayerColor(iKillerID), !msg.bLocalPlayerInvolved ? m_clrLocalBGColor : m_clrBaseBGColor, of_killfeed_color_threshold.GetFloat());
+			// msg.Assister.iColor = FindAcceptableContrast(tf_PR->GetPlayerColor(iAssisterID), !msg.bLocalPlayerInvolved ? m_clrLocalBGColor : m_clrBaseBGColor, of_killfeed_color_threshold.GetFloat());
+			// msg.Victim.iColor = FindAcceptableContrast(tf_PR->GetPlayerColor(iVictimID), !msg.bLocalPlayerInvolved ? m_clrLocalBGColor : m_clrBaseBGColor, of_killfeed_color_threshold.GetFloat());
+			if(LuminanceContrast(Luminance(tf_PR->GetPlayerColor(iKillerID)), backGroundColorLuminance) > of_killfeed_color_threshold.GetFloat())
+				msg.Killer.iColor = tf_PR->GetPlayerColor(iKillerID);
+			else
+				msg.Killer.iColor = !msg.bLocalPlayerInvolved ? m_clrLocalBGColor : m_clrBaseBGColor;
+
+			if(LuminanceContrast(Luminance(tf_PR->GetPlayerColor(iAssisterID)), backGroundColorLuminance) > of_killfeed_color_threshold.GetFloat())
+				msg.Assister.iColor = tf_PR->GetPlayerColor(iAssisterID);
+			else
+				msg.Assister.iColor = !msg.bLocalPlayerInvolved ? m_clrLocalBGColor : m_clrBaseBGColor;
+
+			if(LuminanceContrast(Luminance(tf_PR->GetPlayerColor(iVictimID)), backGroundColorLuminance) > of_killfeed_color_threshold.GetFloat())
+				msg.Victim.iColor = tf_PR->GetPlayerColor(iVictimID);
+			else
+				msg.Victim.iColor = !msg.bLocalPlayerInvolved ? m_clrLocalBGColor : m_clrBaseBGColor;
+
 
 			if (event->GetInt("dominated") > 0)
 			{
