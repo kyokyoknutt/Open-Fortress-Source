@@ -352,8 +352,6 @@ void CHudWeaponWheel::CheckMousePos()
 	
 #ifdef LINUX
 	//some awesome Linux only JANK to see if the delta values are valid
-	if(deltaX || deltaY)
-		DevMsg("DELTA: %i|%i \n", deltaX, deltaY);
 
 	if(abs(deltaX) > 200 || abs(deltaY) > 200)  //super ultra janky.
 	{
@@ -835,29 +833,43 @@ void CHudWeaponWheel::OnTick(void)
 		PerformBlurLerp();
 
 #ifdef LINUX
-	if (bLinuxMouseFix)
+	//Linux fixes by Fenteale: here is the main part of the linux fix.  ill add comments to say whats goin on best I can
+	if (bLinuxMouseFix)  //this is set TRUE whenever the mouse needs to be repositioned by code elsewhere
 	{
-		SetMouseInputEnabled(true);			// Capture the mouse...
+		//not sure if these 3 lines are needed, but its working now so I dont wanna mess with it.
+		SetMouseInputEnabled(true);
 		SetKeyBoardInputEnabled(false);	
 		surface()->SetSoftwareCursor(true);
 		int curPosX, curPosY;
+		/*
+		Here is the root of the issue:
+		With mouse raw input ENABLED: the mouse cannot be repositioned by the engine, and the delta does
+			not change when the cursor hits the sides of the screen
+		With mouse raw input DISABLED: the mouse CAN be repositioned, but the delta values returned by
+			::inputsystem->GetAnalogDelta are incorrect.
+		
+		So we gotta force switching between the two modes depending what we need.  To add MORE jank into the mix,
+		the engine needs one frame before the change in m_rawinput is registered.  This might add one frame when 
+		switching modes where input is ignored, but I cannot for the life of me find any other way.
+		*/
 		if(m_rawinput.GetBool())
-			m_rawinput.SetValue(false);
+			m_rawinput.SetValue(false); //first time through the loop: set m_rawinput off
 		else
-		{
+		{ //second time through the loop:
 			DevMsg("Attempting to center mos pos\n");	
-			vgui::input()->SetCursorPos(iCentreScreenX, iCentreScreenY);
+			vgui::input()->SetCursorPos(iCentreScreenX, iCentreScreenY); //center mouse pos
 
 			vgui::input()->GetCursorPos(curPosX, curPosY);
 			if(abs(curPosX - iCentreScreenX) < 50 && abs(curPosY - iCentreScreenY) < 50)
 			{ //mouse repositioned successfully!
 				
-				m_rawinput.SetValue(true);
+				m_rawinput.SetValue(true);  //so we can force re-enable raw mouse input and continue on
 				bLinuxMouseFix = false;
 			}
 			else
 			{
 				DevMsg("WTF %i|%i\n", curPosX - iCentreScreenX, curPosY - iCentreScreenY);
+				//Mouse position is NOT in the center after resetting it?
 			}
 		}
 			
@@ -868,22 +880,24 @@ void CHudWeaponWheel::OnTick(void)
 	if (lastWheel != bWheelActive)
 	{
 #ifdef LINUX
-		if(bWheelActive)
+		if(bWheelActive) //if it was just activated
 		{
-			m_rawinput_stored = m_rawinput.GetBool();
-			DevMsg("Linux workaround: rawinput disabled\n");
-			//m_rawinput.SetValue(false);
-			//vgui::input()->SetCursorPos(iCentreScreenX, iCentreScreenY);
-			//bLinuxMouseFix = true;
-			SetMouseInputEnabled(true);			// Capture the mouse...
-			SetKeyBoardInputEnabled(false);		// ...but not the keyboard!
-			// Replaced the cursor with an $alpha 0 image, since Valve didn't want to give me a way to hide the cursor or prevent mouselook.
+			m_rawinput_stored = m_rawinput.GetBool(); //store the user's settings for rawinput to restore later
+			//DevMsg("Linux workaround: rawinput disabled\n");
+			
+			//bLinuxMouseFix = true; //used to have this enabled which would reset the mouse pos as soon as the weapon wheel was brought up,
+			//but this caused the player's aim to occasionally snap around upon activation.
+
+			//these next few lines I'm not sure if they are needed but its working well right now so
+			//I dont want to touch it.
+			SetMouseInputEnabled(true);
+			SetKeyBoardInputEnabled(false);
 			surface()->SetSoftwareCursor(true);
 
 		}
-		else
+		else //if its closing
 		{
-			DevMsg("Linux workaround: rawinput restored\n");
+			//DevMsg("Linux workaround: rawinput restored\n");
 			m_rawinput.SetValue(m_rawinput_stored);
 		}
 #endif
@@ -896,11 +910,12 @@ void CHudWeaponWheel::OnTick(void)
 	if (bWheelActive)
 	{
 #ifdef LINUX
-		if(!bLinuxMouseFix)
+		if(!bLinuxMouseFix)  //if mouse position reset is not pending
 #endif
 			CheckMousePos();
 
 #ifdef LINUX
+		//see if mouse is hitting the edges of the screen.  set bLinuxMouseFix on if so.
 		int curPosX_b, curPosY_b;
 		vgui::input()->GetCursorPos(curPosX_b, curPosY_b);
 		if(curPosX_b == 0 || curPosY_b == 0 || curPosX_b >= (iCentreScreenX * 2) - 1 || curPosY_b >= (iCentreScreenY *2) - 1)
