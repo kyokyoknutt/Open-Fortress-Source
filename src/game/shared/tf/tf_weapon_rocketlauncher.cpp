@@ -5,19 +5,12 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_weapon_rocketlauncher.h"
-#include "tf_fx_shared.h"
-#include "tf_weaponbase_rocket.h"
 #include "in_buttons.h"
-#include "tf_weapon_sniperrifle.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-#include <vgui_controls/Panel.h>
-#include <vgui/ISurface.h>
-// Server specific.
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
+	#include "tf_player.h"
 #endif
 
 //=============================================================================
@@ -27,7 +20,7 @@
 IMPLEMENT_NETWORKCLASS_ALIASED( TFRocketLauncher, DT_WeaponRocketLauncher )
 
 BEGIN_NETWORK_TABLE( CTFRocketLauncher, DT_WeaponRocketLauncher )
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	//SendPropBool( SENDINFO(m_bLockedOn) ),
 #else
 	//RecvPropInt( RECVINFO(m_bLockedOn) ),
@@ -41,7 +34,7 @@ LINK_ENTITY_TO_CLASS( tf_weapon_rocketlauncher, CTFRocketLauncher );
 //PRECACHE_WEAPON_REGISTER( tf_weapon_rocketlauncher );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFRocketLauncher )
 END_DATADESC()
 #endif
@@ -58,7 +51,7 @@ LINK_ENTITY_TO_CLASS( tfc_weapon_rpg, CTFCRPG );
 //PRECACHE_WEAPON_REGISTER( tfc_weapon_rpg );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFCRPG )
 END_DATADESC()
 #endif
@@ -75,7 +68,7 @@ LINK_ENTITY_TO_CLASS( tfc_weapon_incendiarycannon, CTFCIncendiaryCannon );
 //PRECACHE_WEAPON_REGISTER( tfc_weapon_incendiarycannon );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFCIncendiaryCannon )
 END_DATADESC()
 #endif
@@ -106,7 +99,7 @@ CTFSuperRocketLauncher::CTFSuperRocketLauncher()
 
 CTFSuperRocketLauncher::~CTFSuperRocketLauncher()
 {
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	DestroyTargetDot();
 #endif
 }
@@ -129,7 +122,7 @@ CTFRocketLauncher::~CTFRocketLauncher()
 {
 }
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

@@ -7,13 +7,8 @@
 #include "cbase.h"
 
 #include "tf_obj_dispenser.h"
-#include "engine/IEngineSound.h"
 #include "tf_player.h"
-#include "tf_team.h"
 #include "vguiscreen.h"
-#include "world.h"
-#include "explode.h"
-#include "triggers.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

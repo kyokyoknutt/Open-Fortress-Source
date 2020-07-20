@@ -12,7 +12,6 @@
 
 #include "GameEventListener.h"
 #include "basepresence.h"
-#include "hl2orange.spa.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: TF implementation for setting user contexts and properties.

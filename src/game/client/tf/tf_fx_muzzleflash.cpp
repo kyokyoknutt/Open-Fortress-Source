@@ -5,23 +5,11 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "particles_simple.h"
-#include "particles_localspace.h"
 #include "c_te_effect_dispatch.h"
 #include "clienteffectprecachesystem.h"
 #include "tier0/vprof.h"
-#include "fx.h"
-#include "r_efx.h"
-#include "tier1/KeyValues.h"
-#include "dlight.h"
-#include "tf_shareddefs.h"
 #include "tf_fx_muzzleflash.h"
 #include "toolframework/itoolframework.h"
-#include "IEffects.h"
-#include "fx_sparks.h"
-#include "iefx.h"
-#include "fx_quad.h"
-#include "fx.h"
 #include "toolframework_client.h"
 
 // Precache our effects

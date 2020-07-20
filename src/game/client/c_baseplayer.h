@@ -456,6 +456,10 @@ public:
 	float			m_flConstraintWidth;
 	float			m_flConstraintSpeedFactor;
 
+#ifdef OF_CLIENT_DLL
+	bool			IsCSliding() { return m_bIsCSliding; }
+#endif
+
 protected:
 
 #ifdef OF_CLIENT_DLL
@@ -506,7 +510,8 @@ protected:
 	float			m_flStepSoundTime;
 	bool			m_IsFootprintOnLeft;
 
-#if defined( OF_CLIENT_DLL )
+#ifdef OF_CLIENT_DLL
+	bool			m_bNoFootStepsSound;
 	bool			m_bIsCSliding;
 #endif
 

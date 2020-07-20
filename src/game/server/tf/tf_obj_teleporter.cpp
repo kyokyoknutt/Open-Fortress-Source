@@ -5,15 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-
 #include "tf_obj_teleporter.h"
-#include "engine/IEngineSound.h"
-#include "tf_player.h"
-#include "tf_team.h"
 #include "tf_gamerules.h"
-#include "world.h"
-#include "explode.h"
-#include "particle_parse.h"
 #include "tf_gamestats.h"
 #include "tf_weapon_sniperrifle.h"
 #include "tf_fx.h"

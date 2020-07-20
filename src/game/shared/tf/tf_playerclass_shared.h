@@ -74,6 +74,8 @@ struct TFPlayerClassData_t
 	CNetworkString( m_szClassImageBlue, TF_NAME_LENGTH );
 	CNetworkString( m_szClassImageMercenary, TF_NAME_LENGTH );		
 	CNetworkString( m_szClassImageColorless, TF_NAME_LENGTH );	
+	
+	CNetworkString( m_szClassIcon, TF_NAME_LENGTH );
 
 	
 	CNetworkVar( int, m_nViewVector );
@@ -99,6 +101,9 @@ struct TFPlayerClassData_t
 	const char *GetClassImageBlue() const { return m_szClassImageBlue; }
 	const char *GetClassImageMercenary() const { return m_szClassImageMercenary; }
 	const char *GetClassImageColorless() const { return m_szClassImageColorless; }
+	
+	const char *GetClassIcon() const { return m_szClassIcon; }
+	
 	const char *GetJumpSound() const { return m_szJumpSound; }
 	void Parse( const char *pszClassName );
 

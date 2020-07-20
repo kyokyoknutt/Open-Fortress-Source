@@ -153,6 +153,17 @@ DEFINE_KEYFIELD( szRoundMusicPlayer , FIELD_SOUNDNAME, "RoundMusicPlayer"),
 DEFINE_THINKFUNC( DMMusicThink ),
 END_DATADESC()
 
+IMPLEMENT_SERVERCLASS_ST( CTFDMMusicManager, DT_DMMusicManager )
+	SendPropStringT( SENDINFO( szWaitingForPlayerMusic ) ),
+	SendPropStringT( SENDINFO( szRoundMusic ) ),
+	SendPropStringT( SENDINFO( szWaitingMusicPlayer ) ),
+	SendPropStringT( SENDINFO( szRoundMusicPlayer ) ),	
+	SendPropInt( SENDINFO( m_iIndex ) ),
+	
+	SendPropEHandle( SENDINFO( pWaitingMusicPlayer ) ),
+	SendPropEHandle( SENDINFO( pRoundMusicPlayer ) ),
+END_SEND_TABLE()
+
 LINK_ENTITY_TO_CLASS( dm_music_manager, CTFDMMusicManager );
 
 CTFDMMusicManager::CTFDMMusicManager()
@@ -169,36 +180,45 @@ CTFDMMusicManager::~CTFDMMusicManager()
 {
 	UTIL_Remove( pWaitingMusicPlayer );
 	UTIL_Remove( pRoundMusicPlayer );
+	gDMMusicManager = NULL;
 }
 
+extern KeyValues *GetSoundscript( const char *szSoundScript );
 
 void CTFDMMusicManager::Spawn( void )
 {
 	BaseClass::Spawn();
 	
-	if( szRoundMusicPlayer != MAKE_STRING("") && gEntList.FindEntityByName( NULL, szRoundMusicPlayer ) )
+	if (szRoundMusicPlayer.Get() != MAKE_STRING("") && gEntList.FindEntityByName(NULL, szRoundMusicPlayer))
 	{
 		pRoundMusicPlayer = dynamic_cast<CTFMusicPlayer *>(gEntList.FindEntityByName( NULL, szRoundMusicPlayer ));
-		if( szRoundMusic != MAKE_STRING("") )
+		if( szRoundMusic.Get() != MAKE_STRING("") )
 			pRoundMusicPlayer->szLoopingSong = szRoundMusic;
 	}
-	else if( szRoundMusic != MAKE_STRING("") )
+	else if (szRoundMusic.Get() != MAKE_STRING(""))
 	{
 		pRoundMusicPlayer = (CTFMusicPlayer *)CBaseEntity::CreateNoSpawn( "of_music_player", GetAbsOrigin() , vec3_angle );
 		pRoundMusicPlayer->szLoopingSong = szRoundMusic;
 		pRoundMusicPlayer->Spawn();
 	}
-	if( szWaitingMusicPlayer != MAKE_STRING("") )
+	if (szWaitingMusicPlayer.Get() != MAKE_STRING(""))
 	{
 		pWaitingMusicPlayer = dynamic_cast<CTFMusicPlayer *>(gEntList.FindEntityByName( NULL, szWaitingMusicPlayer ));
-		if( szWaitingForPlayerMusic != MAKE_STRING("") )
+		if (szWaitingForPlayerMusic.Get() != MAKE_STRING(""))
 			pWaitingMusicPlayer->szLoopingSong = szWaitingForPlayerMusic;
 	}
-	else if( szWaitingForPlayerMusic != MAKE_STRING("") )
+	else if (szWaitingForPlayerMusic.Get() != MAKE_STRING(""))
 	{
 		pWaitingMusicPlayer = (CTFMusicPlayer *)CBaseEntity::CreateNoSpawn( "of_music_player", GetAbsOrigin() , vec3_angle );
 		pWaitingMusicPlayer->szLoopingSong = szWaitingForPlayerMusic;
 		pWaitingMusicPlayer->Spawn();
+	}
+	
+	KeyValues *kvRoundMusic = GetSoundscript( STRING( szRoundMusic.GetForModify() ) );
+	if( kvRoundMusic )
+	{
+		PrecacheScriptSound( kvRoundMusic->GetString("win") );
+		PrecacheScriptSound( kvRoundMusic->GetString("loose") );
 	}
 }
 
@@ -212,6 +232,10 @@ void CTFDMMusicManager::DMMusicThink( void )
 				pWaitingMusicPlayer->SetDisabled( false );
 			if( pRoundMusicPlayer )
 				pRoundMusicPlayer->SetDisabled( true );
+			
+			IGameEvent *event = gameeventmanager->CreateEvent( "music_round_start" );
+			if ( event )
+				gameeventmanager->FireEvent( event );
 		}
 		else
 		{

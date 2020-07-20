@@ -12,11 +12,6 @@
 #endif
 
 #include <vgui_controls/CheckButton.h>
-// engine interface
-#include "cdll_int.h"
-#include "eiface.h"
-#include "icvar.h"
-#include "tier2/tier2.h"
 
 class CCvarToggleCheckButton : public vgui::CheckButton
 {

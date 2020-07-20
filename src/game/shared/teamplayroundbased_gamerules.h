@@ -79,7 +79,8 @@ enum gamerules_roundstate_t
 	GR_NUM_ROUND_STATES
 };
 
-enum {
+enum
+{
 	WINREASON_NONE =0,
 	WINREASON_ALL_POINTS_CAPTURED,
 	WINREASON_OPPONENTS_DEAD,
@@ -92,10 +93,12 @@ enum {
 	WINREASON_RD_REACTOR_CAPTURED,
 	WINREASON_RD_CORES_COLLECTED,
 	WINREASON_RD_REACTOR_RETURNED,
+
 	// open fortress
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
 	WINREASON_POINTLIMIT,
 	WINREASON_JUGGERNAUGHT_TIMER,
+	//WINREASON_RAGEQUIT,
 #endif
 };
 
@@ -278,7 +281,7 @@ public: // IGameEventListener Interface
 	virtual void FireGameEvent( IGameEvent * event );
 	
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
-	void BroadcastSound( int iTeam, const char *sound, bool bAnnouncer = true, int iExcludePlayers = -1 );
+	void BroadcastSound( int iTeam, const char *sound, bool bAnnouncer = true, int iAdditionalSoundFlags = 0, int iExcludePlayers = -1 );
 	void BroadcastSoundFFA( int iPlayer, const char *sound, const char *sound_rest = NULL, bool bAnnouncer = true );
 #endif
 

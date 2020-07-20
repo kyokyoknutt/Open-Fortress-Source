@@ -17,6 +17,8 @@
 // CTF WeaponSpawner class.
 //
 
+class CTFPlayer;
+
 DECLARE_AUTO_LIST(ICondPowerupAutoList)
 class CCondPowerup : public CTFPowerup, public ICondPowerupAutoList
 {
@@ -27,12 +29,14 @@ public:
 	
 	CCondPowerup();
 
-	void	Spawn( void );
-	virtual CBaseEntity* Respawn( void );
-	void	Precache( void );
-	bool	MyTouch( CBasePlayer *pPlayer );
-	virtual void Materialize(void);
-	void    AnnouncerThink( void );
+	void			Spawn( void );
+	virtual 		CBaseEntity* Respawn( void );
+	void			Precache( void );
+	bool			MyTouch( CBasePlayer *pPlayer );
+	virtual bool	DoPowerupEffect( CTFPlayer *pTFPlayer );
+	virtual void 	Materialize(void);
+	void    		AnnouncerThink( void );
+	virtual bool	RemoveIfDuel() { return true; }
 
 	const char* GetPowerupRespawnLine(void);
 	const char* GetPowerupPickupLine(void);

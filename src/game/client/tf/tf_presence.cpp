@@ -11,14 +11,10 @@
 #include "c_team_objectiveresource.h"
 #include "tf_gamerules.h"
 #include "c_tf_team.h"
-#include "c_tf_playerresource.h"
 #include "engine/imatchmaking.h"
-#include "ixboxsystem.h"
-
-#include "physpropclientside.h"
 #include "c_te_legacytempents.h"
-#include "cdll_client_int.h"
 #include "c_soundscape.h"
+#include "hl2orange.spa.h"
 #include <engine/IEngineSound.h>
 
 // memdbgon must be the last include file in a .cpp file!!!

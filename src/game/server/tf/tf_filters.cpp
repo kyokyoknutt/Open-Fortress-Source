@@ -5,10 +5,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "filters.h"
-#include "team_control_point.h"
 #include "tf_gamerules.h"
-#include "tf_playerclass_shared.h"
-#include "tf_player.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

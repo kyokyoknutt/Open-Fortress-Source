@@ -106,7 +106,7 @@ public:
 	bool				IsClientSideGlowEnabled( void ){ return m_bClientSideGlowEnabled; }
 #endif // GLOWS_ENABLE
 #endif
-
+	
 public:
 
 	float			m_flNextAttack;
@@ -138,7 +138,6 @@ private:
 	CGlowObject			*m_pGlowEffect;
 #endif // GLOWS_ENABLE
 #endif
-
 private:
 	C_BaseCombatCharacter( const C_BaseCombatCharacter & ); // not defined, not accessible
 

@@ -5,16 +5,12 @@
 //=============================================================================
 #include "cbase.h"
 #include "tf_weapon_grenadelauncher.h"
-#include "tf_weapon_grenade_pipebomb.h"
-#include "tf_fx_shared.h"
 
-// Client specific.
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-// Server specific.
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
-#include "tf_gamestats.h"
+	#include "tf_player.h"
+	#include "tf_gamestats.h"
 #endif
 
 //=============================================================================
@@ -56,7 +52,7 @@ LINK_ENTITY_TO_CLASS( tfc_weapon_grenadelauncher, CTFCGrenadeLauncher );
 //PRECACHE_WEAPON_REGISTER( tfc_weapon_grenadelauncher );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFGrenadeLauncher )
 END_DATADESC()
 #endif

@@ -6,17 +6,13 @@
 
 #include "cbase.h"
 #include "tf_shareddefs.h"
-#include "KeyValues.h"
-#include "takedamageinfo.h"
 #include "tf_gamerules.h"
-#include "bone_setup.h"
 
-#if defined( CLIENT_DLL )
-#include "c_team.h"
-#include "c_tf_player.h"
-#include "filesystem.h"
+#ifdef CLIENT_DLL
+	#include "c_team.h"
+	#include "filesystem.h"
 #else
-#include "team.h"
+	#include "team.h"
 #endif
 
 extern ConVar of_infiniteammo;
@@ -40,42 +36,6 @@ const char *GetRPCMapImage( char m_szLatchedMapname[MAX_MAP_NAME], const char *p
 	return "missing";
 }
 #endif
-
-int GetWearableCount( void )
-{
-	if ( !TFGameRules() )
-		return 0;
-
-	if ( TFGameRules()->m_iCosmeticCount > 0 )
-		return TFGameRules()->m_iCosmeticCount;
-
-	int i = 0;
-
-	if ( !filesystem )
-		return 0;
-
-	if ( !filesystem->FileExists( "scripts/items/items_game.txt" , "GAME" ) )
-			Error( "Error! items_games.txt is missing. Your game likely didn't download or update properly.\nGo to the open_fortress/scripts/items/ folder and delete the items_games.txt file, and cleanup & update the SVN again." );
-
-	KeyValues* pItemsGame = new KeyValues( "items_game" );
-	pItemsGame->LoadFromFile( filesystem, "scripts/items/items_game.txt", "GAME" );
-	if ( pItemsGame )
-	{
-		KeyValues* pCosmetics = pItemsGame->FindKey( "Cosmetics" );
-		if ( pCosmetics )
-		{
-			for ( KeyValues *pCosmetic = pCosmetics->GetFirstSubKey(); pCosmetic; pCosmetic = pCosmetic->GetNextKey() )
-			{
-				if ( pCosmetic )
-					i++;
-			}
-		}
-	}
-	if ( i > 0 )
-		TFGameRules()->m_iCosmeticCount = i;
-
-	return i;
-}
 
 bool IsGameTeam( int iTeam )
 {
@@ -350,6 +310,7 @@ const char *g_aWeaponNames[] =
 	"TF_WEAPON_INVIS",
 	"TF_WEAPON_RAILGUN",
 	"TF_WEAPON_SUPERSHOTGUN",
+	"TF_WEAPON_ETERNALSHOTGUN",
 	"TF_WEAPON_PISTOL_MERCENARY",
 	"TF_WEAPON_REVOLVER_MERCENARY",
 	"TF_WEAPON_GATLINGGUN",
@@ -371,6 +332,7 @@ const char *g_aWeaponNames[] =
 	"TF_WEAPON_GIB",
 	"TF_WEAPON_CLAWS",
 	"TF_WEAPON_JUGGERNAUGHT",
+	"TF_WEAPON_COMBATKNIFE",
 
 	"TFC_WEAPON_SHOTGUN_SB",
 	"TFC_WEAPON_SHOTGUN_DB",
@@ -548,6 +510,7 @@ uint g_aWeaponDamageTypes[] =
 	DMG_GENERIC,	// TF_WEAPON_INVIS
 	DMG_BULLET | DMG_USE_HITLOCATIONS,	// TF_WEAPON_RAILGUN,
 	DMG_BUCKSHOT | DMG_USEDISTANCEMOD, //TF_WEAPON_SUPERSHOTGUN
+	DMG_BUCKSHOT | DMG_USEDISTANCEMOD, //TF_WEAPON_ETERNALSHOTGUN
 	DMG_BULLET  | DMG_USEDISTANCEMOD,	// TF_WEAPON_PISTOL_MERCENARY,
 	DMG_BULLET  | DMG_USEDISTANCEMOD,	// TF_WEAPON_REVOLVER_MERCENARY,
 	DMG_BULLET | DMG_USEDISTANCEMOD,		// TF_WEAPON_GATLINGGUN,
@@ -569,6 +532,7 @@ uint g_aWeaponDamageTypes[] =
 	DMG_BLAST | DMG_HALF_FALLOFF | DMG_USEDISTANCEMOD,		// TF_WEAPON_GIB,
 	DMG_SLASH, // TF_WEAPON_CLAWS
 	DMG_CLUB,		// TF_WEAPON_JUGGERNAUGHT,
+	DMG_SLASH, // TF_WEAPON_COMBATKNIFE
 	
 	DMG_BUCKSHOT | DMG_USEDISTANCEMOD, //TFC_WEAPON_SHOTGUN_SB
 	DMG_BUCKSHOT | DMG_USEDISTANCEMOD, //TFC_WEAPON_SHOTGUN_DB

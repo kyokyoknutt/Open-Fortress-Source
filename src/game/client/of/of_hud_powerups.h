@@ -12,6 +12,11 @@
 #endif
 
 #include "vgui_avatarimage.h"
+#include "hudelement.h"
+#include <vgui_controls/EditablePanel.h>
+#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/CircularProgressBar.h"
+
 using namespace vgui;
 
 #define TF_MAX_FILENAME_LENGTH	128
@@ -19,15 +24,15 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Purpose:  Displays weapon ammo data
 //-----------------------------------------------------------------------------
-class CTFHudPowerups : public CHudElement, public vgui::EditablePanel
+class CTFHudPowerups : public CHudElement, public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CTFHudPowerups, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE( CTFHudPowerups, EditablePanel );
 
 public:
 
 	CTFHudPowerups( const char *pElementName );
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	virtual void ApplySchemeSettings( IScheme *pScheme );
 
 	virtual bool ShouldDraw( void );
 	
@@ -44,7 +49,7 @@ public:
 protected:
 
 	virtual void OnThink();
-	vgui::SectionedListPanel	*m_pPowerupList;
+	SectionedListPanel	*m_pPowerupList;
 };
 
 extern KeyValues *kvPowerupTimer;

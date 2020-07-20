@@ -453,6 +453,7 @@ C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOf
 	ListenForGameEvent( "base_player_teleported" );
 
 #if defined( OF_CLIENT_DLL )
+	m_bNoFootStepsSound = false;
 	m_bIsCSliding = false;
 #endif
 }

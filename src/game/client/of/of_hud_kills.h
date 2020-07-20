@@ -12,7 +12,7 @@
 #endif
 
 #include "vgui_avatarimage.h"
-
+#include "hudelement.h"
 using namespace vgui;
 
 #define TF_MAX_FILENAME_LENGTH	128
@@ -20,15 +20,15 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Purpose:  Displays weapon ammo data
 //-----------------------------------------------------------------------------
-class CTFHudKills : public CHudElement, public vgui::EditablePanel
+class CTFHudKills : public CHudElement, public EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CTFHudKills, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE( CTFHudKills, EditablePanel );
 
 public:
 
 	CTFHudKills( const char *pElementName );
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	virtual void ApplySchemeSettings(IScheme *pScheme);
 	virtual void Reset();
 
 	virtual bool ShouldDraw( void );

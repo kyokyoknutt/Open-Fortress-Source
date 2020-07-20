@@ -12,10 +12,9 @@
 
 
 #include "baseobject_shared.h"
-#include "takedamageinfo.h"
 
-#if defined( CLIENT_DLL )
-#define CBaseObjectUpgrade C_BaseObjectUpgrade
+#ifdef CLIENT_DLL
+	#define CBaseObjectUpgrade C_BaseObjectUpgrade
 #endif
 
 // ------------------------------------------------------------------------ //

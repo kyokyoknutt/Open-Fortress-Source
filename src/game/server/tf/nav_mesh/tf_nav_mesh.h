@@ -7,10 +7,6 @@
 #include "nav_colors.h"
 #include "tf_nav_area.h"
 
-#include "func_respawnroom.h"
-#include "team_control_point_master.h"
-#include "trigger_area_capture.h"
-
 class CBaseObject;
 
 class CTFNavMesh : public CNavMesh

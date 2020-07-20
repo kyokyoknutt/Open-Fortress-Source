@@ -13,6 +13,10 @@
 #include "cbase.h"
 #include "c_basecombatcharacter.h"
 
+#ifdef OF_CLIENT_DLL
+#include "tf_shareddefs.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -29,6 +33,10 @@ C_BaseCombatCharacter::C_BaseCombatCharacter()
 	{
 		m_iAmmo.Set( i, 0 );
 	}
+
+	PrecacheMaterial("effects/poison/toxicoverlay");
+	PrecacheMaterial("greyscale");
+	PrecacheMaterial("dofblur");
 	
 #ifndef OF_CLIENT_DLL
 #ifdef GLOWS_ENABLE

@@ -11,14 +11,11 @@
 #pragma once
 #endif
 
-#define TF_MAX_FILENAME_LENGTH	128
-
-#include <vgui_controls/ImagePanel.h>
-#include "tf_controls.h"
-#include "tf_imagepanel.h"
-#include "GameEventListener.h"
-#include "tf_hud_playerstatus.h"
+#include "hudelement.h"
 #include "of_imageprogressbar.h"
+#include "tf_controls.h"
+
+#define TF_MAX_FILENAME_LENGTH	128
 
 //-----------------------------------------------------------------------------
 // Purpose:  Displays weapon ammo data

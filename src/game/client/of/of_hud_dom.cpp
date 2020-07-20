@@ -7,36 +7,13 @@
 #include "cbase.h"
 #include "hud.h"
 #include "hudelement.h"
-#include "hud_macros.h"
-#include "hud_numericdisplay.h"
-#include <KeyValues.h>
-#include <vgui/IScheme.h>
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui_controls/AnimationController.h>
 #include "iclientmode.h"
-#include "tf_shareddefs.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui/ISurface.h>
-#include <vgui/IImage.h>
-#include <vgui_controls/Label.h>
-
-#include "tf_controls.h"
-#include "in_buttons.h"
-#include "tf_imagepanel.h"
-#include "c_team.h"
-#include "c_tf_player.h"
 #include "ihudlcd.h"
 #include "of_hud_dom.h"
 #include "tf_gamerules.h"
 #include "c_tf_playerresource.h"
-#include "multiplay_gamerules.h"
-
-#include <vgui/VGUI.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/ProgressBar.h>
 
 using namespace vgui;
 

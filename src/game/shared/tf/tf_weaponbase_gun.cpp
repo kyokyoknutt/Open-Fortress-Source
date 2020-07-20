@@ -7,31 +7,15 @@
 #include "cbase.h"
 #include "tf_weaponbase_gun.h"
 #include "tf_fx_shared.h"
-#include "effect_dispatch_data.h"
-#include "takedamageinfo.h"
 #include "tf_projectile_nail.h"
 #include "in_buttons.h"
-#include "tf_gamerules.h"
 #include "of_projectile_bfg.h"
 #include "tf_weapon_grenade_pipebomb.h"
 #include "tf_weapon_rocketlauncher.h"
 
-#if !defined( CLIENT_DLL )	// Server specific.
-
+#ifdef GAME_DLL
 	#include "tf_gamestats.h"
-	#include "tf_player.h"
-	#include "tf_fx.h"
-	#include "te_effect_dispatch.h"
-
-	#include "tf_projectile_rocket.h"
-	#include "te.h"
 	#include "of_projectile_tripmine.h"
-
-#else	// Client specific.
-
-	#include "c_tf_player.h"
-	#include "c_te_effect_dispatch.h"
-
 #endif
 
 //=============================================================================
@@ -124,6 +108,10 @@ void CTFWeaponBaseGun::BurstFire( void )
 //-----------------------------------------------------------------------------
 void CTFWeaponBaseGun::BeginBurstFire(void)
 {
+	//Ivory: Otherwise animations and sounds play even if gun cannot shoot
+	if (!CanAttack())
+		return;
+
 	BaseClass::BeginBurstFire();
 }
 
@@ -179,7 +167,7 @@ void CTFWeaponBaseGun::PrimaryAttack( void )
 
 	CalcIsAttackCritical();
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	pPlayer->RemoveInvisibility();
 	pPlayer->RemoveDisguise();
 	pPlayer->m_Shared.RemoveCond( TF_COND_SPAWNPROTECT );
@@ -440,7 +428,7 @@ CBaseEntity *CTFWeaponBaseGun::FireProjectile( CTFPlayer *pPlayer )
 
 	if ( m_iClip1 != -1 )
 	{
-		if ( !of_noreload.GetBool() || ReserveAmmo() <= 0 || ( pWeapon && (pWeapon->GetWeaponID() == TF_WEAPON_SUPERSHOTGUN) ) )
+		if ( !of_noreload.GetBool() || ReserveAmmo() <= 0 || ( pWeapon && (pWeapon->GetWeaponID() == TF_WEAPON_SUPERSHOTGUN || pWeapon->GetWeaponID() == TF_WEAPON_ETERNALSHOTGUN ) ) )
 		{
 			m_iClip1 -= m_pWeaponInfo->GetWeaponData( m_iWeaponMode ).m_iAmmoPerShot;
 		}
@@ -654,14 +642,6 @@ CBaseEntity *CTFWeaponBaseGun::FireCoom( CTFPlayer *pPlayer )
 		vecOffset.y = 0.0f; // left right
 		vecOffset.z = -8.0f; //up down
 	}
-	
-	if ( pPlayer->GetFlags() & FL_DUCKING )
-	{
-		if ( bCenter || iQuakeCvar )
-			vecOffset.z = 0.0f;
-		else
-			vecOffset.z = 8.0f;
-	}
 	GetProjectileFireSetup( pPlayer, vecOffset, &vecSrc, &angForward, false );
 
 	CTFBFGProjectile *pProjectile = CTFBFGProjectile::Create( this, vecSrc, angForward, pPlayer, pPlayer );
@@ -706,13 +686,6 @@ CBaseEntity *CTFWeaponBaseGun::FireRocket( CTFPlayer *pPlayer )
 		vecOffset.z = -8.0f; //up down
 	}
 	
-	if ( pPlayer->GetFlags() & FL_DUCKING )
-	{
-		if ( bCenter || iQuakeCvar )
-			vecOffset.z = 0.0f;
-		else
-			vecOffset.z = 8.0f;
-	}
 	GetProjectileFireSetup( pPlayer, vecOffset, &vecSrc, &angForward, false );
 
 	CTFProjectile_Rocket *pProjectile = CTFProjectile_Rocket::Create( this, vecSrc, angForward, pPlayer, pPlayer );
@@ -761,7 +734,7 @@ CBaseEntity *CTFWeaponBaseGun::FireNail( CTFPlayer *pPlayer, int iSpecificNail )
 	{
 		vecOffset.x = 12.0f; //forward backwards
 		vecOffset.y = 0.0f; // left right
-		vecOffset.z = -8.0f; //up down
+		vecOffset.z = -8.0f;
 	}
 	
 	GetProjectileFireSetup( pPlayer, vecOffset , &vecSrc, &angForward );
@@ -833,14 +806,6 @@ CBaseEntity *CTFWeaponBaseGun::FirePipeBomb( CTFPlayer *pPlayer, bool bRemoteDet
 		vecOffset.z = -8.0f; //up down
 	}
 	
-	if ( pPlayer->GetFlags() & FL_DUCKING )
-	{
-		if ( bCenter || iQuakeCvar )
-			vecOffset.z = 0.0f;
-		else
-			vecOffset.z = 8.0f;
-	}
-	
 	vecSrc +=  vecForward * vecOffset.x + vecRight * vecOffset.y + vecUp * vecOffset.z;
 	
 	Vector vecVelocity = ( vecForward * GetProjectileSpeed() ) + ( vecUp * 200.0f ) + ( random->RandomFloat( -10.0f, 10.0f ) * vecRight ) +		
@@ -894,14 +859,6 @@ CBaseEntity *CTFWeaponBaseGun::FirePipeBombDM( CTFPlayer *pPlayer, bool bRemoteD
 		vecOffset.z = -8.0f; //up down
 	}
 	
-	if ( pPlayer->GetFlags() & FL_DUCKING )
-	{
-		if ( bCenter || iQuakeCvar )
-			vecOffset.z = 0.0f;
-		else
-			vecOffset.z = 8.0f;
-	}
-	
 	vecSrc +=  vecForward * vecOffset.x + vecRight * vecOffset.y + vecUp * vecOffset.z;
 
 	Vector vecVelocity = ( vecForward * GetProjectileSpeed() ) + ( vecUp * 200.0f ) + vecRight;
@@ -931,7 +888,7 @@ CBaseEntity *CTFWeaponBaseGun::FireTripmine( CTFPlayer *pPlayer )
 {
 	PlayWeaponShootSound();
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 
 	CTripmineGrenade *pProjectile = NULL;
 
@@ -995,14 +952,6 @@ CBaseEntity *CTFWeaponBaseGun::FireIncendRocket( CTFPlayer *pPlayer )
 		vecOffset.x = 12.0f; //forward backwards
 		vecOffset.y = 0.0f; // left right
 		vecOffset.z = -8.0f; //up down
-	}
-	
-	if ( pPlayer->GetFlags() & FL_DUCKING )
-	{
-		if ( iQuakeCvar )
-			vecOffset.z = 0.0f;
-		else
-			vecOffset.z = 8.0f;
 	}
 	GetProjectileFireSetup( pPlayer, vecOffset, &vecSrc, &angForward, false );
 

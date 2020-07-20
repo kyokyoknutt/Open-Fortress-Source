@@ -5,22 +5,14 @@
 //=============================================================================//
 #include "cbase.h"
 #include "tf_projectile_base.h"
-#include "effect_dispatch_data.h"
 #include "tf_shareddefs.h"
 
-#ifdef GAME_DLL
-#include "te_effect_dispatch.h"
-#else
-#include "c_te_effect_dispatch.h"
-#endif
 #ifdef CLIENT_DLL
-#include "c_basetempentity.h"
-#include "c_te_legacytempents.h"
-#include "c_te_effect_dispatch.h"
-#include "input.h"
-#include "c_tf_player.h"
+	#include "c_te_legacytempents.h"
+	#include "c_te_effect_dispatch.h"
 #else
-#include "tf_player.h"
+	#include "te_effect_dispatch.h"
+	#include "tf_player.h"
 #endif
 
 IMPLEMENT_NETWORKCLASS_ALIASED( TFBaseProjectile, DT_TFBaseProjectile )

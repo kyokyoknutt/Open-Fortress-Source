@@ -8,13 +8,8 @@
 #include "cbase.h"
 #include "player_command.h"
 #include "igamemovement.h"
-#include "in_buttons.h"
-#include "ipredictionsystem.h"
 #include "tf_player.h"
-
 #include "iservervehicle.h"
-#include "vehicle_base.h"
-#include "gamestats.h"
 
 static CMoveData g_MoveData;
 CMoveData *g_pMoveData = &g_MoveData;

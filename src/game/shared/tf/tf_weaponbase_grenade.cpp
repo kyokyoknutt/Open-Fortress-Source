@@ -113,7 +113,7 @@ void CTFWeaponBaseGrenade::Prime()
 	m_flThrowTime = gpGlobals->curtime + weaponInfo.m_flPrimerTime;
 	m_bPrimed = true;
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	if ( GetWeaponID() != TF_WEAPON_GRENADE_SMOKE_BOMB )
 	{
 		// Get the player owning the weapon.

@@ -7,12 +7,7 @@
 #include "tf_projectile_nail.h"
 
 #ifdef CLIENT_DLL
-#include "c_basetempentity.h"
-#include "c_te_legacytempents.h"
-#include "c_te_effect_dispatch.h"
-#include "input.h"
-#include "c_tf_player.h"
-#include "cliententitylist.h"
+	#include "c_tf_player.h"
 #endif
 
 //=============================================================================

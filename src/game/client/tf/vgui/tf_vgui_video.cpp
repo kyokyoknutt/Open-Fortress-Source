@@ -1,21 +1,15 @@
-//====== Copyright © 1996-2007, Valve Corporation, All rights reserved. =======
+ï»¿//====== Copyright ï¿½ 1996-2007, Valve Corporation, All rights reserved. =======
 //
 // Purpose: VGUI panel which can play back video, in-engine
 //
 //=============================================================================
 
 #include "cbase.h"
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
-#include <KeyValues.h>
-#include "vgui_video.h"
 #include "tf_vgui_video.h"
 #include "engine/IEngineSound.h"
 
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
 
 DECLARE_BUILD_FACTORY( CTFVideoPanel );
 
@@ -83,7 +77,10 @@ void CTFVideoPanel::GetPanelPos( int &xpos, int &ypos )
 void CTFVideoPanel::OnVideoOver()
 {
 	BaseClass::OnVideoOver();
-	PostMessage( GetParent(), new KeyValues( "IntroFinished" ) );
+	if ( GetParent() )
+	{
+		PostMessage( GetParent(), new KeyValues( "IntroFinished" ) );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -92,7 +89,7 @@ void CTFVideoPanel::OnVideoOver()
 void CTFVideoPanel::OnClose()
 {
 	// Fire an exit command if we're asked to do so
-	if ( m_szExitCommand[0] )
+	if ( m_szExitCommand[ 0 ] )
 	{
 		engine->ClientCmd( m_szExitCommand );
 	}
@@ -109,4 +106,58 @@ void CTFVideoPanel::Shutdown()
 {
 	OnClose();
 	ReleaseVideo();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Begins playback of a movie
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool CTFVideoPanel::BeginPlaybackNoAudio( const char *pFilename )
+{
+	// need working video services
+	if ( g_pVideo == NULL )
+		return false;
+
+	// Create a new video material
+	if ( m_VideoMaterial != NULL )
+	{
+		g_pVideo->DestroyVideoMaterial( m_VideoMaterial );
+		m_VideoMaterial = NULL;
+	}
+
+	m_VideoMaterial = g_pVideo->CreateVideoMaterial( "VideoMaterial", pFilename, "GAME",
+		VideoPlaybackFlags::DEFAULT_MATERIAL_OPTIONS,
+		VideoSystem::DETERMINE_FROM_FILE_EXTENSION, m_bAllowAlternateMedia );
+
+	if ( m_VideoMaterial == NULL )
+		return false;
+
+	//No audio
+
+	int nWidth, nHeight;
+	m_VideoMaterial->GetVideoImageSize( &nWidth, &nHeight );
+	m_VideoMaterial->GetVideoTexCoordRange( &m_flU, &m_flV );
+	m_pMaterial = m_VideoMaterial->GetMaterial();
+
+
+	float flFrameRatio = ( ( float )GetWide() / ( float )GetTall() );
+	float flVideoRatio = ( ( float )nWidth / ( float )nHeight );
+
+	if ( flVideoRatio > flFrameRatio )
+	{
+		m_nPlaybackWidth = GetWide();
+		m_nPlaybackHeight = ( GetWide() / flVideoRatio );
+	}
+	else if ( flVideoRatio < flFrameRatio )
+	{
+		m_nPlaybackWidth = ( GetTall() * flVideoRatio );
+		m_nPlaybackHeight = GetTall();
+	}
+	else
+	{
+		m_nPlaybackWidth = GetWide();
+		m_nPlaybackHeight = GetTall();
+	}
+
+	return true;
 }

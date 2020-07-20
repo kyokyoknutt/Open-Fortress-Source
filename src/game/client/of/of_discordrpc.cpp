@@ -6,29 +6,16 @@
 
 #include "cbase.h"
 #include "of_discordrpc.h"
-#include "c_team_objectiveresource.h"
 #include "tf_gamerules.h"
-#include "c_tf_team.h"
-#include "c_tf_player.h"
 #include "achievementmgr.h"
-#include "baseachievement.h"
 #include "c_tf_playerresource.h"
 #include <inetchannelinfo.h>
-#include "discord_rpc.h"
 #include "discord_register.h"
-#include "tf_gamerules.h"
-#include "tf_shareddefs.h"
-#include "KeyValues.h"
 #include <ctime>
-#include "steam/isteammatchmaking.h"
-#include "steam/isteamgameserver.h"
-#include "steam/isteamfriends.h"
-#include "steam/steam_api.h"
 #include "tier0/icommandline.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-#include <replay/ienginereplay.h>
 
 ConVar cl_richpresence_printmsg( "cl_richpresence_printmsg", "0", FCVAR_ARCHIVE, "" );
 

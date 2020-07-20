@@ -1,17 +1,11 @@
 #include "cbase.h"
-#include "fmtstr.h"
-#include "utlbuffer.h"
-#include "tier0/vprof.h"
 #include "functorutils.h"
-#include "triggers.h"
 #include "filters.h"
-
 #include "tf_nav_mesh.h"
-
-#include "tf_shareddefs.h"
 #include "tf_gamerules.h"
 #include "tf_obj.h"
-
+#include "func_respawnroom.h"
+#include "team_control_point_master.h"
 #include "NextBotUtil.h"
 
 ConVar tf_show_in_combat_areas( "tf_show_in_combat_areas", "0", FCVAR_CHEAT, "", true, 0.0f, true, 1.0f );

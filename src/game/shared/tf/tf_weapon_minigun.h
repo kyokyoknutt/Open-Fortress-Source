@@ -44,7 +44,7 @@ public:
 	DECLARE_PREDICTABLE();
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	DECLARE_DATADESC();
 #endif
 

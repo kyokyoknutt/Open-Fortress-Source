@@ -29,7 +29,6 @@
 #include "OptionsSubDifficulty.h"
 #include "OptionsSubPortal.h"
 #include "OptionsSubGame.h"
-#include "OptionsSubHL2CE.h"
 #include "ModInfo.h"
 
 using namespace vgui;

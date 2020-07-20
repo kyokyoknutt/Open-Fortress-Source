@@ -247,10 +247,6 @@ protected:
 	friend class CBotManager;
 	static edict_t *s_PlayerEdict; // must be set before calling constructor
 
-#if defined( OF_DLL )
-	bool m_bIsCSliding;
-#endif
-
 public:
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
@@ -1015,6 +1011,10 @@ protected:
 	float					m_fDelay;			// replay delay in seconds
 	float					m_fReplayEnd;		// time to stop replay mode
 	int						m_iReplayEntity;	// follow this entity in replay
+
+#if defined( OF_DLL )
+	bool m_bNoFootStepsSound;
+#endif
 
 private:
 	void HandleFuncTrain();

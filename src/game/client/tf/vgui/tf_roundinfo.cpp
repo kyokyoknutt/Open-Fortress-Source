@@ -7,31 +7,13 @@
 
 #include "cbase.h"
 
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/RichText.h>
 #include <vgui_controls/Frame.h>
 #include <game/client/iviewport.h>
-#include <KeyValues.h>
-#include <filesystem.h>
-#include "materialsystem/imaterialvar.h"
-#include "IGameUIFuncs.h" // for key bindings
-
 #include "tf_controls.h"
-#include "tf_imagepanel.h"
-#include "c_team_objectiveresource.h"
-#include "c_tf_objective_resource.h"
-#include "c_tf_player.h"
-
-#include "tf_shareddefs.h"
 #include "tf_roundinfo.h"
-
-
 #include "vgui/ISurface.h"
-#include <vgui/ILocalize.h>
-#include <vgui/IVGui.h>
 #include "engine/IEngineSound.h"
+#include "filesystem.h"
 
 using namespace vgui;
 

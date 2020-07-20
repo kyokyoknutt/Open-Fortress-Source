@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================
 #include "cbase.h"
-#include "hud.h"
 #include "hudelement.h"
 #include "c_tf_player.h"
 #include "c_playerresource.h"

@@ -6,25 +6,20 @@
 
 #include "cbase.h"
 #include "tier0/vprof.h"
-#include "animation.h"
-#include "studio.h"
-#include "apparent_velocity_helper.h"
-#include "utldict.h"
-#include "tf_playeranimstate.h"
 #include "base_playeranimstate.h"
 #include "datacache/imdlcache.h"
 
-//#include "tf_weapon_grapple.h"
-
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
+	#include "tf_player.h"
 #endif
 
 #define TF_RUN_SPEED			320.0f
 #define TF_WALK_SPEED			75.0f
 #define TF_CROUCHWALK_SPEED		110.0f
+
+extern ConVar of_hook_pendulum;
 
 /*
 acttable_t m_acttableGrapple[] = 
@@ -540,7 +535,7 @@ bool CTFPlayerAnimState::HandleMoving( Activity &idealActivity )
 	}
 
 	// grappling state
-	if ( m_pTFPlayer->m_Shared.IsGrappling() )
+	if ( m_pTFPlayer->m_Shared.GetHook() && !( of_hook_pendulum.GetBool() && m_pTFPlayer->GetGroundEntity() ) )
 	{
 		idealActivity = ACT_GRAPPLE_PULL_IDLE;
 		return true;

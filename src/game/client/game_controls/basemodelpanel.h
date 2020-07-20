@@ -14,6 +14,7 @@
 #include <vgui/IScheme.h>
 #include <vgui_controls/ImagePanel.h>
 #include <vgui_controls/EditablePanel.h>
+#include <vgui_controls/ModelPanel.h>
 #include "GameEventListener.h"
 #include "KeyValues.h"
 
@@ -208,7 +209,11 @@ public:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CModelPanel : public vgui::EditablePanel, public CGameEventListener
+#ifdef OF_CLIENT_DLL
+class CModelPanel : public vgui::EditablePanel, public CGameEventListener, public vgui::AnimContModelPanel
+#else
+class CModelPanel : public vgui::EditablePanel, public CGameEventListener	
+#endif
 {
 public:
 	DECLARE_CLASS_SIMPLE( CModelPanel, vgui::EditablePanel );
@@ -241,10 +246,14 @@ public:
 #else
 	void	SwapModel( const char *pszName, const char *pszAttached = NULL );
 #endif
-
-	virtual void GetModelPos( float &x, float &y, float &z );
-	virtual void SetModelPos( float x, float y, float z );
-
+#ifdef OF_CLIENT_DLL	
+	virtual void GetHUDModelPos( float &x, float &y, float &z );
+	virtual void SetHUDModelPos( float x, float y, float z );
+	
+	virtual void GetHUDModelAng( float &x, float &y, float &z );
+	virtual void SetHUDModelAng( float x, float y, float z );	
+	virtual void ResetAnim();
+#endif
 	virtual void ParseModelInfo( KeyValues *inResourceData );
 
 	void		ClearAttachedModelInfos( void );

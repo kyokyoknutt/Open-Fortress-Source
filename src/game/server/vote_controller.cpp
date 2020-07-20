@@ -228,18 +228,6 @@ CON_COMMAND( callvote, "Start a vote on an issue." )
 	if ( !pVoteCaller )
 		return;
 
-	// WTF WTF WTF
-#ifdef OF_DLL
-	edict_t *pClient = pVoteCaller->edict();
-
-	if ( pClient )
-	{
-		// close main menu when this get called, needs to be called twice
-		engine->ClientCommand( pClient, "escape" );
-		engine->ClientCommand( pClient, "escape" );
-	}
-#endif
-
 	if ( !sv_vote_allow_spectators.GetBool() )
 	{
 		if ( pVoteCaller->GetTeamNumber() == TEAM_SPECTATOR )

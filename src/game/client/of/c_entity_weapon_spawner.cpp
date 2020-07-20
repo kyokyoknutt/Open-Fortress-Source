@@ -5,19 +5,10 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "c_tf_player.h"
 #include "view.h"
-
-#include "glow_outline_effect.h"
 #include "tf_gamerules.h"
-#include "tf_shareddefs.h"
 // for spy material proxy
-#include "toolframework_client.h"
 #include "functionproxy.h"
-#include "proxyentity.h"
-#include "materialsystem/imaterial.h"
-#include "materialsystem/imaterialvar.h"
-#include "materialsystem/imesh.h"		//for materials->FindMaterial
 
 #include "tier0/memdbgon.h"
 

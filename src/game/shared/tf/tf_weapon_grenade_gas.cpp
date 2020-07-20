@@ -236,11 +236,11 @@ IMPLEMENT_NETWORKCLASS_ALIASED( TFGasGrenadeEffect, DT_TFGasGrenadeEffect )
 BEGIN_NETWORK_TABLE(CTFGasGrenadeEffect, DT_TFGasGrenadeEffect )
 END_NETWORK_TABLE()
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	LINK_ENTITY_TO_CLASS( tf_gas_grenade_effect, CTFGasGrenadeEffect );
 #endif
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 
 	int CTFGasGrenadeEffect::UpdateTransmitState( void )
 	{

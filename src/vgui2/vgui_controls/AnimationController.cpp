@@ -13,7 +13,8 @@
 #include <vgui_controls/AnimationController.h>
 #include "filesystem.h"
 #include "filesystem_helpers.h"
-#include "ModelPanel.h"
+
+#include <vgui_controls/ModelPanel.h>
 
 #include <stdio.h>
 #include <math.h>
@@ -70,6 +71,9 @@ AnimationController::AnimationController(Panel *parent) : BaseClass(parent, NULL
 	m_sTall = g_ScriptSymbols.AddString("tall");
 
 	m_sModelPos = g_ScriptSymbols.AddString( "model_pos" );
+	m_sModelAng = g_ScriptSymbols.AddString( "model_ang" );
+	
+	m_sResetAnim = g_ScriptSymbols.AddString( "model_reset_anim" );
 
 	m_flCurrentTime = 0.0f;
 }
@@ -390,6 +394,10 @@ bool AnimationController::ParseScriptFile(char *pMem, int length)
 				{
 					sscanf(token, "%f %f %f", &cmdAnimate.target.a, &cmdAnimate.target.b, &cmdAnimate.target.c);
 				}
+				else if( cmdAnimate.variable == m_sModelAng )
+				{
+					sscanf(token, "%f %f %f", &cmdAnimate.target.a, &cmdAnimate.target.b, &cmdAnimate.target.c);
+				}				
 				else if ( cmdAnimate.variable == m_sXPos )
 				{
 					// XPos and YPos both use target ".a"
@@ -480,6 +488,7 @@ bool AnimationController::ParseScriptFile(char *pMem, int length)
 					pMem = ParseFile(pMem, token, NULL);
 					cmdAnimate.interpolationParameter = (float)atof(token);
 				}
+
 				else if ( !stricmp( token, "Flicker"))
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_FLICKER;
@@ -491,6 +500,26 @@ bool AnimationController::ParseScriptFile(char *pMem, int length)
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_BOUNCE;
 				}
+				// Found these in the hudanimations_tf
+				// Gain - < bias > Lower bias values bias towards 0.5 and higher bias values bias away from it.
+				// Bias - < bias > Lower values bias the curve towards 0 and higher values bias it towards 1.
+				// Im honestly just guessing how these work but it looked nice
+				// while i was testing so i'll keep it like this
+				else if (!stricmp(token,"Bias"))
+				{
+					cmdAnimate.interpolationFunction = INTERPOLATOR_BIAS;
+					// frequencey
+					pMem = ParseFile(pMem, token, NULL);
+					cmdAnimate.interpolationParameter = (float)atof(token);
+				}
+				else if (!stricmp(token,"Gain"))
+				{
+					cmdAnimate.interpolationFunction = INTERPOLATOR_GAIN;
+					// frequencey
+					pMem = ParseFile(pMem, token, NULL);
+					cmdAnimate.interpolationParameter = (float)atof(token);
+				}
+				// end
 				else
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_LINEAR;
@@ -907,6 +936,7 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 		// Make sure we end at 1.0, so use cosine
 		pos = 0.5f + 0.5f * ( cos( pos * 2.0f * M_PI * interpolatorParam ) );
 		break;
+
 	case INTERPOLATOR_FLICKER:
 		if ( RandomFloat( 0.0f, 1.0f ) < interpolatorParam )
 		{
@@ -917,6 +947,7 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 			pos = 0.0f;
 		}
 		break;
+
 	case INTERPOLATOR_BOUNCE:
 	{
 		// fall from startValue to endValue, bouncing a few times and settling out at endValue
@@ -938,6 +969,12 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 		}
 		break;
 	}
+	case INTERPOLATOR_BIAS:
+		pos = Bias( pos, interpolatorParam );
+		break;
+	case INTERPOLATOR_GAIN:
+		pos = Gain( pos, interpolatorParam );
+		break;
 	case INTERPOLATOR_LINEAR:
 	default:
 		break;
@@ -1459,16 +1496,36 @@ AnimationController::Value_t AnimationController::GetValue(ActiveAnimation_t& an
 	}
 	else if ( var == m_sModelPos )
 	{
-		CModelPanel *mdlpanel = dynamic_cast<CModelPanel *>(panel);
-		if( mdlpanel )
+		float x = -1, y = -1, z = -1;
+		AnimContModelPanel *pPanel = dynamic_cast<AnimContModelPanel*>(panel);
+		if( pPanel )
 		{
-			float x, y, z;
-			mdlpanel->GetModelPos( x, y, z );
+			pPanel->GetHUDModelPos( x, y, z );
 			val.a = x;
 			val.b = y;
 			val.c = z;
 		}
 	}
+	else if ( var == m_sModelAng )
+	{
+		float x = -1, y = -1, z = -1;
+		AnimContModelPanel *pPanel = dynamic_cast<AnimContModelPanel*>(panel);
+		if( pPanel )
+		{
+			pPanel->GetHUDModelAng( x, y, z );
+			val.a = x;
+			val.b = y;
+			val.c = z;
+		}
+	}	
+	else if ( var == m_sResetAnim )
+	{
+		AnimContModelPanel *pPanel = dynamic_cast<AnimContModelPanel*>(panel);
+		if( pPanel )
+		{
+			pPanel->ResetAnim();
+		}
+	}	
 	else if (var == m_sSize)
 	{
 		int w, t;
@@ -1561,10 +1618,20 @@ void AnimationController::SetValue(ActiveAnimation_t& anim, Panel *panel, UtlSym
 	}
 	else if ( var == m_sModelPos )
 	{
-		CModelPanel *mdlpanel = dynamic_cast<CModelPanel *>(panel);
-		if( mdlpanel )
-			mdlpanel->SetModelPos( value.a, value.b, value.c );
+		AnimContModelPanel *pPanel = dynamic_cast<AnimContModelPanel*>(panel);
+		if( pPanel )
+		{
+			pPanel->SetHUDModelPos( value.a, value.b, value.c );
+		}
 	}
+	else if ( var == m_sModelAng )
+	{
+		AnimContModelPanel *pPanel = dynamic_cast<AnimContModelPanel*>(panel);
+		if( pPanel )
+		{
+			pPanel->SetHUDModelAng( value.a, value.b, value.c );
+		}
+	}	
 	else if (var == m_sSize)
 	{
 		panel->SetSize((int)value.a, (int)value.b);

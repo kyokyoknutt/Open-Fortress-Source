@@ -5,11 +5,8 @@
 //=============================================================================
 
 #include "cbase.h"
-#include "basetempentity.h"
 #include "tf_fx.h"
-#include "tf_shareddefs.h"
 #include "tf_weaponbase.h"
-#include "coordsize.h"
 
 #define NUM_BULLET_SEED_BITS	8
 

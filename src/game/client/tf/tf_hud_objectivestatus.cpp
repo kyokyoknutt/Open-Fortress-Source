@@ -7,29 +7,9 @@
 #include "cbase.h"
 #include "hudelement.h"
 #include "iclientmode.h"
-#include <KeyValues.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui/ISurface.h>
-#include <vgui/IImage.h>
-#include <vgui_controls/Label.h>
-
-#include "c_playerresource.h"
-#include "teamplay_round_timer.h"
-#include "utlvector.h"
-#include "entity_capture_flag.h"
-#include "c_tf_player.h"
-#include "c_team.h"
-#include "c_tf_team.h"
 #include "c_team_objectiveresource.h"
-#include "tf_hud_flagstatus.h"
 #include "tf_hud_objectivestatus.h"
 #include "tf_spectatorgui.h"
-#include "teamplayroundbased_gamerules.h"
 #include "tf_gamerules.h"
 
 using namespace vgui;

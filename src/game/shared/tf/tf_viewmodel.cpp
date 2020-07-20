@@ -4,19 +4,14 @@
 //
 //===========================================================================//
 #include "cbase.h"
+#include "tf_weaponbase.h"
 #include "tf_viewmodel.h"
-#include "tf_shareddefs.h"
 #include "tf_weapon_minigun.h"
 
 #ifdef CLIENT_DLL
-#include "c_tf_player.h"
-
-// for spy material proxy
-#include "proxyentity.h"
-#include "materialsystem/imaterial.h"
-#include "materialsystem/imaterialvar.h"
-#include "prediction.h"
-
+	#include "c_tf_player.h"
+	// for spy material proxy
+	#include "prediction.h"
 #endif
 
 #include "bone_setup.h"	//temp

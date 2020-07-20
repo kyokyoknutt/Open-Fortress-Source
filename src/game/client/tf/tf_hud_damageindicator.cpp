@@ -5,21 +5,11 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hud.h"
-#include "text_message.h"
 #include "hud_macros.h"
 #include "iclientmode.h"
 #include "view.h"
-#include <KeyValues.h>
 #include <vgui_controls/AnimationController.h>
-#include <vgui/ISurface.h>
-#include "VGuiMatSurface/IMatSystemSurface.h"
-#include "materialsystem/imaterial.h"
-#include "materialsystem/imesh.h"
-#include "materialsystem/imaterialvar.h"
-#include "IEffects.h"
 #include "hudelement.h"
-#include "clienteffectprecachesystem.h"
 
 using namespace vgui;
 

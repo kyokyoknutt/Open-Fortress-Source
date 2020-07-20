@@ -7,7 +7,6 @@
 #include "c_te_effect_dispatch.h"
 #include "tempent.h"
 #include "c_te_legacytempents.h"
-#include "tf_shareddefs.h"
 #include "tf_weapon_parse.h"
 
 extern CTFWeaponInfo *GetTFWeaponInfo( int iWeapon );

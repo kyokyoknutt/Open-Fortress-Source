@@ -8,10 +8,7 @@
 #ifndef TF_VIEWPORT_H
 #define TF_VIEWPORT_H
 
-
-#include "tf_shareddefs.h"
 #include "baseviewport.h"
-
 
 using namespace vgui;
 

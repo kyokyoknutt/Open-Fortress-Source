@@ -6,14 +6,11 @@
 
 #include "cbase.h"
 #include "tf_weapon_revolver.h"
-#include "tf_fx_shared.h"
 
-// Client specific.
 #ifdef CLIENT_DLL 
-#include "c_tf_player.h"
-// Server specific.
+	#include "c_tf_player.h"
 #else
-#include "tf_player.h"
+	#include "tf_player.h"
 #endif
 
 //=============================================================================
@@ -43,7 +40,7 @@ LINK_ENTITY_TO_CLASS( tf_weapon_revolver_mercenary, CTFRevolver_Mercenary );
 //PRECACHE_WEAPON_REGISTER( tf_weapon_revolver_mercenary );
 
 // Server specific.
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 BEGIN_DATADESC( CTFRevolver )
 END_DATADESC()
 #endif

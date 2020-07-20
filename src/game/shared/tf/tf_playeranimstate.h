@@ -9,14 +9,13 @@
 #pragma once
 #endif
 
-#include "convar.h"
 #include "multiplayer_animstate.h"
 
-#if defined( CLIENT_DLL )
-class C_TFPlayer;
-#define CTFPlayer C_TFPlayer
+#ifdef CLIENT_DLL
+	class C_TFPlayer;
+	#define CTFPlayer C_TFPlayer
 #else
-class CTFPlayer;
+	class CTFPlayer;
 #endif
 
 // ------------------------------------------------------------------------------------------------ //

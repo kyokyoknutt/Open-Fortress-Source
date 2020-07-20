@@ -47,7 +47,6 @@
 #include "clienteffectprecachesystem.h"
 #include "glow_outline_effect.h"
 #include "of_discordrpc.h"
-
 #if defined( _X360 )
 #include "tf_clientscoreboard.h"
 #endif
@@ -313,8 +312,10 @@ bool ClientModeTFNormal::ShouldDrawViewModel()
 //-----------------------------------------------------------------------------
 bool ClientModeTFNormal::DoPostScreenSpaceEffects(const CViewSetup *pSetup)
 {
-	if ( !IsInFreezeCam() )
+	if (!IsInFreezeCam())
+	{
 		g_GlowObjectManager.RenderGlowEffects(pSetup, 0);
+	}
 
 	return BaseClass::DoPostScreenSpaceEffects(pSetup);
 }

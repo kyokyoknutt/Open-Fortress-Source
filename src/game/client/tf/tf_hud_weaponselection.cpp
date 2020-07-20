@@ -7,20 +7,12 @@
 #include "cbase.h"
 #include "weapon_selection.h"
 #include "iclientmode.h"
-#include "hud_macros.h"
 #include "history_resource.h"
-#include "menu.h"
-#include "in_buttons.h"
-#include <KeyValues.h>
-#include "filesystem.h"
-#include "iinput.h"
 #include "vgui/ILocalize.h"
 #include <vgui/ISurface.h>
 #include <vgui_controls/AnimationController.h>
 #include "c_tf_player.h"
-#include "c_tf_weapon_builder.h"
 #include "tf_imagepanel.h"
-#include <vgui_controls/Panel.h>
 #include <vgui_controls/EditablePanel.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -986,7 +978,7 @@ void CHudWeaponSelection::CycleToNextWeapon( void )
 		return;
 
 	CTFWeaponBase *pNextWeapon = NULL;
-	if ( IsInSelectionMode() )
+	if ( IsInSelectionMode() && hud_fastswitch.GetInt() != HUDTYPE_FASTSWITCH )
 	{
 		// find the next selection spot
 		CTFWeaponBase *pWeapon = GetSelectedWeapon();
@@ -1044,7 +1036,7 @@ void CHudWeaponSelection::CycleToPrevWeapon( void )
 		return;
 
 	CTFWeaponBase *pNextWeapon = NULL;
-	if ( IsInSelectionMode() )
+	if ( IsInSelectionMode() && hud_fastswitch.GetInt() != HUDTYPE_FASTSWITCH )
 	{
 		// find the next selection spot
 		CTFWeaponBase *pWeapon = GetSelectedWeapon();

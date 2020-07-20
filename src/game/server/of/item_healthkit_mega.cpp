@@ -17,12 +17,6 @@ LINK_ENTITY_TO_CLASS(item_healthkit_mega, CHealthKitMega);
 PRECACHE_REGISTER(item_healthkit_mega);
 
 BEGIN_DATADESC(CHealthKitMega)
-
-// Inputs.
-DEFINE_KEYFIELD(m_iszModel, FIELD_STRING, "model"),
-DEFINE_KEYFIELD(m_iszModelOLD, FIELD_STRING, "powerup_model"),
-DEFINE_KEYFIELD(m_iszPickupSound, FIELD_STRING, "pickup_sound"),
-
 END_DATADESC()
 
 bool ITEM_GiveTFMegaHealth(CBasePlayer *pPlayer)
@@ -42,35 +36,21 @@ bool ITEM_GiveTFMegaHealth(CBasePlayer *pPlayer)
 
 void CHealthKitMega::Precache(void)
 {
-	if (m_iszModel == MAKE_STRING(""))
-	{
-		if (m_iszModelOLD != MAKE_STRING(""))
-			PrecacheModel(STRING(m_iszModelOLD));
-		else
-			PrecacheModel(GetPowerupModel());
-	}
-	else
-	{
-		PrecacheModel(STRING(m_iszModel));
-	}
+	BaseClass::Precache();
 
 	PrecacheScriptSound(TF_HEALTHKIT_PICKUP_SOUND);
 }
 
-bool CHealthKitMega::MyTouch(CBasePlayer *pPlayer)
+bool CHealthKitMega::DoPowerupEffect( CTFPlayer *pTFPlayer )
 {
-	bool m_bDoHeal = false;
-
-	if (!ValidTouch(pPlayer))
-		return m_bDoHeal;
-
-	if (ITEM_GiveTFMegaHealth(pPlayer))
+	if (ITEM_GiveTFMegaHealth(pTFPlayer))
 	{
-		CSingleUserRecipientFilter filter(pPlayer);
+		CSingleUserRecipientFilter filter(pTFPlayer);
 		EmitSound(filter, entindex(), STRING(m_iszPickupSound));
-		AddEffects(EF_NODRAW);
-		m_bDoHeal = true;
+		return true;
 	}
-
-	return m_bDoHeal;
+	else
+	{
+		return false;
+	}
 }

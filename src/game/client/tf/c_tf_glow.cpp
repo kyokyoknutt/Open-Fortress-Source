@@ -16,9 +16,6 @@ CTFGlow - tf_glow
 */
 
 #include "cbase.h"
-#include "c_baseanimating.h"
-#include "glow_outline_effect.h"
-
 #include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------

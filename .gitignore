@@ -143,3 +143,5 @@ src/utils/vtfdiff/Release/vtfdiff.pdb
 src/utils/vvis/Release/vvis_dll.dll
 src/utils/vvis/Release/vvis_dll.lib
 src/utils/vvis/Release/vvis_dll.pdb
+
+*.lib

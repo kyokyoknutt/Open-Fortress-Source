@@ -10,6 +10,7 @@
 #endif
 
 #include "matsys_controls/mdlpanel.h"
+#include <vgui_controls/ModelPanel.h>
 
 //-----------------------------------------------------------------------------
 // Resource file data used in posing the model inside of the model panel.
@@ -147,7 +148,7 @@ struct BMPResData_t
 //		        +->BaseModelPanel	|--> game_controls, client.dll
 //
 //-----------------------------------------------------------------------------
-class CBaseModelPanel : public CMDLPanel
+class CBaseModelPanel : public CMDLPanel, public vgui::AnimContModelPanel
 {
 	DECLARE_CLASS_SIMPLE( CBaseModelPanel, CMDLPanel );
 
@@ -178,6 +179,13 @@ public:
 	virtual void OnMouseReleased( vgui::MouseCode code );
 	virtual void OnCursorMoved( int x, int y );
 	virtual void OnMouseWheeled( int delta );
+	
+	virtual void GetHUDModelPos( float &x, float &y, float &z );
+	virtual void SetHUDModelPos( float x, float y, float z );
+	
+	virtual void GetHUDModelAng( float &x, float &y, float &z );
+	virtual void SetHUDModelAng( float x, float y, float z );	
+//	virtual void ResetAnim();	
 
 	studiohdr_t* GetStudioHdr( void );
 	void SetBody( unsigned int nBody ) { m_RootMDL.m_MDL.m_nBody = nBody; }

@@ -12,9 +12,6 @@
 #endif
 
 #include "tf_shareddefs.h"
-#include "const.h"
-#include "c_baseentity.h"
-#include <igameresources.h>
 #include "c_team_objectiveresource.h"
 
 class C_TFObjectiveResource : public C_BaseTeamObjectiveResource

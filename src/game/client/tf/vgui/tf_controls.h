@@ -11,17 +11,11 @@
 #pragma once
 #endif
 
-#include <vgui/IScheme.h>
-#include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/ScrollBar.h>
 #include <vgui_controls/EditablePanel.h>
 #include <vgui_controls/Button.h>
-#include <vgui_controls/Label.h>
 #include <vgui_controls/RichText.h>
 #include "tf_imagepanel.h"
-#include <vgui_controls/ImagePanel.h>
 
 
 //-----------------------------------------------------------------------------
@@ -78,6 +72,11 @@ public:
 	virtual void PerformLayout();
 	virtual void SetText( const char *text );
 	virtual void SetText( const wchar_t *text );
+	
+	virtual vgui::HFont GetFont( void )
+	{ 
+		return vgui::scheme()->GetIScheme( GetScheme() )->GetFont( m_szFont ); 
+	};
 
 	virtual void OnTick( void );
 	void SetScrollBarImagesVisible( bool visible );

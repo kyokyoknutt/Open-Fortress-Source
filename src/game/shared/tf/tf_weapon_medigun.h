@@ -12,13 +12,12 @@
 
 #include "tf_weaponbase_gun.h"
 
-#if defined( CLIENT_DLL )
-#define CWeaponMedigun C_WeaponMedigun
+#ifdef CLIENT_DLL
+	#define CWeaponMedigun C_WeaponMedigun
 #endif
 
-#define MAX_HEALING_TARGETS			1	//6
-
-#define CLEAR_ALL_TARGETS			-1
+#define MAX_HEALING_TARGETS	1	//6
+#define CLEAR_ALL_TARGETS	-1
 
 //=========================================================
 // Beam healing gun

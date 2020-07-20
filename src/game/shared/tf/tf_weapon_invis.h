@@ -51,7 +51,7 @@ public:
 
 	virtual void	ItemBusyFrame( void );
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	virtual void	GetControlPanelInfo( int nPanelIndex, const char *&pPanelName );
 #endif
 

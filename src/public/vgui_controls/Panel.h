@@ -181,6 +181,7 @@ public:
 	// all units are in pixels
 	void SetPos(int x,int y);		// sets position of panel, in local space (ie. relative to parent's position)
 	void GetPos(int &x,int &y);		// gets local position of panel
+	
 	int GetXPos();
 	int GetYPos();
 	void SetSize(int wide,int tall);	// sets size of panel

@@ -681,7 +681,7 @@ void CBasePlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, flo
 		return;
 
 #if defined( OF_DLL ) || defined ( OF_CLIENT_DLL )
-	if (m_bIsCSliding)
+	if (m_bNoFootStepsSound)
 		return;
 #endif
 

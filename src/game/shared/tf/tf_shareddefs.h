@@ -9,12 +9,7 @@
 #pragma once
 #endif
 
-#include "shareddefs.h"
 #include "mp_shareddefs.h"
-
-#include "KeyValues.h"
-#include "filesystem.h"
-
 #include "bone_setup.h"
 
 // Using MAP_DEBUG mode?
@@ -401,6 +396,7 @@ enum TFWeaponIDs
 	TF_WEAPON_INVIS,
 	TF_WEAPON_RAILGUN,
 	TF_WEAPON_SUPERSHOTGUN,
+	TF_WEAPON_ETERNALSHOTGUN,
 	TF_WEAPON_PISTOL_MERCENARY,
 	TF_WEAPON_REVOLVER_MERCENARY,
 	TF_WEAPON_GATLINGGUN,
@@ -422,6 +418,7 @@ enum TFWeaponIDs
 	TF_WEAPON_GIB,
 	TF_WEAPON_CLAWS,
 	TF_WEAPON_JUGGERNAUGHT,
+	TF_WEAPON_COMBATKNIFE,
 	
 	TFC_WEAPON_SHOTGUN_SB,
 	TFC_WEAPON_SHOTGUN_DB,
@@ -541,6 +538,10 @@ extern const char *g_szProjectileNames[];
 #define TF_BURNING_FLAME_LIFE		10.0
 #define TF_BURNING_FLAME_LIFE_PYRO	0.25		// pyro only displays burning effect momentarily
 #define TF_BURNING_DMG				3
+
+#define TF_POISON_FREQUENCY			0.75f
+#define TF_POISON_STING_LIFE		10.f
+#define TF_POISON_DMG				8
 
 // disguising
 #define TF_TIME_TO_DISGUISE 2.0
@@ -688,13 +689,16 @@ enum
 	TF_COND_AIR_CURRENT,
 
 	// Open fortress
-	TF_COND_SPAWNPROTECT, // 128
-	TF_COND_BERSERK, // 129
-	TF_COND_SHIELD, // 130
-	TF_COND_CRIT_POWERUP, // 131
-	TF_COND_INVIS_POWERUP, // 132
-	TF_COND_HASTE, // 133
-	TF_COND_JAUGGERNAUGHT, // 134
+	TF_COND_SPAWNPROTECT,	// 128
+	TF_COND_BERSERK,		// 129
+	TF_COND_SHIELD,			// 130
+	TF_COND_CRIT_POWERUP,	// 131
+	TF_COND_INVIS_POWERUP,	// 132
+	TF_COND_HASTE,			// 133
+	TF_COND_JAUGGERNAUGHT,	// 134
+	TF_COND_POISON,
+	TF_COND_TRANQ,
+	TF_COND_HOOKED,
 
 	TF_COND_LAST
 };
@@ -711,8 +715,6 @@ enum
 	
 	TF_WEARABLE_LAST
 };
-
-int GetWearableCount( void );
 
 enum
 {
@@ -1046,6 +1048,7 @@ enum
 
 	// open fortress
 	TF_DMG_CUSTOM_CRIT_POWERUP,
+	TF_DMG_CUSTOM_POISON,
 };
 
 enum

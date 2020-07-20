@@ -271,9 +271,16 @@ studiohdr_t* CBaseModelPanel::GetStudioHdr( void )
 {
 	MDLCACHE_CRITICAL_SECTION();
 	//Fenteale: using m_RootMDL.m_MDL.GetStudioHdr() doesnt work in linux.  use this instead
-	MDLHandle_t hSelectedMDL = g_pMDLCache->FindMDL(m_BMPResData.m_pszModelName);
-	g_pMDLCache->PreloadModel(hSelectedMDL);
-	return g_pMDLCache->GetStudioHdr( hSelectedMDL );
+	if ( m_BMPResData.m_pszModelName )
+	{
+		MDLHandle_t hSelectedMDL = g_pMDLCache->FindMDL( m_BMPResData.m_pszModelName );
+		g_pMDLCache->PreloadModel( hSelectedMDL );
+		return g_pMDLCache->GetStudioHdr( hSelectedMDL );
+	}
+	else
+	{
+		return NULL;
+	}
 	
 }
 
@@ -878,4 +885,32 @@ void CBaseModelPanel::PostPaint3D( IMatRenderContext *pRenderContext )
 
 	pRenderContext->MatrixMode( MATERIAL_MODEL );
 	pRenderContext->PopMatrix();
+}
+
+void CBaseModelPanel::GetHUDModelPos( float &x, float &y, float &z )
+{
+	Vector vPos = GetPlayerPos();
+	x = vPos.x;
+	y = vPos.y;
+	z = vPos.z;
+}
+
+void CBaseModelPanel::SetHUDModelPos( float x, float y, float z )
+{
+	Vector vPos( x, y, z );
+	SetModelAnglesAndPosition( GetPlayerAngles(), vPos );
+}
+
+void CBaseModelPanel::GetHUDModelAng( float &x, float &y, float &z )
+{
+	QAngle vAng = GetPlayerAngles();
+	x = vAng.x;
+	y = vAng.y;
+	z = vAng.z;
+}
+
+void CBaseModelPanel::SetHUDModelAng( float x, float y, float z )
+{
+	QAngle vAng( x, y, z);
+	SetModelAnglesAndPosition( vAng, GetPlayerPos() );
 }

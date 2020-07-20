@@ -18,7 +18,7 @@ public:
 	DECLARE_CLASS( CTFDroppedWeapon, CItem );
 	DECLARE_SERVERCLASS();
 
-	CTFDroppedWeapon() {}
+	CTFDroppedWeapon();
 
 	virtual void Spawn();
 	virtual void Precache();	
@@ -28,24 +28,29 @@ public:
 
 	virtual unsigned int PhysicsSolidMaskForEntity( void ) const;
 
-	const char *pszWeaponName;
-	CTFWeaponInfo *pWeaponInfo;
-	int WeaponID;
-
 	static CTFDroppedWeapon *Create( const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner, const char *pszModelName, int iWeaponID, const char *pszClassname );
 
 	float GetCreationTime( void ) { return m_flCreationTime; }
 	void  SetInitialVelocity( Vector &vecVelocity );
+	
+	int GetTeamNum(){ return m_iTeamNum; }
+	void SetTeamNum( int iTeam ){ m_iTeamNum = iTeam; }
 
 public:
 	CNetworkVar( int, m_iReserveAmmo );
 	CNetworkVar( int, m_iClip );
 	CNetworkVar( bool, m_bFlamethrower );
+	
+	const char *pszWeaponName;
+	CTFWeaponInfo *pWeaponInfo;
+	int WeaponID;
 private:
 	float m_flCreationTime;
 
 	bool m_bAllowOwnerPickup;
 	CNetworkVector( m_vecInitialVelocity );
+	
+	int m_iTeamNum;
 
 private:
 	CTFDroppedWeapon( const CTFDroppedWeapon & );

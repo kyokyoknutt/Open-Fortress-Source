@@ -46,7 +46,7 @@ public:
 	CTFRocketLauncher();
 	~CTFRocketLauncher();
 
-#ifndef CLIENT_DLL
+#ifdef GAME_DLL
 	virtual void	Precache();
 #endif
 	virtual int		GetWeaponID( void ) const			{ return TF_WEAPON_ROCKETLAUNCHER; }
