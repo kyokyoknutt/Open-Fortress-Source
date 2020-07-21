@@ -2403,6 +2403,7 @@ bool CTFPlayer::ManageRandomizerWeapons( TFPlayerClassData_t *pData )
 void CTFPlayer::ManageCustomSpawnWeapons( TFPlayerClassData_t *pData )
 {
 	StripWeapons();
+	bool didTheThing = false;
 	char szToken[128];
 	const char *pStr = nexttoken(szToken, of_spawn_with_weapon.GetString(), ' ', 128);
 	while (szToken[0] != 0)
@@ -2423,6 +2424,8 @@ void CTFPlayer::ManageCustomSpawnWeapons( TFPlayerClassData_t *pData )
 					Weapon_SetLast( Weapon_GetSlot( iWeapon++ ) );
 				}
 			}
+
+			didTheThing = true;
 		}
 
 		// OFBOT: I'm not sure why but bots end up A posing when giving only 1 weapon, but normal players don't, this is a quick fix for it
@@ -2442,6 +2445,28 @@ void CTFPlayer::ManageCustomSpawnWeapons( TFPlayerClassData_t *pData )
 		}
 
 		pStr = nexttoken(szToken, pStr, ' ', 128);
+	}
+	if (!didTheThing) //If none of the weapons we tried to spawn were actually valid, default to regular loadout
+	{
+		// Give weapons.
+		if (of_randomizer.GetBool() && ManageRandomizerWeapons(pData))
+		{
+			// Its nothing ¯\_(ツ)_/¯
+		}
+		else if (TFGameRules()->IsGGGamemode())
+			ManageGunGameWeapons(pData);
+		else if (TFGameRules()->IsMutator(INSTAGIB) || TFGameRules()->IsMutator(INSTAGIB_NO_MELEE))
+			ManageInstagibWeapons(pData);
+		else if (TFGameRules()->IsMutator(CLAN_ARENA) || TFGameRules()->IsMutator(UNHOLY_TRINITY))
+			ManageClanArenaWeapons(pData);
+		else if (TFGameRules()->IsMutator(ROCKET_ARENA))
+			ManageRocketArenaWeapons(pData);
+		else if (TFGameRules()->IsMutator(ARSENAL))
+			ManageArsenalWeapons(pData);
+		else if (of_threewave.GetBool())
+			Manage3WaveWeapons(pData);
+		else
+			ManageRegularWeapons(pData);
 	}
 }
 
